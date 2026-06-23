@@ -62,9 +62,9 @@ function GrowthCurve({ result, config }: { result: BetResult; config: Config }) 
     const stakes = Array.from({ length: 101 }, (_, i) => i / 100);
     const growths = stakes.map(s => {
       const ret = result.returns.length > 0
-        ? result.returns.map(r => ({ p: r.p, net: r.net * s }))
-        : [{ p: result.p || 0.5, net: s * (result.yourEff - 1) }, { p: 1 - (result.p || 0.5), net: -s }];
-      return growthRet(ret);
+        ? result.returns
+        : [{ p: result.p || 0.5, net: result.yourEff - 1 }, { p: 1 - (result.p || 0.5), net: -1 }];
+      return growthRet(s, ret);
     });
 
     const maxG = Math.max(...growths, 0.001);
