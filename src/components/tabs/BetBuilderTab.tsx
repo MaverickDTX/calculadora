@@ -160,6 +160,14 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
                 <div><label className="text-xs text-text-muted mb-1.5 block">Odd Over corners</label><input type="text" value={values['poi-c-over'] || ''} onChange={e => onChange('poi-c-over', e.target.value)} className="input-dark" placeholder="1,90" /></div>
                 <div><label className="text-xs text-text-muted mb-1.5 block">Odd Under corners</label><input type="text" value={values['poi-c-under'] || ''} onChange={e => onChange('poi-c-under', e.target.value)} className="input-dark" placeholder="1,90" /></div>
               </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div><label className="text-xs text-text-muted mb-1.5 block">Corner 1X2 — Casa (1) <span className="text-text-muted/70">opcional</span></label><input type="text" value={values['poi-c-1'] || ''} onChange={e => onChange('poi-c-1', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                <div><label className="text-xs text-text-muted mb-1.5 block">Empate corners (X)</label><input type="text" value={values['poi-c-x'] || ''} onChange={e => onChange('poi-c-x', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                <div><label className="text-xs text-text-muted mb-1.5 block">Visitante (2)</label><input type="text" value={values['poi-c-2'] || ''} onChange={e => onChange('poi-c-2', e.target.value)} className="input-dark" placeholder="opt" /></div>
+              </div>
+              <p className="text-xs text-text-muted leading-relaxed">
+                Sem o 1X2 de escanteios, o total é dividido entre os times pela proporção de domínio do jogo (split de gols). Com o 1X2, o split de escanteios é calibrado diretamente. Escanteios costumam ser levemente <b>sobredispersos</b> vs. Poisson — a cauda alta pode ser subestimada (ressalva análoga à de SOT/props).
+              </p>
             </div>
           )}
         </div>
