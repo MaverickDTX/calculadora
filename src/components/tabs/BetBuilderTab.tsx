@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, ChevronDown, RotateCcw, Lightbulb } from 'lucide-react';
 
-type LegKind = 'over' | 'under' | 'homewin' | 'draw' | 'awaywin' | 'homeNoLose' | 'awayNoLose' | 'btts' | 'homeScores' | 'awayScores' | 'player' | 'playerprop' | 'cornerTotal' | 'cornerTeam' | 'cornerSide';
+type LegKind = 'over' | 'under' | 'homewin' | 'draw' | 'awaywin' | 'homeNoLose' | 'awayNoLose' | 'btts' | 'homeScores' | 'awayScores' | 'homeOver' | 'homeUnder' | 'awayOver' | 'awayUnder' | 'player' | 'playerprop' | 'cornerTotal' | 'cornerTeam' | 'cornerSide';
 
 interface Leg {
   id: number;
@@ -41,6 +41,10 @@ const LEG_OPTIONS: { value: LegKind; label: string }[] = [
   { value: 'btts', label: 'Ambas marcam' },
   { value: 'homeScores', label: 'Casa marca' },
   { value: 'awayScores', label: 'Fora marca' },
+  { value: 'homeOver', label: 'Casa Over X gols' },
+  { value: 'homeUnder', label: 'Casa Under X gols' },
+  { value: 'awayOver', label: 'Fora Over X gols' },
+  { value: 'awayUnder', label: 'Fora Under X gols' },
   { value: 'player', label: 'Jogador marca' },
   { value: 'playerprop', label: 'Prop jogador (chutes/SOT/faltas)' },
   { value: 'cornerTotal', label: 'Escanteios totais (O/U)' },
@@ -166,7 +170,7 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
         <div className="space-y-3">
           {legs.map(leg => {
             const isP = leg.kind === 'player';
-            const isOU = leg.kind === 'over' || leg.kind === 'under';
+            const isOU = ['over', 'under', 'homeOver', 'homeUnder', 'awayOver', 'awayUnder'].includes(leg.kind);
             const isPP = leg.kind === 'playerprop';
             const isCT = leg.kind === 'cornerTotal';
             const isCTeam = leg.kind === 'cornerTeam';
@@ -180,6 +184,7 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
                     const k = e.target.value as LegKind;
                     const defaults: Partial<Leg> = { kind: k };
                     if (k === 'over' || k === 'under') defaults.line = '2,5';
+                    if (['homeOver', 'homeUnder', 'awayOver', 'awayUnder'].includes(k)) defaults.line = '1,5';
                     if (k === 'cornerTotal') defaults.line = '9,5';
                     if (k === 'cornerTeam') defaults.line = '5,5';
                     updateLeg(leg.id, defaults);

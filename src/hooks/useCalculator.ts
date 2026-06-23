@@ -487,7 +487,8 @@ function calcPoi(get: (id: string) => string, cfg: Config): BetResult | { err: s
         hasCorner = true;
       } else {
         const lgLine = numDec(parts[1]);
-        legs.push({ kind, line: lgLine, label: `${kind}${kind === 'over' || kind === 'under' ? ' ' + lgLine?.toFixed(2).replace('.', ',') : ''}` });
+        const hasLine = ['over', 'under', 'homeOver', 'homeUnder', 'awayOver', 'awayUnder'].includes(kind);
+        legs.push({ kind, line: lgLine, label: `${kind}${hasLine ? ' ' + lgLine?.toFixed(2).replace('.', ',') : ''}` });
       }
     }
   }
@@ -507,6 +508,10 @@ function calcPoi(get: (id: string) => string, cfg: Config): BetResult | { err: s
       case 'btts': return (i > 0 && j > 0) ? 1 : 0;
       case 'homeScores': return (i > 0) ? 1 : 0;
       case 'awayScores': return (j > 0) ? 1 : 0;
+      case 'homeOver': return (i > (leg.line || 0)) ? 1 : 0;
+      case 'homeUnder': return (i < (leg.line || 0)) ? 1 : 0;
+      case 'awayOver': return (j > (leg.line || 0)) ? 1 : 0;
+      case 'awayUnder': return (j < (leg.line || 0)) ? 1 : 0;
       case 'player': {
         const n = leg.side === 'home' ? i : j;
         return 1 - Math.pow(1 - (leg.theta || 0), n);
