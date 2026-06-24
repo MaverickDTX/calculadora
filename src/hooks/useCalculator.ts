@@ -7,7 +7,7 @@ import {
   scoreMatrix, fitLambdas, solveTheta,
   splitAsianLine, settleTotal, settleHandicap, diffDistribution,
   probTotalOver, fitLambdaTotal, cornerLambdaEff, poisTotalProb, cornerSideProb,
-  fitCornerLambdas,
+  fitCornerLambdas, fitMuFromLadder,
 } from '../lib/math';
 
 function calcSensitivity(B: {
@@ -462,11 +462,17 @@ function calcPoi(get: (id: string) => string, cfg: Config): BetResult | { err: s
         legs.push({ kind: 'player', side, theta, label: `${side === 'home' ? 'Mandante' : 'Visitante'} jogador marca` });
         hasPlayer = true;
       } else if (kind === 'playerprop') {
-        const ppSide = parts[1] as 'home' | 'away';
-        const ppMu = numDec(parts[2]);
-        const ppBeta = numDec(parts[3]);
+        const ppSide = parts[13] as 'home' | 'away';
+        const ppVals = [parts[8], parts[9], parts[10], parts[11], parts[12]].map(v => numDec(v));
+        const ppMu = fitMuFromLadder(ppVals);
+        if (!ppMu) { legErr = 'Preencha ao menos Over 0.5 para o prop do jogador.'; break; }
+        let ppBeta = numDec(parts[14]);
+        if (!Number.isFinite(ppBeta) || ppBeta < 0) ppBeta = 0.20;
         const ppLambda = ppSide === 'home' ? fit.lh : fit.la;
-        legs.push({ kind: 'playerprop', side: ppSide, muProp: ppMu, beta: ppBeta, lambdaTeam: ppLambda, label: `${ppSide === 'home' ? 'Mandante' : 'Visitante'} prop jogador (μ ${ppMu?.toFixed(2).replace('.', ',')})` });
+        let ppLine = numDec(parts[16]);
+        if (!Number.isFinite(ppLine) || ppLine < 0) ppLine = 0.5;
+        const ppK = Math.round(ppLine + 0.5);
+        legs.push({ kind: 'playerprop', side: ppSide, muProp: ppMu, beta: ppBeta, lambdaTeam: ppLambda, line: ppLine, label: `${ppSide === 'home' ? 'Mandante' : 'Visitante'} prop jogador O${ppLine.toFixed(1).replace('.', ',')} (μ ${ppMu.toFixed(2).replace('.', ',')}, P≥${ppK})` });
         hasPlayer = true;
       } else if (kind === 'cornerTotal' || kind === 'cornerTeam' || kind === 'cornerSide') {
         const cBeta = numDec(parts[1]) || 0.15;
@@ -519,7 +525,7 @@ function calcPoi(get: (id: string) => string, cfg: Config): BetResult | { err: s
       case 'playerprop': {
         const tg = leg.side === 'home' ? i : j;
         const mEff = (leg.muProp || 0) * (1 + (leg.beta || 0) * (tg - (leg.lambdaTeam || 0)) / (leg.lambdaTeam || 1));
-        return 1 - Math.exp(-Math.max(0.05, mEff));
+        return poisTotalProb(Math.max(0.05, mEff), 'over', leg.line ?? 0.5);
       }
       case 'cornerTotal': {
         const lhE = cornerLambdaEff(leg.lcH || 0, i, leg.lgH || 0, leg.beta || 0);

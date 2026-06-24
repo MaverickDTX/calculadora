@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { RotateCcw, Lightbulb } from 'lucide-react';
 import { MARGIN_PRESETS } from '../../lib/presets';
 

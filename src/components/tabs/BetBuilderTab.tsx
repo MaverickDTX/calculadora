@@ -21,6 +21,7 @@ interface Leg {
   ppSide?: string;
   ppBeta?: string;
   cBeta?: string;
+  ppLine?: string;
 }
 
 interface Props {
@@ -67,7 +68,7 @@ function parseLegs(saved: string): Leg[] {
       anytime: p[6],
       anytimeNo: p[7],
       ppO0: p[8], ppO1: p[9], ppO2: p[10], ppO3: p[11], ppO4: p[12],
-      ppSide: p[13], ppBeta: p[14], cBeta: p[15],
+      ppSide: p[13], ppBeta: p[14], cBeta: p[15], ppLine: p[16],
     };
   });
 }
@@ -76,7 +77,7 @@ function serializeLegs(legs: Leg[]): string {
   return legs.map(l => [
     l.kind, l.line, l.side, l.cSide, l.cDir, l.c1x2,
     l.anytime, l.anytimeNo, l.ppO0, l.ppO1, l.ppO2, l.ppO3, l.ppO4,
-    l.ppSide, l.ppBeta, l.cBeta,
+    l.ppSide, l.ppBeta, l.cBeta, l.ppLine,
   ].join('|')).join(';');
 }
 
@@ -248,28 +249,39 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
                 {isPP && (
                   <div className="mt-2 pl-3 border-l-2 border-border space-y-2">
                     <div className="grid grid-cols-5 gap-2">
-                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 0.5 *</label><input type="text" value={leg.ppO0 || ''} onChange={e => updateLeg(leg.id, { ppO0: e.target.value })} placeholder="1,31" className="input-dark w-full h-8 text-xs" /></div>
-                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 1.5</label><input type="text" value={leg.ppO1 || ''} onChange={e => updateLeg(leg.id, { ppO1: e.target.value })} placeholder="opt" className="input-dark w-full h-8 text-xs" /></div>
-                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 2.5</label><input type="text" value={leg.ppO2 || ''} onChange={e => updateLeg(leg.id, { ppO2: e.target.value })} placeholder="opt" className="input-dark w-full h-8 text-xs" /></div>
-                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 3.5</label><input type="text" value={leg.ppO3 || ''} onChange={e => updateLeg(leg.id, { ppO3: e.target.value })} placeholder="opt" className="input-dark w-full h-8 text-xs" /></div>
-                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 4.5</label><input type="text" value={leg.ppO4 || ''} onChange={e => updateLeg(leg.id, { ppO4: e.target.value })} placeholder="opt" className="input-dark w-full h-8 text-xs" /></div>
+                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 0.5 *</label><input type="text" value={leg.ppO0 || ''} onChange={e => updateLeg(leg.id, { ppO0: e.target.value })} placeholder="opt" className="input-dark input-compact w-full text-xs" /></div>
+                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 1.5</label><input type="text" value={leg.ppO1 || ''} onChange={e => updateLeg(leg.id, { ppO1: e.target.value })} placeholder="opt" className="input-dark input-compact w-full text-xs" /></div>
+                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 2.5</label><input type="text" value={leg.ppO2 || ''} onChange={e => updateLeg(leg.id, { ppO2: e.target.value })} placeholder="opt" className="input-dark input-compact w-full text-xs" /></div>
+                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 3.5</label><input type="text" value={leg.ppO3 || ''} onChange={e => updateLeg(leg.id, { ppO3: e.target.value })} placeholder="opt" className="input-dark input-compact w-full text-xs" /></div>
+                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 4.5</label><input type="text" value={leg.ppO4 || ''} onChange={e => updateLeg(leg.id, { ppO4: e.target.value })} placeholder="opt" className="input-dark input-compact w-full text-xs" /></div>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <select value={leg.ppSide || 'home'} onChange={e => updateLeg(leg.id, { ppSide: e.target.value })} className="input-dark h-8 text-xs">
+                      <select value={leg.ppSide || 'home'} onChange={e => updateLeg(leg.id, { ppSide: e.target.value })} className="input-dark input-compact w-auto text-xs">
                         <option value="home">Mandante</option>
                         <option value="away">Visitante</option>
                       </select>
                       <label className="flex items-center gap-1.5 text-xs text-text-muted">
-                        β acoplamento <input type="text" value={leg.ppBeta || '0,20'} onChange={e => updateLeg(leg.id, { ppBeta: e.target.value })} className="input-dark w-16 h-8 text-xs" />
+                        Linha
+                        <select value={leg.ppLine || '0,5'} onChange={e => updateLeg(leg.id, { ppLine: e.target.value })} className="input-dark input-compact w-auto text-xs">
+                          <option value="0,5">Over 0,5</option>
+                          <option value="1,5">Over 1,5</option>
+                          <option value="2,5">Over 2,5</option>
+                          <option value="3,5">Over 3,5</option>
+                          <option value="4,5">Over 4,5</option>
+                        </select>
+                      </label>
+                      <label className="flex items-center gap-1.5 text-xs text-text-muted">
+                        β acoplamento <input type="text" value={leg.ppBeta || '0,20'} onChange={e => updateLeg(leg.id, { ppBeta: e.target.value })} className="input-dark input-compact w-16 text-xs" />
                       </label>
                     </div>
+                    <p className="text-[10px] text-text-muted leading-snug">A escada de odds calibra a intensidade (μ). A <b>linha</b> define qual evento entra na probabilidade conjunta: Over k,5 ⇒ P(SOT ≥ k+1). Cauda alta (3,5/4,5) tende a ser subestimada pela Poisson.</p>
                   </div>
                 )}
 
                 {isCorner && (
                   <div className="mt-2 pl-3 border-l-2 border-border">
                     <label className="flex items-center gap-1.5 text-xs text-text-muted">
-                      β corner↔resultado <input type="text" value={leg.cBeta || '0,15'} onChange={e => updateLeg(leg.id, { cBeta: e.target.value })} className="input-dark w-16 h-8 text-xs" />
+                      β corner↔resultado <input type="text" value={leg.cBeta || '0,15'} onChange={e => updateLeg(leg.id, { cBeta: e.target.value })} className="input-dark input-compact w-16 text-xs" />
                     </label>
                   </div>
                 )}

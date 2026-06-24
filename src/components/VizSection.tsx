@@ -18,13 +18,13 @@ export function VizSection({ result, config }: Props) {
         <div className="w-1.5 h-1.5 rounded-full bg-accent" />
         <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Análise gráfica</span>
       </div>
-      <GrowthCurve result={result as BetResult} config={config} />
+      <GrowthCurve result={result as BetResult} />
       <MonteCarlo result={result as BetResult} config={config} />
     </div>
   );
 }
 
-function GrowthCurve({ result, config }: { result: BetResult; config: Config }) {
+function GrowthCurve({ result }: { result: BetResult }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
