@@ -467,7 +467,7 @@ function calcPoi(get: (id: string) => string, cfg: Config): BetResult | { err: s
         const ppMu = fitMuFromLadder(ppVals);
         if (!ppMu) { legErr = 'Preencha ao menos Over 0.5 para o prop do jogador.'; break; }
         let ppBeta = numDec(parts[14]);
-        if (!Number.isFinite(ppBeta) || ppBeta < 0) ppBeta = 0.20;
+        if (!Number.isFinite(ppBeta) || ppBeta < 0) ppBeta = 0.54;
         const ppLambda = ppSide === 'home' ? fit.lh : fit.la;
         let ppLine = numDec(parts[16]);
         if (!Number.isFinite(ppLine) || ppLine < 0) ppLine = 0.5;
@@ -588,7 +588,7 @@ function calcPoi(get: (id: string) => string, cfg: Config): BetResult | { err: s
   let evPointsPoi: EvPoint[] | null = null;
 
   if (hasPP || hasCornerBeta) {
-    const betas = [0, 0.1, 0.2, 0.3, 0.4];
+    const betas = [0, 0.2, 0.4, 0.6];
     const yourEff = boostOdd(your, cfg.boostType, cfg.boostVal);
     const couples = (l: typeof legs[0]) => l.kind === 'playerprop' || l.kind === 'cornerTotal' || l.kind === 'cornerTeam' || l.kind === 'cornerSide';
     const evsBeta = betas.map(b => {
@@ -601,9 +601,9 @@ function calcPoi(get: (id: string) => string, cfg: Config): BetResult | { err: s
 
   const conf = hasPlayer || hasCorner || warnings.length ? 'mid' : 'high';
   let txt: string;
-  if (hasPP && hasCorner) txt = 'Inclui prop de jogador e escanteios com acoplamento β — faixa de EV sobre β∈[0;0,4] exibida. ';
-  else if (hasCorner) txt = 'Inclui escanteios acoplados ao domínio do jogo (β) — correlação corner↔resultado não calibrada empiricamente; faixa de EV sobre β∈[0;0,4] exibida. ';
-  else if (hasPP) txt = 'Inclui prop de jogador com acoplamento β — faixa de EV sobre β∈[0;0,4] exibida. ';
+  if (hasPP && hasCorner) txt = 'Inclui prop de jogador e escanteios com acoplamento β — faixa de EV sobre β∈[0;0,6] exibida. ';
+  else if (hasCorner) txt = 'Inclui escanteios acoplados ao domínio do jogo (β) — correlação corner↔resultado não calibrada empiricamente; faixa de EV sobre β∈[0;0,6] exibida. ';
+  else if (hasPP) txt = 'Inclui prop de jogador com acoplamento β — faixa de EV sobre β∈[0;0,6] exibida. ';
   else if (hasPlayer) txt = 'Confiança média — inclui perna de jogador por thinning. ';
   else txt = 'Alta confiança relativa — só pernas de placar no modelo. ';
   if (hasCorner) warnings.push('Escanteios via Poisson: tendem a ser levemente sobredispersos, então a cauda alta (Over linhas altas) pode ser subestimada. Trate como aproximação estruturada.');

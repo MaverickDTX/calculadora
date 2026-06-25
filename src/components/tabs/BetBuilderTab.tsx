@@ -271,7 +271,7 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
                         </select>
                       </label>
                       <label className="flex items-center gap-1.5 text-xs text-text-muted">
-                        β acoplamento <input type="text" value={leg.ppBeta || '0,20'} onChange={e => updateLeg(leg.id, { ppBeta: e.target.value })} className="input-dark input-compact w-16 text-xs" />
+                        β acoplamento <input type="text" value={leg.ppBeta || '0,54'} onChange={e => updateLeg(leg.id, { ppBeta: e.target.value })} className="input-dark input-compact w-16 text-xs" />
                       </label>
                     </div>
                     <p className="text-[10px] text-text-muted leading-snug">A escada de odds calibra a intensidade (μ). A <b>linha</b> define qual evento entra na probabilidade conjunta: Over k,5 ⇒ P(SOT ≥ k+1). Cauda alta (3,5/4,5) tende a ser subestimada pela Poisson.</p>

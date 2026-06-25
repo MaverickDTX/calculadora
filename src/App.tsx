@@ -105,7 +105,7 @@ const EXAMPLE_MAP: Record<string, Partial<Record<string, string>>> = {
   },
   'poi-playerprop': {
     'poi-h': '1,83', 'poi-d': '3,70', 'poi-a': '4,20', 'poi-ouline': '2,5', 'poi-over': '1,80', 'poi-under': '2,00', 'poi-your': '3,00', 'poi-rho': '-0,13',
-    'poi-legs': 'homewin|||||||||||||||;playerprop||||||||1,31|2,41|6,60|14,00|40,00|home|0,20|',
+    'poi-legs': 'homewin|||||||||||||||;playerprop||||||||1,31|2,41|6,60|14,00|40,00|home|0,54|',
   },
   'asia-total': {
     'asia-mode': 'total', 'asia-cal-line': '2,5', 'asia-over-ref': '1,95', 'asia-under-ref': '1,95', 'asia-side': 'over', 'asia-line': '2,25', 'asia-your': '1,95',
