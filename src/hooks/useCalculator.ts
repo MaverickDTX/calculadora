@@ -87,7 +87,7 @@ function makeBetBase(args: {
   const yourEff = boostOdd(args.your, cfg.boostType, cfg.boostVal);
 
   let base: { returns: ReturnState[]; ev: number; kfull: number; b: number };
-  let pVal = args.p;
+  const pVal = args.p;
   let fairVal = args.fair;
 
   if (args.returns) {
@@ -471,8 +471,7 @@ function calcPoi(get: (id: string) => string, cfg: Config): BetResult | { err: s
         const ppLambda = ppSide === 'home' ? fit.lh : fit.la;
         let ppLine = numDec(parts[16]);
         if (!Number.isFinite(ppLine) || ppLine < 0) ppLine = 0.5;
-        const ppK = Math.round(ppLine + 0.5);
-        legs.push({ kind: 'playerprop', side: ppSide, muProp: ppMu, beta: ppBeta, lambdaTeam: ppLambda, line: ppLine, label: `${ppSide === 'home' ? 'Mandante' : 'Visitante'} prop jogador O${ppLine.toFixed(1).replace('.', ',')} (μ ${ppMu.toFixed(2).replace('.', ',')}, P≥${ppK})` });
+        legs.push({ kind: 'playerprop', side: ppSide, muProp: ppMu, beta: ppBeta, lambdaTeam: ppLambda, line: ppLine, label: `${ppSide === 'home' ? 'Mandante' : 'Visitante'} prop jogador O${ppLine.toFixed(1).replace('.', ',')}` });
         hasPlayer = true;
       } else if (kind === 'cornerTotal' || kind === 'cornerTeam' || kind === 'cornerSide') {
         const cBeta = numDec(parts[1]) || 0.15;
@@ -557,6 +556,19 @@ function calcPoi(get: (id: string) => string, cfg: Config): BetResult | { err: s
         t += f;
       }
     return t;
+  }
+
+  // Marginal de cada perna de prop: expõe o μ efetivo como probabilidade real
+  // (integra a escada μ e o acoplamento β sobre a distribuição de placar) e
+  // deixa visível na hora um μ calibrado errado.
+  for (const lg of legs) {
+    if (lg.kind !== 'playerprop') continue;
+    let m = 0;
+    for (let i = 0; i < P.length; i++)
+      for (let j = 0; j < P.length; j++)
+        m += P[i][j] * legAt(lg, i, j);
+    const k = Math.round((lg.line ?? 0.5) + 0.5);
+    lg.label += ` (μ ${(lg.muProp ?? 0).toFixed(2).replace('.', ',')}, P≥${k} ${(m * 100).toFixed(1).replace('.', ',')}%)`;
   }
 
   const p = jointProb(P, legs);

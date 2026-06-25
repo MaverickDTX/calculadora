@@ -137,7 +137,8 @@ export function devigShin(odds: number[]): number[] {
   if (B <= 1) return b.map(x => x / B);
   const pOf = (z: number) => b.map(bi => (Math.sqrt(z * z + 4 * (1 - z) * bi * bi / B) - z) / (2 * (1 - z)));
   const sumP = (z: number) => pOf(z).reduce((a, x) => a + x, 0);
-  let lo = 0, hi = 0.9999, flo = sumP(lo) - 1, fhi = sumP(hi) - 1;
+  let lo = 0, hi = 0.9999, flo = sumP(lo) - 1;
+  const fhi = sumP(hi) - 1;
   if (flo * fhi > 0) return b.map(x => x / B);
   for (let i = 0; i < 100; i++) {
     const m = (lo + hi) / 2, fm = sumP(m) - 1;
@@ -206,7 +207,7 @@ export function devigN(refs: number[], method: string): { p: number; probs: numb
     try {
       const probs = devigProbit(refs);
       return { p: probs[0], probs, M, fb: false, usedMethod, autoWhy, autoRec };
-    } catch (e) {
+    } catch {
       return { p: q[0] / S, probs: q.map(x => x / S), M, fb: true, usedMethod, autoWhy, autoRec };
     }
   }
@@ -214,7 +215,7 @@ export function devigN(refs: number[], method: string): { p: number; probs: numb
     try {
       const probs = devigLog(refs);
       return { p: probs[0], probs, M, fb: false, usedMethod, autoWhy, autoRec };
-    } catch (e) {
+    } catch {
       return { p: q[0] / S, probs: q.map(x => x / S), M, fb: true, usedMethod, autoWhy, autoRec };
     }
   }
@@ -223,7 +224,7 @@ export function devigN(refs: number[], method: string): { p: number; probs: numb
       const probs = devigShin(refs);
       if (probs.some(x => !(x > 0))) throw 0;
       return { p: probs[0], probs, M, fb: false, usedMethod, autoWhy, autoRec };
-    } catch (e) {
+    } catch {
       return { p: q[0] / S, probs: q.map(x => x / S), M, fb: true, usedMethod, autoWhy, autoRec };
     }
   }
