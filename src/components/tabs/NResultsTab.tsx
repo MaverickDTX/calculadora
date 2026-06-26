@@ -19,6 +19,7 @@ export function NResultsTab({ values, onChange, onLoadExample, onReset }: Props)
   }, [values['nres-others']]);
 
   const updateOthers = (newOthers: string[]) => {
+    newOthers = newOthers.map(s => s.replace(/,/g, '.')); // força ponto; evita colisão com o separador ','
     setOthers(newOthers);
     onChange('nres-others', newOthers.filter(s => s.trim()).join(','));
   };

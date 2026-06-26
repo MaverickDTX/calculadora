@@ -52,6 +52,7 @@ export function ProxyTab({ values, onChange, onLoadExample, onReset }: Props) {
     onChange('proxy-cons-excl', next.map(r => String(r.excl)).join(','));
   };
   const updateCons = (id: number, field: 'odd' | 'excl', value: string | boolean) => {
+    if (field === 'odd' && typeof value === 'string') value = value.replace(/,/g, '.'); // força ponto; evita colisão com ','
     const next = consRows.map(r => r.id === id ? { ...r, [field]: value } : r);
     setConsRows(next);
     onChange('proxy-cons-odds', next.map(r => r.odd).join(','));

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, AlertTriangle, RotateCcw, Lightbulb } from 'lucide-react';
-import { numDec } from '../../lib/math';
+import { numDec, splitComboOdds } from '../../lib/math';
 
 interface ComboLeg {
   id: number;
@@ -20,10 +20,12 @@ function parseLegs(saved: string): ComboLeg[] {
   if (!saved) return [];
   return saved.split(';').map(legStr => {
     const parts = legStr.split('|');
-    return { id: Math.random(), nWays: parseInt(parts[0]) || 2, sideIdx: parseInt(parts[1]) || 0, odds: parts[2] ? parts[2].split(',') : ['', ''] };
+    const nWays = parseInt(parts[0]) || 2;
+    return { id: Math.random(), nWays, sideIdx: parseInt(parts[1]) || 0, odds: parts[2] ? splitComboOdds(parts[2], nWays) : ['', ''] };
   });
 }
 
+// Odds em ponto (entrada normaliza vírgula→ponto), separadas por ',' — ver splitComboOdds.
 function serializeLegs(legs: ComboLeg[]): string {
   return legs.map(l => `${l.nWays}|${l.sideIdx}|${l.odds.join(',')}`).join(';');
 }
@@ -55,6 +57,7 @@ export function ComboTab({ values, onChange, onLoadExample, onReset }: Props) {
     onChange('combo-legs', serializeLegs(next));
   };
   const updateOdd = (legId: number, idx: number, value: string) => {
+    value = value.replace(/,/g, '.'); // força ponto (padrão das casas); evita colisão com o separador ','
     const next = legs.map(l => l.id !== legId ? l : { ...l, odds: l.odds.map((o, i) => i === idx ? value : o) });
     setLegs(next);
     onChange('combo-legs', serializeLegs(next));

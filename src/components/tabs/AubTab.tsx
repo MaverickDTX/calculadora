@@ -37,6 +37,7 @@ export function AubTab({ values, onChange, onLoadExample, onReset }: Props) {
     onChange('aub-odds', next.map(r => r.value).filter(Boolean).join(','));
   };
   const updateRow = (id: number, value: string) => {
+    value = value.replace(/,/g, '.'); // força ponto (padrão das casas); evita colisão com o separador ','
     const next = rows.map(r => r.id === id ? { ...r, value } : r);
     setRows(next);
     onChange('aub-odds', next.map(r => r.value).filter(Boolean).join(','));

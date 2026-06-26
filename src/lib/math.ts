@@ -7,6 +7,21 @@ export function numDec(v: string | number | undefined): number {
   return parseFloat(s);
 }
 
+// Odds de uma perna da Combinada são separadas por ',' e o decimal é PONTO ("1.53",
+// padrão das casas) — a entrada normaliza vírgula→ponto, então não há colisão. Este
+// helper padroniza em ponto e recupera o formato LEGADO (vírgula decimal + vírgula
+// delimitadora, ex.: "1,53,2,37") regrupando os tokens por nWays.
+export function splitComboOdds(seg: string, nWays: number): string[] {
+  if (!seg) return [];
+  const toks = seg.split(',');
+  if (nWays > 1 && toks.length === nWays * 2) {
+    const out: string[] = [];
+    for (let i = 0; i < toks.length; i += 2) out.push(`${toks[i]}.${toks[i + 1]}`);
+    return out;
+  }
+  return toks.map(o => o.replace(/,/g, '.'));
+}
+
 export function numMoney(v: string | number | undefined): number {
   const s = String(v ?? '').trim();
   if (!s) return NaN;

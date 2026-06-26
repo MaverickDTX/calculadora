@@ -7,7 +7,7 @@ import {
   scoreMatrix, fitLambdas, solveTheta,
   splitAsianLine, settleTotal, settleHandicap, diffDistribution,
   probTotalOver, fitLambdaTotal, cornerLambdaEff, poisTotalProb, cornerSideProb,
-  fitCornerLambdas, fitMuFromLadder,
+  fitCornerLambdas, fitMuFromLadder, splitComboOdds,
 } from '../lib/math';
 
 function calcSensitivity(B: {
@@ -333,10 +333,11 @@ function calcCombo(get: (id: string) => string, cfg: Config): BetResult | { err:
 
   const legs = legsRaw.split(';').map(legStr => {
     const parts = legStr.split('|');
+    const nWays = parseInt(parts[0]);
     return {
-      nWays: parseInt(parts[0]),
+      nWays,
       sideIdx: parseInt(parts[1]),
-      odds: parts[2].split(',').map(s => numDec(s)),
+      odds: splitComboOdds(parts[2] || '', nWays).map(s => numDec(s)),
     };
   });
 
