@@ -3,6 +3,7 @@ import {
   Hash, ToggleLeft, Radio, GitBranch, Layers, Puzzle, TrendingUp,
   Settings, History, Calculator
 } from 'lucide-react';
+import { APP_VERSION } from '../version';
 
 interface Props {
   activeTab: TabId;
@@ -39,7 +40,7 @@ export function Sidebar({ activeTab, onChange, onConfig, onHistory }: Props) {
           </div>
           <div>
             <div className="text-sm font-bold text-text-primary tracking-tight">Kelly Stake Pro</div>
-            <div className="text-[10px] text-text-muted font-mono">v2.0</div>
+            <div className="text-[10px] text-text-muted font-mono">v{APP_VERSION}</div>
           </div>
         </div>
       </div>
