@@ -20,7 +20,7 @@ const DEFAULT_INPUTS: Record<string, string> = {
   'nres-name': '1X2 / Moneyline',
   'nres-eval': '2,50',
   'nres-your': '2,65',
-  'nres-others': '3,30,2,80',
+  'nres-others': '3.30,2.80',
   'prop-type': 'simnao',
   'prop-family': 'prop_gols',
   'prop-ref-yes': '2,10',
@@ -34,11 +34,11 @@ const DEFAULT_INPUTS: Record<string, string> = {
   'proxy-ref': '1,70',
   'proxy-margin': '5,0',
   'proxy-your': '2,20',
-  'proxy-cons-odds': '1,95,2,00,2,10',
+  'proxy-cons-odds': '1.95,2.00,2.10',
   'proxy-cons-excl': 'false,false,true',
   'proxy-cons-margin': '5,0',
   'proxy-cons-your': '2,20',
-  'aub-odds': '2,62,2,50',
+  'aub-odds': '2.62,2.50',
   'aub-discount': '8',
   'aub-your': '1,85',
   'combo-your': '7,03',
@@ -81,10 +81,10 @@ const DEFAULT_INPUTS: Record<string, string> = {
 
 const EXAMPLE_MAP: Record<string, Partial<Record<string, string>>> = {
   'nres-1x2': {
-    'nres-type': '1X2 / Moneyline', 'nres-name': '1X2 / Moneyline', 'nres-eval': '2,50', 'nres-your': '2,65', 'nres-others': '3,30,2,80',
+    'nres-type': '1X2 / Moneyline', 'nres-name': '1X2 / Moneyline', 'nres-eval': '2,50', 'nres-your': '2,65', 'nres-others': '3.30,2.80',
   },
   'nres-ou': {
-    'nres-type': 'Over/Under', 'nres-name': 'Over/Under', 'nres-eval': '1,95', 'nres-your': '2,05', 'nres-others': '1,95',
+    'nres-type': 'Over/Under', 'nres-name': 'Over/Under', 'nres-eval': '1,95', 'nres-your': '2,05', 'nres-others': '1.95',
   },
   'prop-anytime': {
     'prop-type': 'simnao', 'prop-family': 'prop_gols', 'prop-ref-yes': '2,10', 'prop-ref-no': '1,80', 'prop-your': '2,30', 'prop-margin-on': 'true', 'prop-side-no': 'false',
@@ -93,7 +93,7 @@ const EXAMPLE_MAP: Record<string, Partial<Record<string, string>>> = {
     'proxy-mode': 'single', 'proxy-family': 'ou_gols_ft', 'proxy-ref': '1,70', 'proxy-margin': '5,0', 'proxy-your': '2,20',
   },
   'aub-basic': {
-    'aub-odds': '2,62,2,50', 'aub-discount': '8', 'aub-your': '1,85',
+    'aub-odds': '2.62,2.50', 'aub-discount': '8', 'aub-your': '1,85',
   },
   'combo-boost': {
     'combo-your': '7,03', 'combo-corr': 'false',
@@ -122,6 +122,10 @@ const TAB_LABELS: Record<TabId, string> = {
   asia: 'Asiáticos',
 };
 
+// Campos serializados (listas com ',' como delimitador estrutural) — NÃO forçar ponto neles;
+// as odds individuais já são normalizadas a ponto nos handlers das abas.
+const RAW_LIST_FIELDS = new Set(['poi-legs', 'combo-legs', 'aub-odds', 'nres-others', 'proxy-cons-odds', 'proxy-cons-excl']);
+
 function App() {
   const { config, setConfig } = useConfig();
   const [activeTab, setActiveTab] = useState<TabId>('nres');
@@ -131,7 +135,9 @@ function App() {
   const [showResults, setShowResults] = useState(true);
 
   const handleInputChange = useCallback((id: string, value: string) => {
-    setInputs(prev => ({ ...prev, [id]: value }));
+    // Padroniza o decimal em ponto (formato das casas): vírgula digitada vira ponto na hora.
+    const v = RAW_LIST_FIELDS.has(id) ? value : value.replace(/,/g, '.');
+    setInputs(prev => ({ ...prev, [id]: v }));
   }, []);
 
   const { result } = useCalculator(inputs, config, activeTab);
@@ -143,18 +149,24 @@ function App() {
     setActiveTab(tab);
     setInputs((prev: Record<string, string>) => {
       const next: Record<string, string> = { ...prev };
-      Object.entries(example).forEach(([k, v]) => { if (v !== undefined) next[k] = v; });
+      Object.entries(example).forEach(([k, v]) => { if (v !== undefined) next[k] = RAW_LIST_FIELDS.has(k) ? v : v.replace(/,/g, '.'); });
       return next;
     });
   }, []);
 
+  // Reset = LIMPAR todos os campos da aba ativa (não recarregar exemplo pré-preenchido).
   const resetTab = useCallback(() => {
-    const map: Record<TabId, string> = {
-      nres: 'nres-1x2', props: 'prop-anytime', proxy: 'proxy-single',
-      aub: 'aub-basic', combo: 'combo-boost', poi: 'poi-playerprop', asia: 'asia-total',
+    const prefixes: Record<TabId, string[]> = {
+      nres: ['nres-'], props: ['prop-'], proxy: ['proxy-'], aub: ['aub-'],
+      combo: ['combo-'], poi: ['poi-'], asia: ['asia-', 'asiah-'],
     };
-    loadExample(map[activeTab]);
-  }, [activeTab, loadExample]);
+    const pfx = prefixes[activeTab];
+    setInputs(prev => {
+      const next = { ...prev };
+      for (const k of Object.keys(next)) if (pfx.some(p => k.startsWith(p))) next[k] = '';
+      return next;
+    });
+  }, [activeTab]);
 
   const tabContent = useMemo(() => {
     const common = { values: inputs, onChange: handleInputChange, onLoadExample: loadExample, onReset: resetTab };

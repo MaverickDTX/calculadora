@@ -97,7 +97,7 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
     if (legs.length < 8) {
       const next = [...legs, {
         id: Date.now(), kind,
-        line: kind === 'over' || kind === 'under' ? '2,5' : kind.includes('corner') ? '9,5' : undefined,
+        line: kind === 'over' || kind === 'under' ? '2.5' : kind.includes('corner') ? '9.5' : undefined,
       }];
       setLegs(next);
       onChange('poi-legs', serializeLegs(next));
@@ -109,7 +109,13 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
     onChange('poi-legs', serializeLegs(next));
   };
   const updateLeg = (id: number, updates: Partial<Leg>) => {
-    const next = legs.map(l => l.id === id ? { ...l, ...updates } : l);
+    // força ponto nos campos decimais (odds/linha); selects/enums (ppLine, side, etc.) ficam intactos
+    const u: Partial<Leg> = { ...updates };
+    const rec = u as Record<string, string | undefined>;
+    for (const f of ['line', 'anytime', 'anytimeNo', 'ppO0', 'ppO1', 'ppO2', 'ppO3', 'ppO4', 'ppBeta']) {
+      const v = rec[f]; if (typeof v === 'string') rec[f] = v.replace(/,/g, '.');
+    }
+    const next = legs.map(l => l.id === id ? { ...l, ...u } : l);
     setLegs(next);
     onChange('poi-legs', serializeLegs(next));
   };
@@ -196,10 +202,10 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
                   <select value={leg.kind} onChange={e => {
                     const k = e.target.value as LegKind;
                     const defaults: Partial<Leg> = { kind: k };
-                    if (k === 'over' || k === 'under') defaults.line = '2,5';
-                    if (['homeOver', 'homeUnder', 'awayOver', 'awayUnder'].includes(k)) defaults.line = '1,5';
-                    if (k === 'cornerTotal') defaults.line = '9,5';
-                    if (k === 'cornerTeam') defaults.line = '5,5';
+                    if (k === 'over' || k === 'under') defaults.line = '2.5';
+                    if (['homeOver', 'homeUnder', 'awayOver', 'awayUnder'].includes(k)) defaults.line = '1.5';
+                    if (k === 'cornerTotal') defaults.line = '9.5';
+                    if (k === 'cornerTeam') defaults.line = '5.5';
                     updateLeg(leg.id, defaults);
                   }} className="input-dark h-9 text-xs">
                     {LEG_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -275,7 +281,7 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
                         </select>
                       </label>
                       <label className="flex items-center gap-1.5 text-xs text-text-muted">
-                        β acoplamento <input type="text" value={leg.ppBeta || '0,54'} onChange={e => updateLeg(leg.id, { ppBeta: e.target.value })} className="input-dark input-compact w-16 text-xs" />
+                        β acoplamento <input type="text" value={leg.ppBeta || '0.54'} onChange={e => updateLeg(leg.id, { ppBeta: e.target.value })} className="input-dark input-compact w-16 text-xs" />
                       </label>
                     </div>
                     <p className="text-[10px] text-text-muted leading-snug">A escada de odds calibra a intensidade (μ). A <b>linha</b> define qual evento entra na probabilidade conjunta: Over k,5 ⇒ P(SOT ≥ k+1). Cauda alta (3,5/4,5) tende a ser subestimada pela Poisson.</p>

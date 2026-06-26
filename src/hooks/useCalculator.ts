@@ -454,9 +454,9 @@ function calcPoi(get: (id: string) => string, cfg: Config): BetResult | { err: s
       const parts = legStr.split('|');
       const kind = parts[0];
       if (kind === 'player') {
-        const side = parts[1] as 'home' | 'away';
-        const od = numDec(parts[2]);
-        const odn = numDec(parts[3]);
+        const side = (parts[2] as 'home' | 'away') || 'home';
+        const od = numDec(parts[6]);   // anytime (Sim)
+        const odn = numDec(parts[7]);  // anytimeNo (Não)
         if (!(od > 1)) { legErr = 'Preencha a odd Sim do jogador (>1).'; break; }
         const target = odn > 1 ? devigN([od, odn], cfg.method).p : 1 / od;
         const theta = solveTheta(P, target, side);
@@ -475,19 +475,19 @@ function calcPoi(get: (id: string) => string, cfg: Config): BetResult | { err: s
         legs.push({ kind: 'playerprop', side: ppSide, muProp: ppMu, beta: ppBeta, lambdaTeam: ppLambda, line: ppLine, label: `${ppSide === 'home' ? 'Mandante' : 'Visitante'} prop jogador O${ppLine.toFixed(1).replace('.', ',')}` });
         hasPlayer = true;
       } else if (kind === 'cornerTotal' || kind === 'cornerTeam' || kind === 'cornerSide') {
-        const cBeta = numDec(parts[1]) || 0.15;
+        const cBeta = numDec(parts[15]) || 0.15;
         const common = { lcH: cfit!.lcH, lcA: cfit!.lcA, lgH: fit.lh, lgA: fit.la, beta: cBeta };
         if (kind === 'cornerTotal') {
-          const cSide = parts[2] as 'over' | 'under';
-          const cL = numDec(parts[3]);
+          const cSide = (parts[3] as 'over' | 'under') || 'over';  // cSide
+          const cL = numDec(parts[1]);                  // line
           legs.push({ ...common, kind: 'cornerTotal', side: cSide, line: cL, label: `Escanteios totais ${cSide === 'over' ? 'Over' : 'Under'} ${cL?.toFixed(1).replace('.', ',')}` });
         } else if (kind === 'cornerTeam') {
-          const tSide = parts[2] as 'home' | 'away';
-          const tDir = parts[3] as 'over' | 'under';
-          const cL = numDec(parts[4]);
+          const tSide = (parts[2] as 'home' | 'away') || 'home';   // side
+          const tDir = (parts[4] as 'over' | 'under') || 'over';   // cDir
+          const cL = numDec(parts[1]);                  // line
           legs.push({ ...common, kind: 'cornerTeam', side: tSide, dir: tDir, line: cL, label: `${tSide === 'home' ? 'Mandante' : 'Visitante'} escanteios ${tDir === 'over' ? 'Over' : 'Under'} ${cL?.toFixed(1).replace('.', ',')}` });
         } else {
-          const sDir = parts[2] as 'home' | 'draw' | 'away';
+          const sDir = (parts[5] as 'home' | 'draw' | 'away') || 'home';  // c1x2
           legs.push({ ...common, kind: 'cornerSide', dir: sDir, label: `Escanteios 1X2 — ${sDir === 'home' ? 'Casa' : sDir === 'draw' ? 'Empate' : 'Visitante'}` });
         }
         hasCorner = true;
@@ -636,6 +636,8 @@ function calcAsia(get: (id: string) => string, cfg: Config): BetResult | { err: 
   let pWinApprox: number | null = null;
   const warnings: string[] = [];
   const label = mode === 'handicap' ? 'Handicap asiático · Poisson/Dixon-Coles' : mode === 'total' ? 'Total asiático · Poisson' : 'Asiático / push';
+  let confClass: 'high' | 'mid' | 'low' = 'mid';
+  let confTxt = 'Confiança média — cálculo correto por estados de retorno, mas depende da distribuição modelada.';
 
   if (mode === 'manual') {
     const pwin = numDec(get('asia-pwin')) / 100;
@@ -719,8 +721,9 @@ function calcAsia(get: (id: string) => string, cfg: Config): BetResult | { err: 
       const parts = splitAsianLine(line);
       const map = new Map<number, number>();
       let rem = 1;
+      let pg = Math.exp(-lam); // P(G=0); recorrência Poisson P(g)=P(g-1)·λ/g (g!, não g)
       for (let g = 0; g <= 24; g++) {
-        const pg = Math.exp(-lam) * Math.pow(lam, g) / (g <= 1 ? 1 : g);
+        if (g > 0) pg *= lam / g;
         rem -= pg;
         let net = (settleTotal(g, parts[0], side, odd) + settleTotal(g, parts[1], side, odd)) / 2;
         net = Math.round(net * 1000000) / 1000000;
@@ -733,6 +736,14 @@ function calcAsia(get: (id: string) => string, cfg: Config): BetResult | { err: 
     };
 
     pWinApprox = side === 'over' ? probTotalOver(line, lam) : (1 - probTotalOver(line, lam));
+    // Linha alvo = calibradora ⇒ P é o de-vig direto das odds de referência (round-trip exato,
+    // sem extrapolação de modelo) ⇒ mesma confiança do N Resultados. Caso contrário, o Poisson
+    // extrapola da linha calibradora para a alvo ⇒ confiança média (risco de modelo).
+    const sameLine = Math.abs(line - cal) < 1e-9;
+    confClass = sameLine ? 'high' : 'mid';
+    confTxt = sameLine
+      ? 'Alta confiança — linha alvo = calibradora: P é o de-vig direto das odds de referência, sem extrapolação de modelo (equivale ao N Resultados).'
+      : 'Confiança média — linha alvo ≠ calibradora: P extrapolada por Poisson a partir da linha calibradora.';
     desc = `${side === 'over' ? 'Over ' : 'Under '}${line.toFixed(2).replace('.', ',')} · λ gols ${lam.toFixed(3).replace('.', ',')} calibrado em O/U ${cal.toFixed(2).replace('.', ',')} (${(pOver * 100).toFixed(1).replace('.', ',')}% over)`;
   }
 
@@ -742,8 +753,8 @@ function calcAsia(get: (id: string) => string, cfg: Config): BetResult | { err: 
     p: pWinApprox,
     fair: null,
     your,
-    confClass: 'mid',
-    confTxt: 'Confiança média — cálculo correto por estados de retorno, mas depende da distribuição informada/modelada.',
+    confClass,
+    confTxt,
     returns: retFactory,
     saveable: false,
     warnings,
