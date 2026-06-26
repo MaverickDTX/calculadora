@@ -1,37 +1,46 @@
 import { useState, useCallback } from 'react';
 import type { Config, DevigMethod, BoostType } from '../types';
 
+const DEFAULTS: Config = {
+  bank: 1000,
+  unit: 10,
+  floor: 0.0025,
+  cap: 0.05,
+  edgemin: 0.005,
+  frac: 0.20,
+  method: 'auto',
+  boostType: 'none',
+  boostVal: 0,
+  confAdj: 'on',
+};
+
+// Se um valor foi salvo em formato percentual (>1), converte para decimal.
+// Necessário porque versões antigas exibiam os campos sem conversão ×100.
+function migratePercent(v: number | undefined, fallback: number): number {
+  if (typeof v !== 'number' || v < 0) return fallback;
+  return v > 1 ? v / 100 : v;
+}
+
 function loadConfig(): Config {
   try {
     const raw = localStorage.getItem('kelly_config');
     if (raw) {
-      const parsed = JSON.parse(raw);
+      const p = JSON.parse(raw);
       return {
-        bank: typeof parsed.bank === 'number' && parsed.bank > 0 ? parsed.bank : 1000,
-        unit: typeof parsed.unit === 'number' && parsed.unit > 0 ? parsed.unit : 10,
-        floor: typeof parsed.floor === 'number' && parsed.floor >= 0 ? parsed.floor : 0.0025,
-        cap: typeof parsed.cap === 'number' && parsed.cap > 0 ? parsed.cap : 0.03,
-        edgemin: typeof parsed.edgemin === 'number' && parsed.edgemin >= 0 ? parsed.edgemin : 0.005,
-        frac: typeof parsed.frac === 'number' && parsed.frac > 0 ? parsed.frac : 0.20,
-        method: (parsed.method as DevigMethod) || 'auto',
-        boostType: (parsed.boostType as BoostType) || 'none',
-        boostVal: typeof parsed.boostVal === 'number' ? parsed.boostVal : 0,
-        confAdj: parsed.confAdj === 'off' ? 'off' : 'on',
+        bank: typeof p.bank === 'number' && p.bank > 0 ? p.bank : DEFAULTS.bank,
+        unit: typeof p.unit === 'number' && p.unit > 0 ? p.unit : DEFAULTS.unit,
+        frac: typeof p.frac === 'number' && p.frac > 0 ? p.frac : DEFAULTS.frac,
+        cap: migratePercent(p.cap, DEFAULTS.cap),
+        floor: migratePercent(p.floor, DEFAULTS.floor),
+        edgemin: migratePercent(p.edgemin, DEFAULTS.edgemin),
+        method: (p.method as DevigMethod) || DEFAULTS.method,
+        boostType: (p.boostType as BoostType) || DEFAULTS.boostType,
+        boostVal: typeof p.boostVal === 'number' ? p.boostVal : DEFAULTS.boostVal,
+        confAdj: p.confAdj === 'off' ? 'off' : 'on',
       };
     }
   } catch { /* ignore */ }
-  return {
-    bank: 1000,
-    unit: 10,
-    floor: 0.0025,
-    cap: 0.03,
-    edgemin: 0.005,
-    frac: 0.20,
-    method: 'auto',
-    boostType: 'none',
-    boostVal: 0,
-    confAdj: 'on',
-  };
+  return { ...DEFAULTS };
 }
 
 function saveConfig(cfg: Config) {

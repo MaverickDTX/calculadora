@@ -79,7 +79,7 @@ export function ResultsDrawer({ result, config, onClose }: Props) {
   }, [result, config]);
 
   return (
-    <div className="w-[400px] shrink-0 border-l border-border flex flex-col animate-slide-right"
+    <div className="fixed inset-0 z-50 flex flex-col md:relative md:inset-auto md:z-auto md:w-[400px] md:shrink-0 border-l border-border animate-slide-right"
       style={{
         background: 'rgba(11, 15, 23, 0.75)',
         backdropFilter: 'blur(24px) saturate(150%)',

@@ -59,16 +59,16 @@ export function ConfigModal({ config, onChange, onClose }: Props) {
           {/* Kelly */}
           <Section icon={TrendingUp} title="Critério de Kelly">
             <div className="grid grid-cols-3 gap-3">
-              <Field label="Fração Kelly" value={String(local.frac).replace('.', ',')} onChange={v => update({ frac: parseFloat(v.replace(',', '.')) || 0.25 })} />
-              <Field label="Teto (% banca)" value={String(local.cap).replace('.', ',')} onChange={v => update({ cap: parseFloat(v.replace(',', '.')) || 0.05 })} suffix="%" />
-              <Field label="Piso (% banca)" value={String(local.floor).replace('.', ',')} onChange={v => update({ floor: parseFloat(v.replace(',', '.')) || 0.01 })} suffix="%" />
+              <Field label="Fração Kelly" value={String(local.frac).replace('.', ',')} onChange={v => update({ frac: parseFloat(v.replace(',', '.')) || 0.20 })} />
+              <Field label="Teto (% banca)" value={fmtPct(local.cap)} onChange={v => update({ cap: parsePct(v) })} suffix="%" />
+              <Field label="Piso (% banca)" value={fmtPct(local.floor)} onChange={v => update({ floor: parsePct(v) })} suffix="%" />
             </div>
           </Section>
 
           {/* Edge */}
           <Section icon={Shield} title="Filtros de valor">
             <div className="grid grid-cols-2 gap-3">
-              <Field label="Edge mínimo" value={String(local.edgemin).replace('.', ',')} onChange={v => update({ edgemin: parseFloat(v.replace(',', '.')) || 0 })} suffix="%" />
+              <Field label="Edge mínimo" value={fmtPct(local.edgemin)} onChange={v => update({ edgemin: parsePct(v) })} suffix="%" />
               <div className="flex items-end">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -152,6 +152,17 @@ function Section({ icon: Icon, title, children }: { icon: React.ElementType; tit
       {children}
     </div>
   );
+}
+
+function fmtPct(v: number): string {
+  // Exibe cap/floor/edgemin em pontos percentuais (0.05 → "5")
+  const pct = v * 100;
+  const rounded = parseFloat(pct.toPrecision(6));
+  return String(rounded).replace('.', ',');
+}
+
+function parsePct(s: string): number {
+  return (parseFloat(s.replace(',', '.')) || 0) / 100;
 }
 
 function Field({ label, value, onChange, suffix }: { label: string; value: string; onChange: (v: string) => void; suffix?: string }) {

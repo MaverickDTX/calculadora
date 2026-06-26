@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, ChevronDown, RotateCcw, Lightbulb } from 'lucide-react';
 
-type LegKind = 'over' | 'under' | 'homewin' | 'draw' | 'awaywin' | 'homeNoLose' | 'awayNoLose' | 'btts' | 'homeScores' | 'awayScores' | 'homeOver' | 'homeUnder' | 'awayOver' | 'awayUnder' | 'player' | 'playerprop' | 'cornerTotal' | 'cornerTeam' | 'cornerSide';
+type LegKind = 'over' | 'under' | 'homewin' | 'draw' | 'awaywin' | 'homeNoLose' | 'awayNoLose' | 'btts' | 'bttsNo' | 'homeScores' | 'awayScores' | 'homeOver' | 'homeUnder' | 'awayOver' | 'awayUnder' | 'player' | 'playerprop' | 'cornerTotal' | 'cornerTeam' | 'cornerSide';
 
 interface Leg {
   id: number;
@@ -40,6 +40,7 @@ const LEG_OPTIONS: { value: LegKind; label: string }[] = [
   { value: 'homeNoLose', label: 'Casa não perde (1X)' },
   { value: 'awayNoLose', label: 'Fora não perde (X2)' },
   { value: 'btts', label: 'Ambas marcam' },
+  { value: 'bttsNo', label: 'Ambas marcam: Não' },
   { value: 'homeScores', label: 'Casa marca' },
   { value: 'awayScores', label: 'Fora marca' },
   { value: 'homeOver', label: 'Casa Over X gols' },

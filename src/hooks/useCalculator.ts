@@ -512,6 +512,7 @@ function calcPoi(get: (id: string) => string, cfg: Config): BetResult | { err: s
       case 'homeNoLose': return (i >= j) ? 1 : 0;
       case 'awayNoLose': return (i <= j) ? 1 : 0;
       case 'btts': return (i > 0 && j > 0) ? 1 : 0;
+      case 'bttsNo': return (i === 0 || j === 0) ? 1 : 0;
       case 'homeScores': return (i > 0) ? 1 : 0;
       case 'awayScores': return (j > 0) ? 1 : 0;
       case 'homeOver': return (i > (leg.line || 0)) ? 1 : 0;
