@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Wallet, SlidersHorizontal, Percent, Shield, TrendingUp } from 'lucide-react';
 import type { Config, DevigMethod, BoostType } from '../types';
 
@@ -166,14 +166,17 @@ function parsePct(s: string): number {
 }
 
 function Field({ label, value, onChange, suffix }: { label: string; value: string; onChange: (v: string) => void; suffix?: string }) {
+  const [draft, setDraft] = useState(value);
+  useEffect(() => { setDraft(value); }, [value]);
   return (
     <div>
       <label className="text-xs text-text-muted mb-1.5 block">{label}</label>
       <div className="relative">
         <input
           type="text"
-          value={value}
-          onChange={e => onChange(e.target.value)}
+          value={draft}
+          onChange={e => setDraft(e.target.value)}
+          onBlur={() => onChange(draft)}
           className="input-dark pr-8"
         />
         {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-text-muted">{suffix}</span>}
