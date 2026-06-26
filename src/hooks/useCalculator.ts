@@ -462,7 +462,7 @@ function calcPoi(get: (id: string) => string, cfg: Config): BetResult | { err: s
         legs.push({ kind: 'player', side, theta, label: `${side === 'home' ? 'Mandante' : 'Visitante'} jogador marca` });
         hasPlayer = true;
       } else if (kind === 'playerprop') {
-        const ppSide = parts[13] as 'home' | 'away';
+        const ppSide: 'home' | 'away' = parts[13] === 'away' ? 'away' : 'home';
         const ppVals = [parts[8], parts[9], parts[10], parts[11], parts[12]].map(v => numDec(v));
         const ppMu = fitMuFromLadder(ppVals);
         if (!ppMu) { legErr = 'Preencha ao menos Over 0.5 para o prop do jogador.'; break; }

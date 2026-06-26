@@ -31,8 +31,12 @@ function serializeLegs(legs: ComboLeg[]): string {
 export function ComboTab({ values, onChange, onLoadExample, onReset }: Props) {
   const [legs, setLegs] = useState<ComboLeg[]>([]);
 
+  // Só re-parseia quando a mudança vem de FORA (exemplo/reset). Em edições próprias o
+  // valor recebido já bate com a serialização → mantém o mesmo array (mesma referência/
+  // ids), sem remontar os inputs nem perder o cursor a cada tecla.
   useEffect(() => {
-    setLegs(parseLegs(values['combo-legs'] || ''));
+    const incoming = values['combo-legs'] || '';
+    setLegs(prev => incoming === serializeLegs(prev) ? prev : parseLegs(incoming));
   }, [values['combo-legs']]);
 
   const addLeg = () => {

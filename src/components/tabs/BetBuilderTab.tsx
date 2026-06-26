@@ -85,8 +85,12 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
   const [legs, setLegs] = useState<Leg[]>([]);
   const [cornerOpen, setCornerOpen] = useState(false);
 
+  // Só re-parseia quando a mudança vem de FORA (carregar exemplo/reset). Para edições
+  // próprias, o valor recebido já bate com a serialização atual → mantém o mesmo array
+  // (mesma referência/ids), evitando remontar os inputs e perder o cursor a cada tecla.
   useEffect(() => {
-    setLegs(parseLegs(values['poi-legs'] || ''));
+    const incoming = values['poi-legs'] || '';
+    setLegs(prev => incoming === serializeLegs(prev) ? prev : parseLegs(incoming));
   }, [values['poi-legs']]);
 
   const addLeg = (kind: LegKind = 'over') => {
