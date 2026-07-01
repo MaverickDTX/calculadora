@@ -97,24 +97,6 @@ export interface GridStake {
   pct: number;
 }
 
-export interface SavedBet {
-  id?: string;
-  label: string;
-  market: string;
-  prob: number | null;
-  fair: number | null;
-  your: number;
-  your_eff: number;
-  ev: number;
-  kfull: number;
-  kadj: number;
-  stake_units: number;
-  stake_reais: number;
-  confidence: string;
-  method: string;
-  decomp: string;
-  created_at?: string;
-}
 
 export type TabId = 'nres' | 'props' | 'proxy' | 'aub' | 'combo' | 'poi' | 'asia';
 

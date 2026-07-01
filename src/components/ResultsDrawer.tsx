@@ -1,8 +1,7 @@
-import { useState, useCallback, useEffect } from 'react';
-import { Save, X, AlertTriangle, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, AlertTriangle, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import type { BetResult, Config } from '../types';
 import { fpct, fbrl, fnum, gridStake, confFactor } from '../lib/math';
-import { saveBet } from '../lib/supabase';
 
 interface Props {
   result: BetResult | { err: string } | null;
@@ -45,38 +44,11 @@ function setQuality(B: BetResult): { cls: string; label: string; pill: string; d
 }
 
 export function ResultsDrawer({ result, config, onClose }: Props) {
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
   const [animateKey, setAnimateKey] = useState(0);
 
   useEffect(() => {
-    setSaved(false);
     setAnimateKey(k => k + 1);
   }, [result]);
-
-  const handleSave = useCallback(async () => {
-    if (!result || 'err' in result || !result.saveable) return;
-    setSaving(true);
-    const gs = gridStake(result.kadj, config.bank, config.unit);
-    const { error } = await saveBet({
-      label: result.label,
-      market: result.label,
-      prob: result.p,
-      fair: result.fair,
-      your: result.your,
-      your_eff: result.yourEff,
-      ev: result.ev,
-      kfull: result.kfull,
-      kadj: result.kadj,
-      stake_units: gs.units,
-      stake_reais: gs.reais,
-      confidence: result.confClass,
-      method: config.method,
-      decomp: result.decomp,
-    });
-    setSaving(false);
-    if (!error) setSaved(true);
-  }, [result, config]);
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col md:relative md:inset-auto md:z-auto md:w-[400px] md:shrink-0 border-l border-border animate-slide-right"
@@ -101,7 +73,7 @@ export function ResultsDrawer({ result, config, onClose }: Props) {
       <div className="flex-1 overflow-y-auto scrollbar-thin p-5 space-y-5">
         {!result && <EmptyState />}
         {result && 'err' in result && <ErrorState msg={result.err} />}
-        {result && !('err' in result) && <ResultContent key={animateKey} B={result} config={config} onSave={handleSave} saving={saving} saved={saved} />}
+        {result && !('err' in result) && <ResultContent key={animateKey} B={result} config={config} />}
       </div>
     </div>
   );
@@ -133,7 +105,7 @@ function ErrorState({ msg }: { msg: string }) {
   );
 }
 
-function ResultContent({ B, config, onSave, saving, saved }: { B: BetResult; config: Config; onSave: () => void; saving: boolean; saved: boolean }) {
+function ResultContent({ B, config }: { B: BetResult; config: Config }) {
   const flow = stakeFlow(B);
   const gs = gridStake(B.kadj, config.bank, config.unit);
   const qual = setQuality(B);
@@ -259,19 +231,6 @@ function ResultContent({ B, config, onSave, saving, saved }: { B: BetResult; con
             </div>
           ))}
         </div>
-      )}
-
-      {/* Save */}
-      {B.saveable && (
-        <button
-          type="button"
-          onClick={onSave}
-          disabled={saving || saved}
-          className="btn-primary w-full justify-center"
-        >
-          <Save size={16} />
-          {saved ? 'Salvo!' : saving ? 'Salvando...' : 'Salvar aposta'}
-        </button>
       )}
     </div>
   );

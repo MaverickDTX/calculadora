@@ -1,7 +1,7 @@
 import type { TabId } from '../types';
 import {
   Hash, ToggleLeft, Radio, GitBranch, Layers, Puzzle, TrendingUp,
-  Settings, History, Calculator
+  Settings, Calculator
 } from 'lucide-react';
 import { APP_VERSION } from '../version';
 
@@ -9,7 +9,6 @@ interface Props {
   activeTab: TabId;
   onChange: (tab: TabId) => void;
   onConfig: () => void;
-  onHistory: () => void;
 }
 
 const TABS: { id: TabId; label: string; short: string; icon: React.ElementType }[] = [
@@ -28,7 +27,7 @@ const glassBg: React.CSSProperties = {
   WebkitBackdropFilter: 'blur(24px) saturate(150%)',
 };
 
-export function Sidebar({ activeTab, onChange, onConfig, onHistory }: Props) {
+export function Sidebar({ activeTab, onChange, onConfig }: Props) {
   return (
     <>
       {/* Desktop sidebar — hidden on mobile */}
@@ -66,10 +65,6 @@ export function Sidebar({ activeTab, onChange, onConfig, onHistory }: Props) {
           <button type="button" onClick={onConfig} className="nav-item">
             <Settings size={16} />
             <span>Configurações</span>
-          </button>
-          <button type="button" onClick={onHistory} className="nav-item">
-            <History size={16} />
-            <span>Histórico</span>
           </button>
         </div>
       </aside>

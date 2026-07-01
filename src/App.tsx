@@ -5,7 +5,6 @@ import { useCalculator } from './hooks/useCalculator';
 import { Sidebar } from './components/Sidebar';
 import { ResultsDrawer } from './components/ResultsDrawer';
 import { ConfigModal } from './components/ConfigModal';
-import { HistoryModal } from './components/HistoryModal';
 import { VizSection } from './components/VizSection';
 import { NResultsTab } from './components/tabs/NResultsTab';
 import { PropsTab } from './components/tabs/PropsTab';
@@ -85,7 +84,6 @@ function App() {
   const [activeTab, setActiveTab] = useState<TabId>('nres');
   const [inputs, setInputs] = useState<Record<string, string>>(DEFAULT_INPUTS);
   const [showConfig, setShowConfig] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
   const [showResults, setShowResults] = useState(true);
 
   const handleInputChange = useCallback((id: string, value: string) => {
@@ -137,7 +135,7 @@ function App() {
 
   return (
     <div className="min-h-screen flex">
-      <Sidebar activeTab={activeTab} onChange={setActiveTab} onConfig={() => setShowConfig(true)} onHistory={() => setShowHistory(true)} />
+      <Sidebar activeTab={activeTab} onChange={setActiveTab} onConfig={() => setShowConfig(true)} />
 
       <main className="flex-1 min-w-0 flex flex-col">
         <header className="border-b border-border px-6 py-4 flex items-center justify-between">
@@ -174,7 +172,6 @@ function App() {
       </main>
 
       {showConfig && <ConfigModal config={config} onChange={setConfig} onClose={() => setShowConfig(false)} />}
-      {showHistory && <HistoryModal onClose={() => setShowHistory(false)} />}
     </div>
   );
 }
