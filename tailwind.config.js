@@ -18,7 +18,7 @@ export default {
         text: {
           primary: '#F9FAFB',
           secondary: '#9CA3AF',
-          muted: '#6B7280',
+          muted: '#8B93A1',
         },
         accent: {
           DEFAULT: '#6366F1',
@@ -49,7 +49,7 @@ export default {
         },
       },
       fontFamily: {
-        mono: ['"JetBrains Mono"', '"Fira Code"', 'monospace'],
+        mono: ['"Chivo Mono"', '"JetBrains Mono"', '"Fira Code"', 'monospace'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
         display: ['Inter', 'system-ui', 'sans-serif'],
       },

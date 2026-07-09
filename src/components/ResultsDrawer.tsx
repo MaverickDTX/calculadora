@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, AlertTriangle, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { X, AlertTriangle, ChevronRight, ChevronDown, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import type { BetResult, Config } from '../types';
 import { fpct, fbrl, fnum, gridStake, confFactor } from '../lib/math';
 
@@ -65,12 +65,12 @@ export function ResultsDrawer({ result, config, onClose }: Props) {
           <div className="w-2 h-2 rounded-full bg-accent animate-pulse-soft" />
           <span className="text-sm font-semibold text-text-primary">Resultado</span>
         </div>
-        <button type="button" onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors">
-          <X size={18} />
+        <button type="button" onClick={onClose} aria-label="Fechar resultado" className="icon-btn text-text-muted hover:text-text-primary transition-colors">
+          <X size={18} aria-hidden="true" />
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-thin p-5 space-y-5">
+      <div className="flex-1 overflow-y-auto scrollbar-thin p-5 space-y-5" style={{ overscrollBehavior: 'contain' }}>
         {!result && <EmptyState />}
         {result && 'err' in result && <ErrorState msg={result.err} />}
         {result && !('err' in result) && <ResultContent key={animateKey} B={result} config={config} />}
@@ -85,7 +85,7 @@ function EmptyState() {
       <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
         style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
       >
-        <ChevronRight size={28} className="opacity-40" />
+        <ChevronRight size={28} className="opacity-40" aria-hidden="true" />
       </div>
       <p className="text-sm">Preencha os campos para ver o resultado</p>
       <p className="text-xs mt-1 opacity-60">A stake recomendada aparecerá aqui</p>
@@ -95,9 +95,9 @@ function EmptyState() {
 
 function ErrorState({ msg }: { msg: string }) {
   return (
-    <div className="panel border-danger/30" style={{ background: 'rgba(239, 68, 68, 0.06)' }}>
+    <div role="alert" className="panel border-danger/30" style={{ background: 'rgba(239, 68, 68, 0.06)' }}>
       <div className="flex items-center gap-2 text-danger mb-2">
-        <AlertTriangle size={16} />
+        <AlertTriangle size={16} aria-hidden="true" />
         <span className="text-sm font-semibold">Erro no cálculo</span>
       </div>
       <p className="text-sm text-text-secondary">{msg}</p>
@@ -117,7 +117,7 @@ function ResultContent({ B, config }: { B: BetResult; config: Config }) {
       <div className={`panel ${qual.cls}`}>
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <QualIcon size={18} className={qual.cls === 'quality-good' ? 'text-value' : qual.cls === 'quality-mid' ? 'text-warn' : 'text-danger'} />
+            <QualIcon size={18} aria-hidden="true" className={qual.cls === 'quality-good' ? 'text-value' : qual.cls === 'quality-mid' ? 'text-warn' : 'text-danger'} />
             <span className="text-sm font-semibold text-text-primary">{qual.label}</span>
           </div>
           <span className={`tag ${qual.cls === 'quality-good' ? 'tag-value' : qual.cls === 'quality-mid' ? 'tag-warn' : qual.cls === 'quality-bad' ? 'tag-danger' : 'tag-info'}`}>
@@ -152,15 +152,14 @@ function ResultContent({ B, config }: { B: BetResult; config: Config }) {
       )}
 
       {/* Decomp */}
-      <div className="panel">
-        <div className="section-title">Decomposição</div>
+      <CollapsibleSection title="Decomposição">
         <div className="font-mono text-sm text-text-secondary rounded-lg p-3 border border-border"
           style={{ background: 'rgba(11, 15, 23, 0.5)' }}
         >
           {B.decomp}
           {B.boosted && <span className="text-accent ml-2">→ boost {fnum(B.yourEff, 3)}</span>}
         </div>
-      </div>
+      </CollapsibleSection>
 
       {/* Metrics grid */}
       <div className="grid grid-cols-2 gap-2.5">
@@ -173,8 +172,7 @@ function ResultContent({ B, config }: { B: BetResult; config: Config }) {
       </div>
 
       {/* Flow */}
-      <div className="panel">
-        <div className="section-title">Fluxo do ajuste</div>
+      <CollapsibleSection title="Fluxo do ajuste" defaultOpen={false}>
         <div className="flex flex-wrap gap-1.5">
           <FlowTag label={`fração ${fnum(config.frac, 2)}`} />
           <FlowTag label={`confiança ${fnum(flow.cf, 2)}`} type={flow.cf < 1 ? 'warn' : 'info'} />
@@ -185,7 +183,7 @@ function ResultContent({ B, config }: { B: BetResult; config: Config }) {
           {flow.capApplied && <FlowTag label={`teto ${fpct(config.cap)}`} type="warn" />}
           {B.ev < config.edgemin && <FlowTag label="edge mínimo trava" type="bad" />}
         </div>
-      </div>
+      </CollapsibleSection>
 
       {/* Confidence */}
       <div className="panel">
@@ -200,8 +198,7 @@ function ResultContent({ B, config }: { B: BetResult; config: Config }) {
 
       {/* Returns */}
       {B.ev > 0 && B.kadj > 0 && gs.units > 0 && B.returns.length > 0 && (
-        <div className="panel">
-          <div className="section-title">Retornos por estado</div>
+        <CollapsibleSection title="Retornos por estado" defaultOpen={false}>
           <div className="space-y-2">
             <div className="flex justify-between items-center text-sm">
               <span className="text-text-muted">Melhor estado</span>
@@ -216,7 +213,7 @@ function ResultContent({ B, config }: { B: BetResult; config: Config }) {
               </span>
             </div>
           </div>
-        </div>
+        </CollapsibleSection>
       )}
 
       {/* Warnings */}
@@ -226,7 +223,7 @@ function ResultContent({ B, config }: { B: BetResult; config: Config }) {
             <div key={i} className="flex items-start gap-2 text-xs text-warn rounded-lg p-2.5 border border-warn/20"
               style={{ background: 'rgba(245, 158, 11, 0.06)' }}
             >
-              <AlertTriangle size={14} className="shrink-0 mt-0.5" />
+              <AlertTriangle size={14} className="shrink-0 mt-0.5" aria-hidden="true" />
               <span>{w}</span>
             </div>
           ))}
@@ -243,6 +240,18 @@ function MetricCard({ label, value, highlight }: { label: string; value: string;
       <div className="metric-label">{label}</div>
       <div className={`metric-value ${colorClass}`}>{value}</div>
     </div>
+  );
+}
+
+function CollapsibleSection({ title, children, defaultOpen = true }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
+  return (
+    <details className="panel-collapsible" open={defaultOpen}>
+      <summary>
+        <span className="section-title mb-0">{title}</span>
+        <ChevronDown size={16} className="chevron" aria-hidden="true" />
+      </summary>
+      <div className="collapsible-body">{children}</div>
+    </details>
   );
 }
 

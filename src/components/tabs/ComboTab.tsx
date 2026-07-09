@@ -69,7 +69,7 @@ export function ComboTab({ values, onChange, onLoadExample, onReset }: Props) {
     <div className="space-y-5 animate-fade-in">
       <div className="panel border-warn/30" style={{ background: 'rgba(245, 158, 11, 0.04)' }}>
         <div className="flex items-start gap-2">
-          <AlertTriangle size={16} className="text-warn shrink-0 mt-0.5" />
+          <AlertTriangle size={16} className="text-warn shrink-0 mt-0.5" aria-hidden="true" />
           <p className="text-xs text-text-secondary leading-relaxed">
             Use para combinadas de <b>jogos diferentes</b>. O de-vig é feito internamente nas 4 escalas (proporcional, probit, log, Shin). O veredito mostra a faixa de EV entre escalas.
           </p>
@@ -78,12 +78,12 @@ export function ComboTab({ values, onChange, onLoadExample, onReset }: Props) {
 
       <div className="panel">
         <div className="flex items-center gap-2 mb-3">
-          <Lightbulb size={14} className="text-warn" />
+          <Lightbulb size={14} className="text-warn" aria-hidden="true" />
           <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Exemplos rápidos</span>
         </div>
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={() => onLoadExample('combo-boost')} className="btn-ghost text-xs">4 pernas</button>
-          <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} /> Reset</button>
+          <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} aria-hidden="true" /> Reset</button>
         </div>
       </div>
 
@@ -91,7 +91,7 @@ export function ComboTab({ values, onChange, onLoadExample, onReset }: Props) {
         <div className="section-title">Sua odd</div>
         <div>
           <label className="text-xs text-text-muted mb-1.5 block">Odd combinada (com boost se houver)</label>
-          <input type="text" value={values['combo-your'] || ''} onChange={e => onChange('combo-your', e.target.value)} className="input-dark input-highlight" placeholder="7,03" />
+          <input type="text" inputMode="decimal" autoComplete="off" value={values['combo-your'] || ''} onChange={e => onChange('combo-your', e.target.value)} className="input-dark input-highlight" placeholder="7,03" />
         </div>
 
         <div className="divider" />
@@ -110,21 +110,21 @@ export function ComboTab({ values, onChange, onLoadExample, onReset }: Props) {
                   <option value={1}>Via 2</option>
                   {leg.nWays >= 3 && <option value={2}>Via 3</option>}
                 </select>
-                <button type="button" onClick={() => removeLeg(leg.id)} className="ml-auto text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors">
-                  <Trash2 size={14} />
+                <button type="button" aria-label="Remover perna" onClick={() => removeLeg(leg.id)} className="icon-btn ml-auto text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors">
+                  <Trash2 size={14} aria-hidden="true" />
                 </button>
               </div>
               <div className="grid grid-cols-3 gap-2">
                 {leg.odds.map((o, i) => (
                   <div key={i}>
                     <label className="text-[10px] text-text-muted mb-1 block">Odd via {i + 1}</label>
-                    <input type="text" value={o} onChange={e => updateOdd(leg.id, i, e.target.value)} className="input-dark h-9 text-xs" />
+                    <input type="text" inputMode="decimal" autoComplete="off" value={o} onChange={e => updateOdd(leg.id, i, e.target.value)} className="input-dark h-9 text-xs" />
                   </div>
                 ))}
               </div>
               {hasTail && (
                 <div className="flex items-center gap-1.5 text-[11px] text-warn">
-                  <AlertTriangle size={12} />
+                  <AlertTriangle size={12} aria-hidden="true" />
                   Perna de cauda — divergência entre escalas pode ser material
                 </div>
               )}
@@ -132,7 +132,7 @@ export function ComboTab({ values, onChange, onLoadExample, onReset }: Props) {
           ))}
         </div>
         <button type="button" onClick={addLeg} className="btn-ghost text-xs flex items-center gap-1.5">
-          <Plus size={14} /> Perna
+          <Plus size={14} aria-hidden="true" /> Perna
         </button>
 
         <div className="divider" />
@@ -143,7 +143,7 @@ export function ComboTab({ values, onChange, onLoadExample, onReset }: Props) {
         </label>
         {values['combo-corr'] === 'true' && (
           <div className="flex items-start gap-2 text-xs text-danger rounded-lg p-2.5 border border-danger/20" style={{ background: 'rgba(239, 68, 68, 0.04)' }}>
-            <AlertTriangle size={14} className="shrink-0 mt-0.5" />
+            <AlertTriangle size={14} className="shrink-0 mt-0.5" aria-hidden="true" />
             Para pernas do mesmo jogo, use a aba <b>Bet Builder</b> — o produto de independentes é inválido quando correlacionado.
           </div>
         )}

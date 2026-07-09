@@ -47,12 +47,12 @@ export function AubTab({ values, onChange, onLoadExample, onReset }: Props) {
     <div className="space-y-5 animate-fade-in">
       <div className="panel">
         <div className="flex items-center gap-2 mb-3">
-          <Lightbulb size={14} className="text-warn" />
+          <Lightbulb size={14} className="text-warn" aria-hidden="true" />
           <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Exemplos rápidos</span>
         </div>
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={() => onLoadExample('aub-basic')} className="btn-ghost text-xs">Duas seleções</button>
-          <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} /> Reset</button>
+          <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} aria-hidden="true" /> Reset</button>
         </div>
       </div>
 
@@ -66,23 +66,23 @@ export function AubTab({ values, onChange, onLoadExample, onReset }: Props) {
           {rows.map((row, idx) => (
             <div key={row.id} className="flex items-center gap-2">
               <span className="text-xs text-text-muted w-6 shrink-0">{String.fromCharCode(65 + idx)}</span>
-              <input type="text" value={row.value} onChange={e => updateRow(row.id, e.target.value)} className="input-dark flex-1" placeholder={`odd seleção ${String.fromCharCode(65 + idx)}`} />
+              <input type="text" inputMode="decimal" autoComplete="off" value={row.value} onChange={e => updateRow(row.id, e.target.value)} className="input-dark flex-1" placeholder={`odd seleção ${String.fromCharCode(65 + idx)}`} />
               {rows.length > 1 && (
-                <button type="button" onClick={() => removeRow(row.id)} className="text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors"><Trash2 size={14} /></button>
+                <button type="button" aria-label="Remover seleção" onClick={() => removeRow(row.id)} className="icon-btn text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors"><Trash2 size={14} aria-hidden="true" /></button>
               )}
             </div>
           ))}
         </div>
-        <button type="button" onClick={addRow} className="btn-ghost text-xs flex items-center gap-1.5"><Plus size={14} /> Seleção</button>
+        <button type="button" onClick={addRow} className="btn-ghost text-xs flex items-center gap-1.5"><Plus size={14} aria-hidden="true" /> Seleção</button>
 
         <div className="grid grid-cols-2 gap-3 pt-3 border-t border-border">
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Desconto correlação (%)</label>
-            <input type="text" value={values['aub-discount'] || ''} onChange={e => onChange('aub-discount', e.target.value)} className="input-dark" placeholder="8" />
+            <input type="text" inputMode="decimal" autoComplete="off" value={values['aub-discount'] || ''} onChange={e => onChange('aub-discount', e.target.value)} className="input-dark" placeholder="8" />
           </div>
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
-            <input type="text" value={values['aub-your'] || ''} onChange={e => onChange('aub-your', e.target.value)} className="input-dark input-highlight" placeholder="1,85" />
+            <input type="text" inputMode="decimal" autoComplete="off" value={values['aub-your'] || ''} onChange={e => onChange('aub-your', e.target.value)} className="input-dark input-highlight" placeholder="1,85" />
           </div>
         </div>
       </div>

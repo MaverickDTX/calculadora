@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Plus, Trash2, ChevronDown, RotateCcw, Lightbulb } from 'lucide-react';
 
 type LegKind = 'over' | 'under' | 'homewin' | 'draw' | 'awaywin' | 'homeNoLose' | 'awayNoLose' | 'btts' | 'bttsNo' | 'homeScores' | 'awayScores' | 'homeOver' | 'homeUnder' | 'awayOver' | 'awayUnder' | 'player' | 'playerprop' | 'cornerTotal' | 'cornerTeam' | 'cornerSide';
@@ -85,14 +85,13 @@ function serializeLegs(legs: Leg[]): string {
 export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Props) {
   const [legs, setLegs] = useState<Leg[]>([]);
   const [cornerOpen, setCornerOpen] = useState(false);
+  const prevLegsRef = useRef(values['poi-legs']);
 
-  // Só re-parseia quando a mudança vem de FORA (carregar exemplo/reset). Para edições
-  // próprias, o valor recebido já bate com a serialização atual → mantém o mesmo array
-  // (mesma referência/ids), evitando remontar os inputs e perder o cursor a cada tecla.
-  useEffect(() => {
+  if (values['poi-legs'] !== prevLegsRef.current) {
+    prevLegsRef.current = values['poi-legs'];
     const incoming = values['poi-legs'] || '';
     setLegs(prev => incoming === serializeLegs(prev) ? prev : parseLegs(incoming));
-  }, [values['poi-legs']]);
+  }
 
   const addLeg = (kind: LegKind = 'over') => {
     if (legs.length < 8) {
@@ -131,51 +130,51 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
 
       <div className="panel">
         <div className="flex items-center gap-2 mb-3">
-          <Lightbulb size={14} className="text-warn" />
+          <Lightbulb size={14} className="text-warn" aria-hidden="true" />
           <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Exemplos rápidos</span>
         </div>
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={() => onLoadExample('poi-builder')} className="btn-ghost text-xs">Over + Casa vence</button>
           <button type="button" onClick={() => onLoadExample('poi-playerprop')} className="btn-ghost text-xs">Prop jogador</button>
-          <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} /> Reset</button>
+          <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} aria-hidden="true" /> Reset</button>
         </div>
       </div>
 
       <div className="panel panel-focus space-y-5">
         <div className="section-title">Odds simples do jogo</div>
         <div className="grid grid-cols-3 gap-3">
-          <div><label className="text-xs text-text-muted mb-1.5 block">Casa (1)</label><input type="text" value={values['poi-h'] || ''} onChange={e => onChange('poi-h', e.target.value)} className="input-dark" placeholder="1,80" /></div>
-          <div><label className="text-xs text-text-muted mb-1.5 block">Empate (X)</label><input type="text" value={values['poi-d'] || ''} onChange={e => onChange('poi-d', e.target.value)} className="input-dark" placeholder="3,60" /></div>
-          <div><label className="text-xs text-text-muted mb-1.5 block">Fora (2)</label><input type="text" value={values['poi-a'] || ''} onChange={e => onChange('poi-a', e.target.value)} className="input-dark" placeholder="4,50" /></div>
+          <div><label className="text-xs text-text-muted mb-1.5 block">Casa (1)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-h'] || ''} onChange={e => onChange('poi-h', e.target.value)} className="input-dark" placeholder="1,80" /></div>
+          <div><label className="text-xs text-text-muted mb-1.5 block">Empate (X)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-d'] || ''} onChange={e => onChange('poi-d', e.target.value)} className="input-dark" placeholder="3,60" /></div>
+          <div><label className="text-xs text-text-muted mb-1.5 block">Fora (2)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-a'] || ''} onChange={e => onChange('poi-a', e.target.value)} className="input-dark" placeholder="4,50" /></div>
         </div>
         <div className="grid grid-cols-3 gap-3">
-          <div><label className="text-xs text-text-muted mb-1.5 block">Linha O/U gols</label><input type="text" value={values['poi-ouline'] || ''} onChange={e => onChange('poi-ouline', e.target.value)} className="input-dark" placeholder="2,5" /></div>
-          <div><label className="text-xs text-text-muted mb-1.5 block">Odd Over</label><input type="text" value={values['poi-over'] || ''} onChange={e => onChange('poi-over', e.target.value)} className="input-dark" placeholder="1,95" /></div>
-          <div><label className="text-xs text-text-muted mb-1.5 block">Odd Under</label><input type="text" value={values['poi-under'] || ''} onChange={e => onChange('poi-under', e.target.value)} className="input-dark" placeholder="1,95" /></div>
+          <div><label className="text-xs text-text-muted mb-1.5 block">Linha O/U gols</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-ouline'] || ''} onChange={e => onChange('poi-ouline', e.target.value)} className="input-dark" placeholder="2,5" /></div>
+          <div><label className="text-xs text-text-muted mb-1.5 block">Odd Over</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-over'] || ''} onChange={e => onChange('poi-over', e.target.value)} className="input-dark" placeholder="1,95" /></div>
+          <div><label className="text-xs text-text-muted mb-1.5 block">Odd Under</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-under'] || ''} onChange={e => onChange('poi-under', e.target.value)} className="input-dark" placeholder="1,95" /></div>
         </div>
 
         <div>
           <label className="text-xs text-text-muted mb-1.5 block">Correção Dixon-Coles ρ</label>
-          <input type="text" value={values['poi-rho'] || ''} onChange={e => onChange('poi-rho', e.target.value)} className="input-dark" placeholder="-0,05" />
+          <input type="text" inputMode="decimal" autoComplete="off" value={values['poi-rho'] || ''} onChange={e => onChange('poi-rho', e.target.value)} className="input-dark" placeholder="-0,05" />
         </div>
 
         <div className="pt-3 border-t border-border">
           <button type="button" onClick={() => setCornerOpen(!cornerOpen)} className="flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">
-            <ChevronDown size={16} className={`transition-transform ${cornerOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown size={16} aria-hidden="true" className={`transition-transform ${cornerOpen ? 'rotate-180' : ''}`} />
             Calibração de escanteios
             <span className="text-xs text-text-muted font-normal">— preencha só se houver perna de escanteio</span>
           </button>
           {cornerOpen && (
             <div className="mt-3 space-y-3 animate-fade-in">
               <div className="grid grid-cols-3 gap-3">
-                <div><label className="text-xs text-text-muted mb-1.5 block">Linha O/U corners</label><input type="text" value={values['poi-c-line'] || ''} onChange={e => onChange('poi-c-line', e.target.value)} className="input-dark" placeholder="9,5" /></div>
-                <div><label className="text-xs text-text-muted mb-1.5 block">Odd Over corners</label><input type="text" value={values['poi-c-over'] || ''} onChange={e => onChange('poi-c-over', e.target.value)} className="input-dark" placeholder="1,90" /></div>
-                <div><label className="text-xs text-text-muted mb-1.5 block">Odd Under corners</label><input type="text" value={values['poi-c-under'] || ''} onChange={e => onChange('poi-c-under', e.target.value)} className="input-dark" placeholder="1,90" /></div>
+                <div><label className="text-xs text-text-muted mb-1.5 block">Linha O/U corners</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-line'] || ''} onChange={e => onChange('poi-c-line', e.target.value)} className="input-dark" placeholder="9,5" /></div>
+                <div><label className="text-xs text-text-muted mb-1.5 block">Odd Over corners</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-over'] || ''} onChange={e => onChange('poi-c-over', e.target.value)} className="input-dark" placeholder="1,90" /></div>
+                <div><label className="text-xs text-text-muted mb-1.5 block">Odd Under corners</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-under'] || ''} onChange={e => onChange('poi-c-under', e.target.value)} className="input-dark" placeholder="1,90" /></div>
               </div>
               <div className="grid grid-cols-3 gap-3">
-                <div><label className="text-xs text-text-muted mb-1.5 block">Corner 1X2 — Casa (1) <span className="text-text-muted/70">opcional</span></label><input type="text" value={values['poi-c-1'] || ''} onChange={e => onChange('poi-c-1', e.target.value)} className="input-dark" placeholder="opt" /></div>
-                <div><label className="text-xs text-text-muted mb-1.5 block">Empate corners (X)</label><input type="text" value={values['poi-c-x'] || ''} onChange={e => onChange('poi-c-x', e.target.value)} className="input-dark" placeholder="opt" /></div>
-                <div><label className="text-xs text-text-muted mb-1.5 block">Visitante (2)</label><input type="text" value={values['poi-c-2'] || ''} onChange={e => onChange('poi-c-2', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                <div><label className="text-xs text-text-muted mb-1.5 block">Corner 1X2 — Casa (1) <span className="text-text-muted/70">opcional</span></label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-1'] || ''} onChange={e => onChange('poi-c-1', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                <div><label className="text-xs text-text-muted mb-1.5 block">Empate corners (X)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-x'] || ''} onChange={e => onChange('poi-c-x', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                <div><label className="text-xs text-text-muted mb-1.5 block">Visitante (2)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-2'] || ''} onChange={e => onChange('poi-c-2', e.target.value)} className="input-dark" placeholder="opt" /></div>
               </div>
               <p className="text-xs text-text-muted leading-relaxed">
                 Sem o 1X2 de escanteios, o total é dividido entre os times pela proporção de domínio do jogo (split de gols). Com o 1X2, o split de escanteios é calibrado diretamente. Escanteios costumam ser levemente <b>sobredispersos</b> vs. Poisson — a cauda alta pode ser subestimada (ressalva análoga à de SOT/props).
@@ -213,7 +212,7 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
                   </select>
 
                   {(isOU || isCT || isCTeam) && (
-                    <input type="text" value={leg.line || ''} onChange={e => updateLeg(leg.id, { line: e.target.value })} placeholder="linha" className="input-dark w-20 h-9 text-xs" />
+                    <input type="text" inputMode="decimal" autoComplete="off" value={leg.line || ''} onChange={e => updateLeg(leg.id, { line: e.target.value })} placeholder="linha" className="input-dark w-20 h-9 text-xs" />
                   )}
 
                   {(isP || isCTeam) && (
@@ -247,24 +246,24 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
 
                   {isP && (
                     <>
-                      <input type="text" value={leg.anytime || ''} onChange={e => updateLeg(leg.id, { anytime: e.target.value })} placeholder="odd Sim" className="input-dark w-24 h-9 text-xs" />
-                      <input type="text" value={leg.anytimeNo || ''} onChange={e => updateLeg(leg.id, { anytimeNo: e.target.value })} placeholder="odd Não" className="input-dark w-24 h-9 text-xs" />
+                      <input type="text" inputMode="decimal" autoComplete="off" value={leg.anytime || ''} onChange={e => updateLeg(leg.id, { anytime: e.target.value })} placeholder="odd Sim" className="input-dark w-24 h-9 text-xs" />
+                      <input type="text" inputMode="decimal" autoComplete="off" value={leg.anytimeNo || ''} onChange={e => updateLeg(leg.id, { anytimeNo: e.target.value })} placeholder="odd Não" className="input-dark w-24 h-9 text-xs" />
                     </>
                   )}
 
-                  <button type="button" onClick={() => removeLeg(leg.id)} className="ml-auto text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors">
-                    <Trash2 size={14} />
+                  <button type="button" aria-label="Remover perna" onClick={() => removeLeg(leg.id)} className="icon-btn ml-auto text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors">
+                  <Trash2 size={14} aria-hidden="true" />
                   </button>
                 </div>
 
                 {isPP && (
                   <div className="mt-2 pl-3 border-l-2 border-border space-y-2">
                     <div className="grid grid-cols-5 gap-2">
-                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 0.5 *</label><input type="text" value={leg.ppO0 || ''} onChange={e => updateLeg(leg.id, { ppO0: e.target.value })} placeholder="opt" className="input-dark input-compact w-full text-xs" /></div>
-                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 1.5</label><input type="text" value={leg.ppO1 || ''} onChange={e => updateLeg(leg.id, { ppO1: e.target.value })} placeholder="opt" className="input-dark input-compact w-full text-xs" /></div>
-                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 2.5</label><input type="text" value={leg.ppO2 || ''} onChange={e => updateLeg(leg.id, { ppO2: e.target.value })} placeholder="opt" className="input-dark input-compact w-full text-xs" /></div>
-                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 3.5</label><input type="text" value={leg.ppO3 || ''} onChange={e => updateLeg(leg.id, { ppO3: e.target.value })} placeholder="opt" className="input-dark input-compact w-full text-xs" /></div>
-                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 4.5</label><input type="text" value={leg.ppO4 || ''} onChange={e => updateLeg(leg.id, { ppO4: e.target.value })} placeholder="opt" className="input-dark input-compact w-full text-xs" /></div>
+                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 0.5 *</label><input type="text" inputMode="decimal" autoComplete="off" value={leg.ppO0 || ''} onChange={e => updateLeg(leg.id, { ppO0: e.target.value })} placeholder="opt" className="input-dark input-compact w-full text-xs" /></div>
+                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 1.5</label><input type="text" inputMode="decimal" autoComplete="off" value={leg.ppO1 || ''} onChange={e => updateLeg(leg.id, { ppO1: e.target.value })} placeholder="opt" className="input-dark input-compact w-full text-xs" /></div>
+                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 2.5</label><input type="text" inputMode="decimal" autoComplete="off" value={leg.ppO2 || ''} onChange={e => updateLeg(leg.id, { ppO2: e.target.value })} placeholder="opt" className="input-dark input-compact w-full text-xs" /></div>
+                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 3.5</label><input type="text" inputMode="decimal" autoComplete="off" value={leg.ppO3 || ''} onChange={e => updateLeg(leg.id, { ppO3: e.target.value })} placeholder="opt" className="input-dark input-compact w-full text-xs" /></div>
+                      <div><label className="text-[10px] text-text-muted mb-1 block">Over 4.5</label><input type="text" inputMode="decimal" autoComplete="off" value={leg.ppO4 || ''} onChange={e => updateLeg(leg.id, { ppO4: e.target.value })} placeholder="opt" className="input-dark input-compact w-full text-xs" /></div>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <select value={leg.ppSide || 'home'} onChange={e => updateLeg(leg.id, { ppSide: e.target.value })} className="input-dark input-compact w-auto text-xs">
@@ -282,7 +281,7 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
                         </select>
                       </label>
                       <label className="flex items-center gap-1.5 text-xs text-text-muted">
-                        β acoplamento <input type="text" value={leg.ppBeta || '0.54'} onChange={e => updateLeg(leg.id, { ppBeta: e.target.value })} className="input-dark input-compact w-16 text-xs" />
+                        β acoplamento <input type="text" inputMode="decimal" autoComplete="off" value={leg.ppBeta || '0.54'} onChange={e => updateLeg(leg.id, { ppBeta: e.target.value })} className="input-dark input-compact w-16 text-xs" />
                       </label>
                     </div>
                     <p className="text-[10px] text-text-muted leading-snug">A escada de odds calibra a intensidade (μ). A <b>linha</b> define qual evento entra na probabilidade conjunta: Over k,5 ⇒ P(SOT ≥ k+1). Cauda alta (3,5/4,5) tende a ser subestimada pela Poisson.</p>
@@ -292,7 +291,7 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
                 {isCorner && (
                   <div className="mt-2 pl-3 border-l-2 border-border">
                     <label className="flex items-center gap-1.5 text-xs text-text-muted">
-                      β corner↔resultado <input type="text" value={leg.cBeta || '0,15'} onChange={e => updateLeg(leg.id, { cBeta: e.target.value })} className="input-dark input-compact w-16 text-xs" />
+                      β corner↔resultado <input type="text" inputMode="decimal" autoComplete="off" value={leg.cBeta || '0,15'} onChange={e => updateLeg(leg.id, { cBeta: e.target.value })} className="input-dark input-compact w-16 text-xs" />
                     </label>
                   </div>
                 )}
@@ -301,7 +300,7 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
           })}
         </div>
         <button type="button" onClick={() => addLeg('over')} className="btn-ghost text-xs flex items-center gap-1.5">
-          <Plus size={14} /> Perna
+          <Plus size={14} aria-hidden="true" /> Perna
         </button>
 
         <div className="divider" />
@@ -309,7 +308,7 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Sua odd final</label>
-            <input type="text" value={values['poi-your'] || ''} onChange={e => onChange('poi-your', e.target.value)} className="input-dark input-highlight" placeholder="3,15" />
+            <input type="text" inputMode="decimal" autoComplete="off" value={values['poi-your'] || ''} onChange={e => onChange('poi-your', e.target.value)} className="input-dark input-highlight" placeholder="3,15" />
           </div>
         </div>
       </div>

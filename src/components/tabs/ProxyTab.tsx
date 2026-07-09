@@ -63,12 +63,12 @@ export function ProxyTab({ values, onChange, onLoadExample, onReset }: Props) {
     <div className="space-y-5 animate-fade-in">
       <div className="panel">
         <div className="flex items-center gap-2 mb-3">
-          <Lightbulb size={14} className="text-warn" />
+          <Lightbulb size={14} className="text-warn" aria-hidden="true" />
           <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Exemplos rápidos</span>
         </div>
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={() => onLoadExample('proxy-single')} className="btn-ghost text-xs">Referência única</button>
-          <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} /> Reset</button>
+          <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} aria-hidden="true" /> Reset</button>
         </div>
       </div>
 
@@ -111,16 +111,16 @@ export function ProxyTab({ values, onChange, onLoadExample, onReset }: Props) {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs text-text-muted mb-1.5 block">Odd de referência</label>
-                <input type="text" value={values['proxy-ref'] || ''} onChange={e => onChange('proxy-ref', e.target.value)} className="input-dark" placeholder="1,70" />
+                <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-ref'] || ''} onChange={e => onChange('proxy-ref', e.target.value)} className="input-dark" placeholder="1,70" />
               </div>
               <div>
                 <label className="text-xs text-text-muted mb-1.5 block">Margem presumida (%)</label>
-                <input type="text" value={values['proxy-margin'] || ''} onChange={e => onChange('proxy-margin', e.target.value)} className="input-dark" placeholder="5,0" />
+                <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-margin'] || ''} onChange={e => onChange('proxy-margin', e.target.value)} className="input-dark" placeholder="5,0" />
               </div>
             </div>
             <div>
               <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
-              <input type="text" value={values['proxy-your'] || ''} onChange={e => onChange('proxy-your', e.target.value)} className="input-dark input-highlight" placeholder="2,20" />
+              <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-your'] || ''} onChange={e => onChange('proxy-your', e.target.value)} className="input-dark input-highlight" placeholder="2,20" />
             </div>
           </>
         ) : (
@@ -129,24 +129,24 @@ export function ProxyTab({ values, onChange, onLoadExample, onReset }: Props) {
             <div className="space-y-2">
               {consRows.map(row => (
                 <div key={row.id} className="flex items-center gap-2">
-                  <input type="text" value={row.odd} onChange={e => updateCons(row.id, 'odd', e.target.value)} className="input-dark flex-1" placeholder="Odd" />
+                  <input type="text" inputMode="decimal" autoComplete="off" value={row.odd} onChange={e => updateCons(row.id, 'odd', e.target.value)} className="input-dark flex-1" placeholder="Odd" />
                   <label className="flex items-center gap-1.5 text-xs text-text-muted cursor-pointer shrink-0">
                     <input type="checkbox" checked={row.excl} onChange={e => updateCons(row.id, 'excl', e.target.checked)} className="w-4 h-4 rounded border-border bg-surface text-accent" />
                     alvo
                   </label>
-                  <button type="button" onClick={() => removeCons(row.id)} className="text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors"><Trash2 size={14} /></button>
+                  <button type="button" aria-label="Remover casa" onClick={() => removeCons(row.id)} className="icon-btn text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors"><Trash2 size={14} aria-hidden="true" /></button>
                 </div>
               ))}
             </div>
-            <button type="button" onClick={addCons} className="btn-ghost text-xs flex items-center gap-1.5"><Plus size={14} /> Casa</button>
+            <button type="button" onClick={addCons} className="btn-ghost text-xs flex items-center gap-1.5"><Plus size={14} aria-hidden="true" /> Casa</button>
             <div className="grid grid-cols-2 gap-3 mt-3">
               <div>
                 <label className="text-xs text-text-muted mb-1.5 block">Margem presumida (%)</label>
-                <input type="text" value={values['proxy-cons-margin'] || ''} onChange={e => onChange('proxy-cons-margin', e.target.value)} className="input-dark" placeholder="5,0" />
+                <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-cons-margin'] || ''} onChange={e => onChange('proxy-cons-margin', e.target.value)} className="input-dark" placeholder="5,0" />
               </div>
               <div>
                 <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
-                <input type="text" value={values['proxy-cons-your'] || ''} onChange={e => onChange('proxy-cons-your', e.target.value)} className="input-dark input-highlight" placeholder="2,20" />
+                <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-cons-your'] || ''} onChange={e => onChange('proxy-cons-your', e.target.value)} className="input-dark input-highlight" placeholder="2,20" />
               </div>
             </div>
           </>

@@ -35,7 +35,7 @@ export function Sidebar({ activeTab, onChange, onConfig }: Props) {
         <div className="px-4 py-5 border-b border-border" style={{ background: 'rgba(11, 15, 23, 0.4)' }}>
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center shadow-glow">
-              <Calculator size={18} className="text-white" />
+              <Calculator size={18} className="text-white" aria-hidden="true" />
             </div>
             <div>
               <div className="text-sm font-bold text-text-primary tracking-tight">Kelly Stake Pro</div>
@@ -54,7 +54,7 @@ export function Sidebar({ activeTab, onChange, onConfig }: Props) {
               aria-selected={activeTab === t.id}
               className="nav-item"
             >
-              <t.icon size={16} />
+              <t.icon size={16} aria-hidden="true" />
               <span>{t.label}</span>
             </button>
           ))}
@@ -63,7 +63,7 @@ export function Sidebar({ activeTab, onChange, onConfig }: Props) {
         <div className="px-3 py-4 border-t border-border space-y-0.5">
           <div className="section-title px-2">Sistema</div>
           <button type="button" onClick={onConfig} className="nav-item">
-            <Settings size={16} />
+            <Settings size={16} aria-hidden="true" />
             <span>Configurações</span>
           </button>
         </div>
@@ -83,7 +83,7 @@ export function Sidebar({ activeTab, onChange, onConfig }: Props) {
               activeTab === t.id ? 'text-accent' : 'text-text-muted'
             }`}
           >
-            <t.icon size={18} />
+            <t.icon size={18} aria-hidden="true" />
             <span className="text-[9px] leading-tight font-medium">{t.short}</span>
           </button>
         ))}
@@ -92,7 +92,7 @@ export function Sidebar({ activeTab, onChange, onConfig }: Props) {
           onClick={onConfig}
           className="flex-1 flex flex-col items-center justify-center gap-0.5 text-text-muted transition-colors"
         >
-          <Settings size={18} />
+          <Settings size={18} aria-hidden="true" />
           <span className="text-[9px] leading-tight font-medium">Config</span>
         </button>
       </nav>

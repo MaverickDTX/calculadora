@@ -137,7 +137,7 @@ function App() {
     <div className="min-h-screen flex">
       <Sidebar activeTab={activeTab} onChange={setActiveTab} onConfig={() => setShowConfig(true)} />
 
-      <main className="flex-1 min-w-0 flex flex-col">
+      <main id="main" className="flex-1 min-w-0 flex flex-col">
         <header className="border-b border-border px-6 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-lg font-semibold text-text-primary">{TAB_LABELS[activeTab]}</h1>

@@ -27,7 +27,7 @@ export function ConfigModal({ config, onChange, onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md animate-fade-in" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md animate-fade-in" style={{ overscrollBehavior: 'contain' }} onClick={onClose}>
       <div className="border border-border rounded-2xl shadow-float w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col animate-slide-up"
         style={{ background: 'rgba(17, 24, 39, 0.85)', backdropFilter: 'blur(32px) saturate(150%)', WebkitBackdropFilter: 'blur(32px) saturate(150%)' }}
         onClick={e => e.stopPropagation()}
@@ -35,15 +35,15 @@ export function ConfigModal({ config, onChange, onClose }: Props) {
         <div className="px-6 py-4 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center">
-              <SlidersHorizontal size={16} className="text-accent" />
+              <SlidersHorizontal size={16} className="text-accent" aria-hidden="true" />
             </div>
             <div>
               <h2 className="text-sm font-semibold text-text-primary">Configurações</h2>
               <p className="text-xs text-text-muted">Ajuste a gestão de banca e o motor de cálculo</p>
             </div>
           </div>
-          <button type="button" onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors">
-            <X size={18} />
+          <button type="button" onClick={onClose} aria-label="Fechar configurações" className="icon-btn text-text-muted hover:text-text-primary transition-colors">
+            <X size={18} aria-hidden="true" />
           </button>
         </div>
 
@@ -146,7 +146,7 @@ function Section({ icon: Icon, title, children }: { icon: React.ElementType; tit
   return (
     <div>
       <div className="flex items-center gap-2 mb-3">
-        <Icon size={14} className="text-text-muted" />
+        <Icon size={14} className="text-text-muted" aria-hidden="true" />
         <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">{title}</span>
       </div>
       {children}
@@ -174,6 +174,8 @@ function Field({ label, value, onChange, suffix }: { label: string; value: strin
       <div className="relative">
         <input
           type="text"
+          inputMode="decimal"
+          autoComplete="off"
           value={draft}
           onChange={e => setDraft(e.target.value)}
           onBlur={() => onChange(draft)}

@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Plus, Minus, RotateCcw, Lightbulb } from 'lucide-react';
 
 interface Props {
@@ -9,18 +8,11 @@ interface Props {
 }
 
 export function NResultsTab({ values, onChange, onLoadExample, onReset }: Props) {
-  const [others, setOthers] = useState<string[]>(['']);
-
-  // Sync with prop values when tab changes / example loads
-  useEffect(() => {
-    const raw = values['nres-others'] || '';
-    const parsed = raw ? raw.split(',').map(s => s.trim()).filter(Boolean) : [''];
-    setOthers(parsed.length > 0 ? parsed : ['']);
-  }, [values['nres-others']]);
+  const raw = values['nres-others'] || '';
+  const others = raw ? raw.split(',').map(s => s.trim()).filter(Boolean) : [''];
 
   const updateOthers = (newOthers: string[]) => {
-    newOthers = newOthers.map(s => s.replace(/,/g, '.')); // força ponto; evita colisão com o separador ','
-    setOthers(newOthers);
+    newOthers = newOthers.map(s => s.replace(/,/g, '.'));
     onChange('nres-others', newOthers.filter(s => s.trim()).join(','));
   };
 
@@ -44,14 +36,14 @@ export function NResultsTab({ values, onChange, onLoadExample, onReset }: Props)
     <div className="space-y-5 animate-fade-in">
       <div className="panel">
         <div className="flex items-center gap-2 mb-3">
-          <Lightbulb size={14} className="text-warn" />
+          <Lightbulb size={14} className="text-warn" aria-hidden="true" />
           <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Exemplos rápidos</span>
         </div>
         <div className="flex flex-wrap gap-2">
           {presets.map(p => (
             <button key={p.key} type="button" onClick={() => onLoadExample(p.key)} className="btn-ghost text-xs">{p.label}</button>
           ))}
-          <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} /> Reset</button>
+          <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} aria-hidden="true" /> Reset</button>
         </div>
       </div>
 
@@ -77,11 +69,11 @@ export function NResultsTab({ values, onChange, onLoadExample, onReset }: Props)
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Resultado avaliado</label>
-            <input type="text" value={values['nres-eval'] || ''} onChange={e => onChange('nres-eval', e.target.value)} className="input-dark" placeholder="2,50" />
+            <input type="text" inputMode="decimal" autoComplete="off" value={values['nres-eval'] || ''} onChange={e => onChange('nres-eval', e.target.value)} className="input-dark" placeholder="2,50" />
           </div>
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
-            <input type="text" value={values['nres-your'] || ''} onChange={e => onChange('nres-your', e.target.value)} className="input-dark input-highlight" placeholder="2,65" />
+            <input type="text" inputMode="decimal" autoComplete="off" value={values['nres-your'] || ''} onChange={e => onChange('nres-your', e.target.value)} className="input-dark input-highlight" placeholder="2,65" />
           </div>
         </div>
 
@@ -89,13 +81,13 @@ export function NResultsTab({ values, onChange, onLoadExample, onReset }: Props)
         <div className="space-y-2">
           {others.map((v, i) => (
             <div key={i} className="flex items-center gap-2">
-              <input type="text" value={v} onChange={e => changeOther(i, e.target.value)} className="input-dark flex-1" placeholder={`Odd do resultado ${i + 2}`} />
+              <input type="text" inputMode="decimal" autoComplete="off" value={v} onChange={e => changeOther(i, e.target.value)} className="input-dark flex-1" placeholder={`Odd do resultado ${i + 2}`} />
               {others.length > 1 && (
-                <button type="button" onClick={() => removeOther(i)} className="text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors"><Minus size={16} /></button>
+                <button type="button" aria-label="Remover resultado" onClick={() => removeOther(i)} className="icon-btn text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors"><Minus size={16} aria-hidden="true" /></button>
               )}
             </div>
           ))}
-          <button type="button" onClick={addOther} className="btn-ghost text-xs flex items-center gap-1.5 mt-1"><Plus size={14} /> Adicionar resultado</button>
+          <button type="button" onClick={addOther} className="btn-ghost text-xs flex items-center gap-1.5 mt-1"><Plus size={14} aria-hidden="true" /> Adicionar resultado</button>
         </div>
       </div>
     </div>
