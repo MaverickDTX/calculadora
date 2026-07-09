@@ -22,3 +22,7 @@ vite.config.ts.timestamp-*.mjs
 *.sln
 *.sw?
 .env
+
+dist-audit/
+.claude/
+.fuse_hidden*

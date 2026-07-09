@@ -57,6 +57,20 @@ corretos e migração de localStorage legado.
 - **#5 Binomial Negativa** p/ cauda SOT (se o padrão migrar p/ Over 3,5/4,5).
 - **Re-arquitetar coupling p/ xG latente** (usar β-xG≈0,85 em vez do β-gols 0,54).
 
+### Engavetadas — decisão registrada (2026-07-09)
+- **#14 Leitor de prints (bot Telegram e/ou no app)** — SEGURADO por decisão do usuário.
+  Contexto: pedido original era bot Telegram com leitor de prints à la Bankroll Pro
+  (backend Vercel no mesmo repo, escopo Proxy + N Resultados). Na análise, o risco
+  central é que aqui o print alimenta **decisão de stake** (erro de OCR = aposta mal
+  dimensionada; a própria análise de sensibilidade mostra que ±1 tick muda o EV),
+  diferente do Bankroll Pro onde o print só registra. Alternativa recomendada quando
+  reabrir: **leitor de prints dentro do app** (extração Gemini preenche o formulário,
+  usuário revisa antes de calcular) — 80% do valor, sem infra nova; bot depois,
+  herdando o módulo de extração já validado. Ordens de execução completas do bot já
+  redigidas em `C:\Projetos\calculadora\ORDENS-bot-telegram-kelly.md` (inclui a
+  refatoração `useCalculator.ts` → `src/lib/calc.ts`, que tem valor por si só e pode
+  ser antecipada em qualquer sessão).
+
 ### Feitas
 #1, #3, #4 (Supabase confirmado), #6, #7, #8 (já estava OK),
 #9, #11 (bttsNo), #12 (ponto decimal global).
@@ -65,6 +79,10 @@ corretos e migração de localStorage legado.
 1. **#11 + #13** — alinhar com o usuário sobre a fonte de calibração antes de
    implementar SOT/finalizações/cartões.
 2. **#10** — papercut de UX rápido se o usuário reportar incômodo.
+3. **Manutenção:** limpeza da camada externa de `C:\Projetos\calculadora` (fora do git)
+   **executada em 2026-07-09** — 38 arquivos movidos para `old/{html,patches,tests,docs,misc}`,
+   2 deletados. Ordens arquivadas em `old\docs\ORDENS-limpeza-legado.md`; mapa de
+   reversão em `old\INVENTARIO-pre-limpeza-2026-07-09.txt`.
 
 > Antes de qualquer mercado novo (#11 SOT/finalizações, #13 cartões), **alinhar com
 > o usuário de onde vem a calibração** — é a decisão de produto que trava ambos.
