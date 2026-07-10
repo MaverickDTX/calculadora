@@ -143,19 +143,19 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
       <div className="panel panel-focus space-y-5">
         <div className="section-title">Odds simples do jogo</div>
         <div className="grid grid-cols-3 gap-3">
-          <div><label className="text-xs text-text-muted mb-1.5 block">Casa (1)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-h'] || ''} onChange={e => onChange('poi-h', e.target.value)} className="input-dark" placeholder="1,80" /></div>
-          <div><label className="text-xs text-text-muted mb-1.5 block">Empate (X)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-d'] || ''} onChange={e => onChange('poi-d', e.target.value)} className="input-dark" placeholder="3,60" /></div>
-          <div><label className="text-xs text-text-muted mb-1.5 block">Fora (2)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-a'] || ''} onChange={e => onChange('poi-a', e.target.value)} className="input-dark" placeholder="4,50" /></div>
+          <div><label className="text-xs text-text-muted mb-1.5 block">Casa (1)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-h'] || ''} onChange={e => onChange('poi-h', e.target.value)} className="input-dark" placeholder="1.80" /></div>
+          <div><label className="text-xs text-text-muted mb-1.5 block">Empate (X)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-d'] || ''} onChange={e => onChange('poi-d', e.target.value)} className="input-dark" placeholder="3.60" /></div>
+          <div><label className="text-xs text-text-muted mb-1.5 block">Fora (2)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-a'] || ''} onChange={e => onChange('poi-a', e.target.value)} className="input-dark" placeholder="4.50" /></div>
         </div>
         <div className="grid grid-cols-3 gap-3">
-          <div><label className="text-xs text-text-muted mb-1.5 block">Linha O/U gols</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-ouline'] || ''} onChange={e => onChange('poi-ouline', e.target.value)} className="input-dark" placeholder="2,5" /></div>
-          <div><label className="text-xs text-text-muted mb-1.5 block">Odd Over</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-over'] || ''} onChange={e => onChange('poi-over', e.target.value)} className="input-dark" placeholder="1,95" /></div>
-          <div><label className="text-xs text-text-muted mb-1.5 block">Odd Under</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-under'] || ''} onChange={e => onChange('poi-under', e.target.value)} className="input-dark" placeholder="1,95" /></div>
+          <div><label className="text-xs text-text-muted mb-1.5 block">Linha O/U gols</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-ouline'] || ''} onChange={e => onChange('poi-ouline', e.target.value)} className="input-dark" placeholder="2.5" /></div>
+          <div><label className="text-xs text-text-muted mb-1.5 block">Odd Over</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-over'] || ''} onChange={e => onChange('poi-over', e.target.value)} className="input-dark" placeholder="1.95" /></div>
+          <div><label className="text-xs text-text-muted mb-1.5 block">Odd Under</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-under'] || ''} onChange={e => onChange('poi-under', e.target.value)} className="input-dark" placeholder="1.95" /></div>
         </div>
 
         <div>
-          <label className="text-xs text-text-muted mb-1.5 block">Correção Dixon-Coles ρ</label>
-          <input type="text" inputMode="text" autoComplete="off" value={values['poi-rho'] || ''} onChange={e => onChange('poi-rho', e.target.value)} className="input-dark" placeholder="-0,05" />
+          <label className="text-xs text-text-muted mb-1.5 block" title="Correção de dependência entre poucos gols (Dixon-Coles). Valores típicos entre -0.15 e 0; ~-0.05 é comum. 0 = Poisson pura.">Correção Dixon-Coles ρ</label>
+          <input type="text" inputMode="text" autoComplete="off" value={values['poi-rho'] || ''} onChange={e => onChange('poi-rho', e.target.value)} className="input-dark" placeholder="-0.05" />
         </div>
 
         <div className="pt-3 border-t border-border">
@@ -167,9 +167,9 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
           {cornerOpen && (
             <div className="mt-3 space-y-3 animate-fade-in">
               <div className="grid grid-cols-3 gap-3">
-                <div><label className="text-xs text-text-muted mb-1.5 block">Linha O/U corners</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-line'] || ''} onChange={e => onChange('poi-c-line', e.target.value)} className="input-dark" placeholder="9,5" /></div>
-                <div><label className="text-xs text-text-muted mb-1.5 block">Odd Over corners</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-over'] || ''} onChange={e => onChange('poi-c-over', e.target.value)} className="input-dark" placeholder="1,90" /></div>
-                <div><label className="text-xs text-text-muted mb-1.5 block">Odd Under corners</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-under'] || ''} onChange={e => onChange('poi-c-under', e.target.value)} className="input-dark" placeholder="1,90" /></div>
+                <div><label className="text-xs text-text-muted mb-1.5 block">Linha O/U corners</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-line'] || ''} onChange={e => onChange('poi-c-line', e.target.value)} className="input-dark" placeholder="9.5" /></div>
+                <div><label className="text-xs text-text-muted mb-1.5 block">Odd Over corners</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-over'] || ''} onChange={e => onChange('poi-c-over', e.target.value)} className="input-dark" placeholder="1.90" /></div>
+                <div><label className="text-xs text-text-muted mb-1.5 block">Odd Under corners</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-under'] || ''} onChange={e => onChange('poi-c-under', e.target.value)} className="input-dark" placeholder="1.90" /></div>
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div><label className="text-xs text-text-muted mb-1.5 block">Corner 1X2 — Casa (1) <span className="text-text-muted/70">opcional</span></label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-1'] || ''} onChange={e => onChange('poi-c-1', e.target.value)} className="input-dark" placeholder="opt" /></div>
@@ -280,7 +280,7 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
                           <option value="4,5">Over 4,5</option>
                         </select>
                       </label>
-                      <label className="flex items-center gap-1.5 text-xs text-text-muted">
+                      <label className="flex items-center gap-1.5 text-xs text-text-muted" title="Intensidade do acoplamento entre a prop do jogador e o resultado do jogo. 0 = independente; ~0.54 é o default calibrado.">
                         β acoplamento <input type="text" inputMode="decimal" autoComplete="off" value={leg.ppBeta || '0.54'} onChange={e => updateLeg(leg.id, { ppBeta: e.target.value })} className="input-dark input-compact w-16 text-xs" />
                       </label>
                     </div>
@@ -290,8 +290,8 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
 
                 {isCorner && (
                   <div className="mt-2 pl-3 border-l-2 border-border">
-                    <label className="flex items-center gap-1.5 text-xs text-text-muted">
-                      β corner↔resultado <input type="text" inputMode="decimal" autoComplete="off" value={leg.cBeta || '0,15'} onChange={e => updateLeg(leg.id, { cBeta: e.target.value })} className="input-dark input-compact w-16 text-xs" />
+                    <label className="flex items-center gap-1.5 text-xs text-text-muted" title="Intensidade do acoplamento entre escanteios e resultado do jogo. 0 = independente; ~0.15 é o default.">
+                      β corner↔resultado <input type="text" inputMode="decimal" autoComplete="off" value={leg.cBeta || '0.15'} onChange={e => updateLeg(leg.id, { cBeta: e.target.value })} className="input-dark input-compact w-16 text-xs" />
                     </label>
                   </div>
                 )}
@@ -308,7 +308,7 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Sua odd final</label>
-            <input type="text" inputMode="decimal" autoComplete="off" value={values['poi-your'] || ''} onChange={e => onChange('poi-your', e.target.value)} className="input-dark input-highlight" placeholder="3,15" />
+            <input type="text" inputMode="decimal" autoComplete="off" value={values['poi-your'] || ''} onChange={e => onChange('poi-your', e.target.value)} className="input-dark input-highlight" placeholder="3.15" />
           </div>
         </div>
       </div>

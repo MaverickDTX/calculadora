@@ -51,10 +51,11 @@ function MonteCarlo({ result, config }: { result: BetResult; config: Config }) {
 
   return (
     <div className="panel">
-      <div className="flex items-center justify-between mb-3">
-        <div className="section-title mb-0">Simulação Monte Carlo</div>
+      <div className="flex items-center justify-between mb-1">
+        <div className="section-title mb-0">Projeção de banca (Monte Carlo)</div>
         <span className="tag tag-info">{sims.length} trajetórias · 250 apostas</span>
       </div>
+      <p className="text-[11px] text-text-muted mb-3">Risco de ruína e mediana após 250 apostas</p>
       <div className="flex items-center justify-between text-xs text-text-muted">
         <span>Ruína aprox: <span className="font-mono text-text-secondary">{fpct(ruin)}</span></span>
         <span>Mediana final: <span className="font-mono text-text-secondary">{median.toFixed(2)}x</span></span>

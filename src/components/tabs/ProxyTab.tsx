@@ -111,16 +111,16 @@ export function ProxyTab({ values, onChange, onLoadExample, onReset }: Props) {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs text-text-muted mb-1.5 block">Odd de referência</label>
-                <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-ref'] || ''} onChange={e => onChange('proxy-ref', e.target.value)} className="input-dark" placeholder="1,70" />
+                <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-ref'] || ''} onChange={e => onChange('proxy-ref', e.target.value)} className="input-dark" placeholder="1.70" />
               </div>
               <div>
                 <label className="text-xs text-text-muted mb-1.5 block">Margem presumida (%)</label>
-                <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-margin'] || ''} onChange={e => onChange('proxy-margin', e.target.value)} className="input-dark" placeholder="5,0" />
+                <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-margin'] || ''} onChange={e => onChange('proxy-margin', e.target.value)} className="input-dark" placeholder="5.0" />
               </div>
             </div>
             <div>
               <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
-              <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-your'] || ''} onChange={e => onChange('proxy-your', e.target.value)} className="input-dark input-highlight" placeholder="2,20" />
+              <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-your'] || ''} onChange={e => onChange('proxy-your', e.target.value)} className="input-dark input-highlight" placeholder="2.20" />
             </div>
           </>
         ) : (
@@ -142,11 +142,11 @@ export function ProxyTab({ values, onChange, onLoadExample, onReset }: Props) {
             <div className="grid grid-cols-2 gap-3 mt-3">
               <div>
                 <label className="text-xs text-text-muted mb-1.5 block">Margem presumida (%)</label>
-                <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-cons-margin'] || ''} onChange={e => onChange('proxy-cons-margin', e.target.value)} className="input-dark" placeholder="5,0" />
+                <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-cons-margin'] || ''} onChange={e => onChange('proxy-cons-margin', e.target.value)} className="input-dark" placeholder="5.0" />
               </div>
               <div>
                 <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
-                <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-cons-your'] || ''} onChange={e => onChange('proxy-cons-your', e.target.value)} className="input-dark input-highlight" placeholder="2,20" />
+                <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-cons-your'] || ''} onChange={e => onChange('proxy-cons-your', e.target.value)} className="input-dark input-highlight" placeholder="2.20" />
               </div>
             </div>
           </>

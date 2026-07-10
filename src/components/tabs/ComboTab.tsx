@@ -91,7 +91,7 @@ export function ComboTab({ values, onChange, onLoadExample, onReset }: Props) {
         <div className="section-title">Sua odd</div>
         <div>
           <label className="text-xs text-text-muted mb-1.5 block">Odd combinada (com boost se houver)</label>
-          <input type="text" inputMode="decimal" autoComplete="off" value={values['combo-your'] || ''} onChange={e => onChange('combo-your', e.target.value)} className="input-dark input-highlight" placeholder="7,03" />
+          <input type="text" inputMode="decimal" autoComplete="off" value={values['combo-your'] || ''} onChange={e => onChange('combo-your', e.target.value)} className="input-dark input-highlight" placeholder="7.03" />
         </div>
 
         <div className="divider" />

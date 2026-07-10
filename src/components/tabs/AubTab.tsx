@@ -82,7 +82,7 @@ export function AubTab({ values, onChange, onLoadExample, onReset }: Props) {
           </div>
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
-            <input type="text" inputMode="decimal" autoComplete="off" value={values['aub-your'] || ''} onChange={e => onChange('aub-your', e.target.value)} className="input-dark input-highlight" placeholder="1,85" />
+            <input type="text" inputMode="decimal" autoComplete="off" value={values['aub-your'] || ''} onChange={e => onChange('aub-your', e.target.value)} className="input-dark input-highlight" placeholder="1.85" />
           </div>
         </div>
       </div>

@@ -65,24 +65,24 @@ export function PropsTab({ values, onChange, onLoadExample, onReset }: Props) {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Ref. {evalLabel}</label>
-            <input type="text" inputMode="decimal" autoComplete="off" value={values['prop-ref-yes'] || ''} onChange={e => onChange('prop-ref-yes', e.target.value)} className="input-dark" placeholder="2,10" />
+            <input type="text" inputMode="decimal" autoComplete="off" value={values['prop-ref-yes'] || ''} onChange={e => onChange('prop-ref-yes', e.target.value)} className="input-dark" placeholder="2.10" />
           </div>
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Ref. {otherLabel}</label>
-            <input type="text" inputMode="decimal" autoComplete="off" value={values['prop-ref-no'] || ''} onChange={e => onChange('prop-ref-no', e.target.value)} className="input-dark" placeholder="1,80" />
+            <input type="text" inputMode="decimal" autoComplete="off" value={values['prop-ref-no'] || ''} onChange={e => onChange('prop-ref-no', e.target.value)} className="input-dark" placeholder="1.80" />
           </div>
         </div>
 
         {marginOn && (
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Margem presumida (%)</label>
-            <input type="text" inputMode="decimal" autoComplete="off" value={values['prop-margin'] || ''} onChange={e => onChange('prop-margin', e.target.value)} className="input-dark" placeholder="5,0" />
+            <input type="text" inputMode="decimal" autoComplete="off" value={values['prop-margin'] || ''} onChange={e => onChange('prop-margin', e.target.value)} className="input-dark" placeholder="5.0" />
           </div>
         )}
 
         <div>
           <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
-          <input type="text" inputMode="decimal" autoComplete="off" value={values['prop-your'] || ''} onChange={e => onChange('prop-your', e.target.value)} className="input-dark input-highlight" placeholder="2,30" />
+          <input type="text" inputMode="decimal" autoComplete="off" value={values['prop-your'] || ''} onChange={e => onChange('prop-your', e.target.value)} className="input-dark input-highlight" placeholder="2.30" />
         </div>
 
         <div className="space-y-3 pt-2 border-t border-border">

@@ -69,11 +69,11 @@ export function NResultsTab({ values, onChange, onLoadExample, onReset }: Props)
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Resultado avaliado</label>
-            <input type="text" inputMode="decimal" autoComplete="off" value={values['nres-eval'] || ''} onChange={e => onChange('nres-eval', e.target.value)} className="input-dark" placeholder="2,50" />
+            <input type="text" inputMode="decimal" autoComplete="off" value={values['nres-eval'] || ''} onChange={e => onChange('nres-eval', e.target.value)} className="input-dark" placeholder="2.50" />
           </div>
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
-            <input type="text" inputMode="decimal" autoComplete="off" value={values['nres-your'] || ''} onChange={e => onChange('nres-your', e.target.value)} className="input-dark input-highlight" placeholder="2,65" />
+            <input type="text" inputMode="decimal" autoComplete="off" value={values['nres-your'] || ''} onChange={e => onChange('nres-your', e.target.value)} className="input-dark input-highlight" placeholder="2.65" />
           </div>
         </div>
 
