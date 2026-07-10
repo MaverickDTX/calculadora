@@ -155,7 +155,7 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
 
         <div>
           <label className="text-xs text-text-muted mb-1.5 block">Correção Dixon-Coles ρ</label>
-          <input type="text" inputMode="decimal" autoComplete="off" value={values['poi-rho'] || ''} onChange={e => onChange('poi-rho', e.target.value)} className="input-dark" placeholder="-0,05" />
+          <input type="text" inputMode="text" autoComplete="off" value={values['poi-rho'] || ''} onChange={e => onChange('poi-rho', e.target.value)} className="input-dark" placeholder="-0,05" />
         </div>
 
         <div className="pt-3 border-t border-border">

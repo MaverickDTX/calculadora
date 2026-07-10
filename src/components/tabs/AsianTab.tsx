@@ -98,7 +98,7 @@ export function AsianTab({ values, onChange, onLoadExample, onReset }: Props) {
               <div><label className="text-xs text-text-muted mb-1.5 block">Odd Under</label><input type="text" inputMode="decimal" autoComplete="off" value={values['asiah-under'] || ''} onChange={e => onChange('asiah-under', e.target.value)} className="input-dark" placeholder="1,95" /></div>
             </div>
             <div className="grid grid-cols-3 gap-3">
-              <div><label className="text-xs text-text-muted mb-1.5 block">Dixon-Coles ρ</label><input type="text" inputMode="decimal" autoComplete="off" value={values['asiah-rho'] || ''} onChange={e => onChange('asiah-rho', e.target.value)} className="input-dark" placeholder="-0,05" /></div>
+              <div><label className="text-xs text-text-muted mb-1.5 block">Dixon-Coles ρ</label><input type="text" inputMode="text" autoComplete="off" value={values['asiah-rho'] || ''} onChange={e => onChange('asiah-rho', e.target.value)} className="input-dark" placeholder="-0,05" /></div>
               <div>
                 <label className="text-xs text-text-muted mb-1.5 block">Lado</label>
                 <select value={values['asiah-side'] || 'home'} onChange={e => onChange('asiah-side', e.target.value)} className="input-dark">
@@ -106,7 +106,7 @@ export function AsianTab({ values, onChange, onLoadExample, onReset }: Props) {
                   <option value="away">Fora</option>
                 </select>
               </div>
-              <div><label className="text-xs text-text-muted mb-1.5 block">Handicap</label><input type="text" inputMode="decimal" autoComplete="off" value={values['asiah-line'] || ''} onChange={e => onChange('asiah-line', e.target.value)} className="input-dark" placeholder="-0,5" /></div>
+              <div><label className="text-xs text-text-muted mb-1.5 block">Handicap</label><input type="text" inputMode="text" autoComplete="off" value={values['asiah-line'] || ''} onChange={e => onChange('asiah-line', e.target.value)} className="input-dark" placeholder="-0,5" /></div>
             </div>
             <p className="text-xs text-text-muted leading-relaxed">
               Negativo = casa favorita; positivo = casa desfavorecida; 0 = neutro. O handicap do visitante é o inverso.
