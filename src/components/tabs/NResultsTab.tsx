@@ -1,13 +1,15 @@
 import { Plus, Minus, RotateCcw, Lightbulb } from 'lucide-react';
+import { Select } from '../Select';
 
 interface Props {
   values: Record<string, string>;
   onChange: (id: string, value: string) => void;
   onLoadExample: (key: string) => void;
   onReset: () => void;
+  onCalculate: () => void;
 }
 
-export function NResultsTab({ values, onChange, onLoadExample, onReset }: Props) {
+export function NResultsTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
   const raw = values['nres-others'] || '';
   const others = raw ? raw.split(',').map(s => s.trim()).filter(Boolean) : [''];
 
@@ -49,21 +51,21 @@ export function NResultsTab({ values, onChange, onLoadExample, onReset }: Props)
 
       <div className="panel panel-focus">
         <div className="section-title">Mercado</div>
-        <div className="mb-4">
-          <label className="text-xs text-text-muted mb-1.5 block">Tipo do mercado</label>
-          <select
-            value={values['nres-type'] || '1X2 / Moneyline'}
-            onChange={e => { onChange('nres-type', e.target.value); onChange('nres-name', e.target.value); }}
-            className="input-dark"
-          >
-            <option>1X2 / Moneyline</option>
-            <option>Over/Under</option>
-            <option>Dupla chance</option>
-            <option>Ambas marcam</option>
-            <option>Handicap asiático (3 vias)</option>
-            <option>Outro</option>
-          </select>
-        </div>
+<div className="mb-4">
+            <label className="text-xs text-text-muted mb-1.5 block">Tipo do mercado</label>
+            <Select
+              value={values['nres-type'] || '1X2 / Moneyline'}
+              onChange={v => { onChange('nres-type', v); onChange('nres-name', v); }}
+              options={[
+                { value: '1X2 / Moneyline', label: '1X2 / Moneyline' },
+                { value: 'Over/Under', label: 'Over/Under' },
+                { value: 'Dupla chance', label: 'Dupla chance' },
+                { value: 'Ambas marcam', label: 'Ambas marcam' },
+                { value: 'Handicap asiático (3 vias)', label: 'Handicap asiático (3 vias)' },
+                { value: 'Outro', label: 'Outro' },
+              ]}
+            />
+          </div>
 
         <div className="section-title">Odds de referência</div>
         <div className="grid grid-cols-2 gap-3 mb-4">
@@ -90,6 +92,10 @@ export function NResultsTab({ values, onChange, onLoadExample, onReset }: Props)
           <button type="button" onClick={addOther} className="btn-ghost text-xs flex items-center gap-1.5 mt-1"><Plus size={14} aria-hidden="true" /> Adicionar resultado</button>
         </div>
       </div>
+
+      <button type="button" onClick={onCalculate} className="btn-primary w-full mt-4 py-3 text-base">
+        Calcular
+      </button>
     </div>
   );
 }

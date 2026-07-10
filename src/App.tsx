@@ -3,7 +3,7 @@ import type { TabId } from './types';
 import { useConfig } from './hooks/useConfig';
 import { useCalculator } from './hooks/useCalculator';
 import { Sidebar } from './components/Sidebar';
-import { ResultsDrawer } from './components/ResultsDrawer';
+import { ResultsModal } from './components/ResultsModal';
 import { ConfigModal } from './components/ConfigModal';
 import { VizSection } from './components/VizSection';
 import { Toast } from './components/Toast';
@@ -31,6 +31,16 @@ const DEFAULT_INPUTS: Record<string, string> = {
   'asia-mode': 'total',
   'asia-side': 'over',
   'asiah-side': 'home',
+};
+
+const EXAMPLE_TAB: Record<string, TabId> = {
+  'nres-1x2': 'nres', 'nres-ou': 'nres',
+  'prop-anytime': 'props',
+  'proxy-single': 'proxy',
+  'aub-basic': 'aub',
+  'combo-boost': 'combo',
+  'poi-builder': 'poi', 'poi-playerprop': 'poi',
+  'asia-total': 'asia',
 };
 
 const EXAMPLE_MAP: Record<string, Partial<Record<string, string>>> = {
@@ -80,27 +90,32 @@ const TAB_LABELS: Record<TabId, string> = {
 // as odds individuais já são normalizadas a ponto nos handlers das abas.
 const RAW_LIST_FIELDS = new Set(['poi-legs', 'combo-legs', 'aub-odds', 'nres-others', 'proxy-cons-odds', 'proxy-cons-excl']);
 
+// Abas que usam cálculo lazy (sob demanda via botão "Calcular") — abas pesadas.
+const LAZY_TABS: Set<TabId> = new Set(['combo', 'poi', 'asia']);
+
 function App() {
   const { config, setConfig } = useConfig();
   const [activeTab, setActiveTab] = useState<TabId>('nres');
   const [inputs, setInputs] = useState<Record<string, string>>(DEFAULT_INPUTS);
   const [showConfig, setShowConfig] = useState(false);
-  const [showResults, setShowResults] = useState(true);
+  const [showResultsModal, setShowResultsModal] = useState(false);
+  const [calcTrigger, setCalcTrigger] = useState(0);
   // Snapshot dos inputs anterior ao último Reset, para o "Desfazer" do toast.
   const [undoSnapshot, setUndoSnapshot] = useState<Record<string, string> | null>(null);
 
   const handleInputChange = useCallback((id: string, value: string) => {
-    // Padroniza o decimal em ponto (formato das casas): vírgula digitada vira ponto na hora.
     const v = RAW_LIST_FIELDS.has(id) ? value : value.replace(/,/g, '.');
     setInputs(prev => ({ ...prev, [id]: v }));
   }, []);
 
-  const { result } = useCalculator(inputs, config, activeTab);
+  const isLazyTab = LAZY_TABS.has(activeTab);
+  const { result } = useCalculator(inputs, config, activeTab, isLazyTab ? calcTrigger : undefined);
 
   const loadExample = useCallback((key: string) => {
     const example = EXAMPLE_MAP[key];
     if (!example) return;
-    const tab = key.split('-')[0] as TabId;
+    const tab = EXAMPLE_TAB[key];
+    if (!tab) return;
     setActiveTab(tab);
     setInputs((prev: Record<string, string>) => {
       const next: Record<string, string> = { ...prev };
@@ -109,8 +124,6 @@ function App() {
     });
   }, []);
 
-  // Reset = LIMPAR os campos da aba ativa. Sem diálogo bloqueante: limpa direto e
-  // oferece "Desfazer" via toast por alguns segundos (padrão do mockup M3).
   const resetTab = useCallback(() => {
     const prefixes: Record<TabId, string[]> = {
       nres: ['nres-'], props: ['prop-'], proxy: ['proxy-'], aub: ['aub-'],
@@ -118,7 +131,6 @@ function App() {
     };
     const pfx = prefixes[activeTab];
     setInputs(prev => {
-      // Guarda o estado anterior só se houver algo preenchido para desfazer.
       const hadContent = Object.keys(prev).some(k => pfx.some(p => k.startsWith(p)) && prev[k] !== '');
       if (hadContent) setUndoSnapshot(prev);
       const next = { ...prev };
@@ -132,8 +144,13 @@ function App() {
     setUndoSnapshot(null);
   }, [undoSnapshot]);
 
+  const handleCalculate = useCallback(() => {
+    setCalcTrigger(t => t + 1);
+    setShowResultsModal(true);
+  }, []);
+
   const tabContent = useMemo(() => {
-    const common = { values: inputs, onChange: handleInputChange, onLoadExample: loadExample, onReset: resetTab };
+    const common = { values: inputs, onChange: handleInputChange, onLoadExample: loadExample, onReset: resetTab, onCalculate: handleCalculate };
     switch (activeTab) {
       case 'nres': return <NResultsTab {...common} />;
       case 'props': return <PropsTab {...common} />;
@@ -143,7 +160,7 @@ function App() {
       case 'poi': return <BetBuilderTab {...common} />;
       case 'asia': return <AsianTab {...common} />;
     }
-  }, [activeTab, inputs, handleInputChange, loadExample, resetTab]);
+  }, [activeTab, inputs, handleInputChange, loadExample, resetTab, handleCalculate]);
 
   return (
     <div className="min-h-screen flex">
@@ -154,15 +171,6 @@ function App() {
           <div>
             <h1 className="text-lg font-semibold text-text-primary">{TAB_LABELS[activeTab]}</h1>
             <p className="hidden sm:block text-xs text-text-muted mt-0.5">Kelly Stake Pro — quanto apostar, não em que apostar</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setShowResults(v => !v)}
-              className={`btn-ghost text-xs ${showResults ? 'border-accent text-accent' : ''}`}
-            >
-              {showResults ? 'Ocultar resultado' : 'Mostrar resultado'}
-            </button>
           </div>
         </header>
 
@@ -176,14 +184,18 @@ function App() {
             </div>
             <div className="h-8" />
           </div>
-
-          {showResults && (
-            <ResultsDrawer result={result} config={config} onClose={() => setShowResults(false)} />
-          )}
         </div>
       </main>
 
       {showConfig && <ConfigModal config={config} onChange={setConfig} onClose={() => setShowConfig(false)} />}
+
+      {showResultsModal && (
+        <ResultsModal
+          result={result}
+          config={config}
+          onClose={() => setShowResultsModal(false)}
+        />
+      )}
 
       {undoSnapshot && (
         <Toast

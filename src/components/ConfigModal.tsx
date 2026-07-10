@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Wallet, SlidersHorizontal, Percent, Shield, TrendingUp } from 'lucide-react';
 import type { Config, DevigMethod, BoostType } from '../types';
 import { useDialog } from '../hooks/useDialog';
+import { Select } from './Select';
 
 interface Props {
   config: Config;
@@ -22,7 +23,7 @@ const METHODS: { id: DevigMethod; label: string; desc: string }[] = [
 
 export function ConfigModal({ config, onChange, onClose }: Props) {
   const [local, setLocal] = useState<Config>(config);
-  const { ref, dialogProps } = useDialog<HTMLDivElement>({
+  const { dialogProps } = useDialog<HTMLDivElement>({
     open: true,
     onClose,
     labelId: TITLE_ID,
@@ -35,8 +36,8 @@ export function ConfigModal({ config, onChange, onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md animate-fade-in" style={{ overscrollBehavior: 'contain' }} onClick={onClose}>
-      <div ref={ref} {...dialogProps}
+    <div className="fixed inset-0 z-50 flex items-center justify-center md:pl-60 bg-black/50 backdrop-blur-md animate-fade-in" style={{ overscrollBehavior: 'contain' }} onClick={onClose}>
+      <div {...dialogProps}
         className="border border-border rounded-2xl shadow-float w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col animate-slide-up"
         style={{ background: 'rgba(17, 24, 39, 0.85)', backdropFilter: 'blur(32px) saturate(150%)', WebkitBackdropFilter: 'blur(32px) saturate(150%)' }}
         onClick={e => e.stopPropagation()}
@@ -126,15 +127,15 @@ export function ConfigModal({ config, onChange, onClose }: Props) {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs text-text-muted mb-1.5 block">Tipo</label>
-                <select
+                <Select
                   value={local.boostType}
-                  onChange={e => update({ boostType: e.target.value as BoostType })}
-                  className="input-dark"
-                >
-                  <option value="none">Sem boost</option>
-                  <option value="profit">Profit %</option>
-                  <option value="mult">Multiplicador</option>
-                </select>
+                  onChange={v => update({ boostType: v as BoostType })}
+                  options={[
+                    { value: 'none', label: 'Sem boost' },
+                    { value: 'profit', label: 'Profit %' },
+                    { value: 'mult', label: 'Multiplicador' },
+                  ]}
+                />
               </div>
               {local.boostType !== 'none' && (
                 <Field

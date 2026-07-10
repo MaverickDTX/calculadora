@@ -1,6 +1,6 @@
 # Handoff — Régua de Kelly (Kelly Stake Pro)
 
-> Última atualização: 2026-07-09 · Versão em produção: **v0.3** (`a7f57f6`)
+> Última atualização: 2026-07-10 · Versão em produção: **v0.4**
 > Memória detalhada do projeto: `memory/project_kelly.md` (índice em `memory/MEMORY.md`)
 > Handoff do coletor de dados: `HANDOFF-coletor-shots-time.md` (fora do git, em `C:\Projetos\calculadora\`)
 
@@ -47,12 +47,14 @@ corretos e migração de localStorage legado.
 ### Abertas — acionáveis
 - **#11 Novas pernas Bet Builder (resto)** — "Ambas marcam: Não" feito. **Pipeline de
   dados construído** (script Python `coletar_shots_time_sofasport.py`, fora do git):
-  coleta shots/SOT + cartões por time via SofaScore RapidAPI. Champions/Libertadores
-  corrigidos. Coleta completa **travada na quota free da API** (~317 chamadas usadas,
-  aguardar reset). Cache parcial com 224 eventos (Brasileirão + Libertadores).
-  **Decisão de calibração ainda pendente** (escada de odds / linha O-U / base rate).
+  coleta shots/SOT + cartões por time via SofaScore RapidAPI (provider atual:
+  **sportapi7 / RapidSportAPI**). Cache: 376 eventos com stats + 13 times com
+  metadados (de 156 times). Coleta completa **travada na quota free** (500 req/mês
+  esgotados em ~130 chamadas Fase 1). **Decisão de calibração ainda pendente**
+  (escada de odds / linha O-U / base rate).
 - **#13 Mercado de cartões** (O/U partida/time + 1X2) — dados de cartão já incluídos
-  no pipeline de coleta acima. Mesma decisão de calibração pendente.
+  no pipeline acima (`yellowCards` confirmado, `redCards` condicional). Mesma decisão
+  de calibração pendente.
 - **#10 Colapso de linha** ao limpar campo do meio (A ou B / N Resultados) — baixa prio.
 - **#2 Resumo do ajuste λ/erro** (paridade v14) — opcional, baixo valor.
 

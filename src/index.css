@@ -157,7 +157,10 @@
     border: none;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
   }
   .btn-primary:hover {
     background: #5D5DD9;

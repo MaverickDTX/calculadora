@@ -27,27 +27,31 @@ export function Toast({ message, actionLabel, onAction, onDismiss, duration = 50
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[300] flex items-center gap-3 px-5 py-3 rounded-xl border border-border text-text-primary text-sm shadow-float animate-slide-up"
-      style={{ background: 'rgba(31, 41, 55, 0.96)', backdropFilter: 'blur(20px) saturate(140%)' }}
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 md:left-[calc(50%+7.5rem)] z-[300] pointer-events-none"
     >
-      <span>{message}</span>
-      {actionLabel && onAction && (
+      <div
+        className="flex items-center gap-3 px-5 py-3 rounded-xl border border-border text-text-primary text-sm shadow-float animate-slide-up pointer-events-auto"
+        style={{ background: 'rgba(31, 41, 55, 0.96)', backdropFilter: 'blur(20px) saturate(140%)' }}
+      >
+        <span>{message}</span>
+        {actionLabel && onAction && (
+          <button
+            type="button"
+            onClick={() => { onAction(); onDismiss(); }}
+            className="btn-primary text-xs px-3 py-1 flex items-center gap-1.5"
+          >
+            <RotateCcw size={13} aria-hidden="true" /> {actionLabel}
+          </button>
+        )}
         <button
           type="button"
-          onClick={() => { onAction(); onDismiss(); }}
-          className="btn-primary text-xs px-3 py-1 flex items-center gap-1.5"
+          onClick={onDismiss}
+          aria-label="Fechar aviso"
+          className="icon-btn text-text-muted hover:text-text-primary transition-colors"
         >
-          <RotateCcw size={13} aria-hidden="true" /> {actionLabel}
+          <X size={16} aria-hidden="true" />
         </button>
-      )}
-      <button
-        type="button"
-        onClick={onDismiss}
-        aria-label="Fechar aviso"
-        className="icon-btn text-text-muted hover:text-text-primary transition-colors"
-      >
-        <X size={16} aria-hidden="true" />
-      </button>
+      </div>
     </div>
   );
 }

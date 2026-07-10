@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, AlertTriangle, RotateCcw, Lightbulb } from 'lucide-react';
 import { numDec, splitComboOdds } from '../../lib/math';
+import { Select } from '../Select';
 
 interface ComboLeg {
   id: number;
@@ -14,6 +15,7 @@ interface Props {
   onChange: (id: string, value: string) => void;
   onLoadExample: (key: string) => void;
   onReset: () => void;
+  onCalculate: () => void;
 }
 
 function parseLegs(saved: string): ComboLeg[] {
@@ -30,7 +32,7 @@ function serializeLegs(legs: ComboLeg[]): string {
   return legs.map(l => `${l.nWays}|${l.sideIdx}|${l.odds.join(',')}`).join(';');
 }
 
-export function ComboTab({ values, onChange, onLoadExample, onReset }: Props) {
+export function ComboTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
   const [legs, setLegs] = useState<ComboLeg[]>([]);
 
   // Só re-parseia quando a mudança vem de FORA (exemplo/reset). Em edições próprias o
@@ -101,15 +103,23 @@ export function ComboTab({ values, onChange, onLoadExample, onReset }: Props) {
           {legs.map(leg => (
             <div key={leg.id} className="panel p-3 space-y-2.5">
               <div className="flex items-center gap-2">
-                <select value={leg.nWays} onChange={e => updateLeg(leg.id, { nWays: parseInt(e.target.value), sideIdx: 0, odds: parseInt(e.target.value) >= 3 ? [...leg.odds, ''] : leg.odds.slice(0, 2) })} className="input-dark h-9 text-xs">
-                  <option value={2}>2 vias</option>
-                  <option value={3}>3 vias</option>
-                </select>
-                <select value={leg.sideIdx} onChange={e => updateLeg(leg.id, { sideIdx: parseInt(e.target.value) })} className="input-dark h-9 text-xs">
-                  <option value={0}>Via 1 (apostado)</option>
-                  <option value={1}>Via 2</option>
-                  {leg.nWays >= 3 && <option value={2}>Via 3</option>}
-                </select>
+                <Select
+                  value={String(leg.nWays)}
+                  onChange={v => updateLeg(leg.id, { nWays: parseInt(v), sideIdx: 0, odds: parseInt(v) >= 3 ? [...leg.odds, ''] : leg.odds.slice(0, 2) })}
+                  options={[
+                    { value: '2', label: '2 vias' },
+                    { value: '3', label: '3 vias' },
+                  ]}
+                />
+                <Select
+                  value={String(leg.sideIdx)}
+                  onChange={v => updateLeg(leg.id, { sideIdx: parseInt(v) })}
+                  options={[
+                    { value: '0', label: 'Via 1 (apostado)' },
+                    { value: '1', label: 'Via 2' },
+                    ...(leg.nWays >= 3 ? [{ value: '2', label: 'Via 3' }] : []),
+                  ]}
+                />
                 <button type="button" aria-label="Remover perna" onClick={() => removeLeg(leg.id)} className="icon-btn ml-auto text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors">
                   <Trash2 size={14} aria-hidden="true" />
                 </button>
@@ -147,6 +157,7 @@ export function ComboTab({ values, onChange, onLoadExample, onReset }: Props) {
             Para pernas do mesmo jogo, use a aba <b>Bet Builder</b> — o produto de independentes é inválido quando correlacionado.
           </div>
         )}
+        <button type="button" onClick={onCalculate} className="btn-primary w-full mt-4">Calcular</button>
       </div>
     </div>
   );

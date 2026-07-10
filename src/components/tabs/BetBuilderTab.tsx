@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { Plus, Trash2, ChevronDown, RotateCcw, Lightbulb } from 'lucide-react';
 import { HelpTip } from '../HelpTip';
+import { Select } from '../Select';
 
 type LegKind = 'over' | 'under' | 'homewin' | 'draw' | 'awaywin' | 'homeNoLose' | 'awayNoLose' | 'btts' | 'bttsNo' | 'homeScores' | 'awayScores' | 'homeOver' | 'homeUnder' | 'awayOver' | 'awayUnder' | 'player' | 'playerprop' | 'cornerTotal' | 'cornerTeam' | 'cornerSide';
 
@@ -30,6 +31,7 @@ interface Props {
   onChange: (id: string, value: string) => void;
   onLoadExample: (key: string) => void;
   onReset: () => void;
+  onCalculate: () => void;
 }
 
 const LEG_OPTIONS: { value: LegKind; label: string }[] = [
@@ -83,7 +85,7 @@ function serializeLegs(legs: Leg[]): string {
   ].join('|')).join(';');
 }
 
-export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Props) {
+export function BetBuilderTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
   const [legs, setLegs] = useState<Leg[]>([]);
   const [cornerOpen, setCornerOpen] = useState(false);
   const prevLegsRef = useRef(values['poi-legs']);
@@ -200,49 +202,67 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
             return (
               <div key={leg.id} className="panel p-3 space-y-2.5">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <select value={leg.kind} onChange={e => {
-                    const k = e.target.value as LegKind;
-                    const defaults: Partial<Leg> = { kind: k };
-                    if (k === 'over' || k === 'under') defaults.line = '2.5';
-                    if (['homeOver', 'homeUnder', 'awayOver', 'awayUnder'].includes(k)) defaults.line = '1.5';
-                    if (k === 'cornerTotal') defaults.line = '9.5';
-                    if (k === 'cornerTeam') defaults.line = '5.5';
-                    updateLeg(leg.id, defaults);
-                  }} className="input-dark h-9 text-xs">
-                    {LEG_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                  </select>
+                  <Select
+                    value={leg.kind}
+                    onChange={v => {
+                      const k = v as LegKind;
+                      const defaults: Partial<Leg> = { kind: k };
+                      if (k === 'over' || k === 'under') defaults.line = '2.5';
+                      if (['homeOver', 'homeUnder', 'awayOver', 'awayUnder'].includes(k)) defaults.line = '1.5';
+                      if (k === 'cornerTotal') defaults.line = '9.5';
+                      if (k === 'cornerTeam') defaults.line = '5.5';
+                      updateLeg(leg.id, defaults);
+                    }}
+                    options={LEG_OPTIONS}
+                  />
 
                   {(isOU || isCT || isCTeam) && (
                     <input type="text" inputMode="decimal" autoComplete="off" value={leg.line || ''} onChange={e => updateLeg(leg.id, { line: e.target.value })} placeholder="linha" className="input-dark w-20 h-9 text-xs" />
                   )}
 
                   {(isP || isCTeam) && (
-                    <select value={leg.side || 'home'} onChange={e => updateLeg(leg.id, { side: e.target.value })} className="input-dark h-9 text-xs">
-                      <option value="home">mandante</option>
-                      <option value="away">visitante</option>
-                    </select>
+                    <Select
+                      value={leg.side || 'home'}
+                      onChange={v => updateLeg(leg.id, { side: v })}
+                      options={[
+                        { value: 'home', label: 'mandante' },
+                        { value: 'away', label: 'visitante' },
+                      ]}
+                    />
                   )}
 
                   {isCT && (
-                    <select value={leg.cSide || 'over'} onChange={e => updateLeg(leg.id, { cSide: e.target.value })} className="input-dark h-9 text-xs">
-                      <option value="over">Over</option>
-                      <option value="under">Under</option>
-                    </select>
+                    <Select
+                      value={leg.cSide || 'over'}
+                      onChange={v => updateLeg(leg.id, { cSide: v })}
+                      options={[
+                        { value: 'over', label: 'Over' },
+                        { value: 'under', label: 'Under' },
+                      ]}
+                    />
                   )}
 
                   {isCTeam && (
-                    <select value={leg.cDir || 'over'} onChange={e => updateLeg(leg.id, { cDir: e.target.value })} className="input-dark h-9 text-xs">
-                      <option value="over">Over</option>
-                      <option value="under">Under</option>
-                    </select>
+                    <Select
+                      value={leg.cDir || 'over'}
+                      onChange={v => updateLeg(leg.id, { cDir: v })}
+                      options={[
+                        { value: 'over', label: 'Over' },
+                        { value: 'under', label: 'Under' },
+                      ]}
+                    />
                   )}
 
                   {isCSide && (
-                    <select value={leg.c1x2 || 'home'} onChange={e => updateLeg(leg.id, { c1x2: e.target.value })} className="input-dark h-9 text-xs">
-                      <option value="home">Casa</option>
-                      <option value="draw">Empate</option>
-                      <option value="away">Visitante</option>
-                    </select>
+                    <Select
+                      value={leg.c1x2 || 'home'}
+                      onChange={v => updateLeg(leg.id, { c1x2: v })}
+                      options={[
+                        { value: 'home', label: 'Casa' },
+                        { value: 'draw', label: 'Empate' },
+                        { value: 'away', label: 'Visitante' },
+                      ]}
+                    />
                   )}
 
                   {isP && (
@@ -267,19 +287,27 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
                       <div><label className="text-[10px] text-text-muted mb-1 block">Over 4.5</label><input type="text" inputMode="decimal" autoComplete="off" value={leg.ppO4 || ''} onChange={e => updateLeg(leg.id, { ppO4: e.target.value })} placeholder="opt" className="input-dark input-compact w-full text-xs" /></div>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <select value={leg.ppSide || 'home'} onChange={e => updateLeg(leg.id, { ppSide: e.target.value })} className="input-dark input-compact w-auto text-xs">
-                        <option value="home">Mandante</option>
-                        <option value="away">Visitante</option>
-                      </select>
+                      <Select
+                        value={leg.ppSide || 'home'}
+                        onChange={v => updateLeg(leg.id, { ppSide: v })}
+                        options={[
+                          { value: 'home', label: 'Mandante' },
+                          { value: 'away', label: 'Visitante' },
+                        ]}
+                      />
                       <label className="flex items-center gap-1.5 text-xs text-text-muted">
                         Linha
-                        <select value={leg.ppLine || '0,5'} onChange={e => updateLeg(leg.id, { ppLine: e.target.value })} className="input-dark input-compact w-auto text-xs">
-                          <option value="0,5">Over 0,5</option>
-                          <option value="1,5">Over 1,5</option>
-                          <option value="2,5">Over 2,5</option>
-                          <option value="3,5">Over 3,5</option>
-                          <option value="4,5">Over 4,5</option>
-                        </select>
+                        <Select
+                          value={leg.ppLine || '0,5'}
+                          onChange={v => updateLeg(leg.id, { ppLine: v })}
+                          options={[
+                            { value: '0,5', label: 'Over 0,5' },
+                            { value: '1,5', label: 'Over 1,5' },
+                            { value: '2,5', label: 'Over 2,5' },
+                            { value: '3,5', label: 'Over 3,5' },
+                            { value: '4,5', label: 'Over 4,5' },
+                          ]}
+                        />
                       </label>
                       <label className="flex items-center gap-1.5 text-xs text-text-muted">
                         <span className="inline-flex items-center">β acoplamento<HelpTip text="Intensidade do acoplamento entre a prop do jogador e o resultado do jogo. 0 = independente; ~0.54 é o default calibrado." /></span> <input type="text" inputMode="decimal" autoComplete="off" value={leg.ppBeta || '0.54'} onChange={e => updateLeg(leg.id, { ppBeta: e.target.value })} className="input-dark input-compact w-16 text-xs" />
@@ -313,6 +341,10 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
           </div>
         </div>
       </div>
+
+      <button type="button" onClick={onCalculate} className="btn-primary w-full mt-4 py-3 text-base">
+        Calcular
+      </button>
     </div>
   );
 }

@@ -1,14 +1,16 @@
 import { RotateCcw, Lightbulb } from 'lucide-react';
 import { HelpTip } from '../HelpTip';
+import { Select } from '../Select';
 
 interface Props {
   values: Record<string, string>;
   onChange: (id: string, value: string) => void;
   onLoadExample: (key: string) => void;
   onReset: () => void;
+  onCalculate: () => void;
 }
 
-export function AsianTab({ values, onChange, onLoadExample, onReset }: Props) {
+export function AsianTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
   const mode = values['asia-mode'] || 'total';
 
   return (
@@ -32,24 +34,24 @@ export function AsianTab({ values, onChange, onLoadExample, onReset }: Props) {
 
       <div className="panel panel-focus space-y-5">
         <div className="section-title">Modo de cálculo</div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-xs text-text-muted mb-1.5 block">Tipo</label>
-            <select
-              value={mode}
-              onChange={e => onChange('asia-mode', e.target.value)}
-              className="input-dark"
-            >
-              <option value="total">Total asiático por Poisson</option>
-              <option value="handicap">Handicap asiático por Dixon-Coles</option>
-              <option value="manual">Estados manuais</option>
-            </select>
+<div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs text-text-muted mb-1.5 block">Tipo</label>
+              <Select
+                value={mode}
+                onChange={v => onChange('asia-mode', v)}
+                options={[
+                  { value: 'total', label: 'Total asiático por Poisson' },
+                  { value: 'handicap', label: 'Handicap asiático por Dixon-Coles' },
+                  { value: 'manual', label: 'Estados manuais' },
+                ]}
+              />
+            </div>
+            <div>
+              <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
+              <input type="text" inputMode="decimal" autoComplete="off" value={values['asia-your'] || ''} onChange={e => onChange('asia-your', e.target.value)} className="input-dark input-highlight" placeholder="1.95" />
+            </div>
           </div>
-          <div>
-            <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
-            <input type="text" inputMode="decimal" autoComplete="off" value={values['asia-your'] || ''} onChange={e => onChange('asia-your', e.target.value)} className="input-dark input-highlight" placeholder="1.95" />
-          </div>
-        </div>
 
         {mode === 'total' && (
           <div className="space-y-3 animate-fade-in">
@@ -69,18 +71,18 @@ export function AsianTab({ values, onChange, onLoadExample, onReset }: Props) {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs text-text-muted mb-1.5 block">Lado apostado</label>
-                <select value={values['asia-side'] || 'over'} onChange={e => onChange('asia-side', e.target.value)} className="input-dark">
-                  <option value="over">Over</option>
-                  <option value="under">Under</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-xs text-text-muted mb-1.5 block">Linha asiática alvo</label>
-                <input type="text" inputMode="decimal" autoComplete="off" value={values['asia-line'] || ''} onChange={e => onChange('asia-line', e.target.value)} className="input-dark" placeholder="2.25" />
-              </div>
+            <div>
+              <label className="text-xs text-text-muted mb-1.5 block">Lado apostado</label>
+              <Select value={values['asia-side'] || 'over'} onChange={v => onChange('asia-side', v)} options={[
+                { value: 'over', label: 'Over' },
+                { value: 'under', label: 'Under' },
+              ]} />
             </div>
+            <div>
+              <label className="text-xs text-text-muted mb-1.5 block">Linha asiática alvo</label>
+              <input type="text" inputMode="decimal" autoComplete="off" value={values['asia-line'] || ''} onChange={e => onChange('asia-line', e.target.value)} className="input-dark" placeholder="2.25" />
+            </div>
+          </div>
           </div>
         )}
 
@@ -102,10 +104,10 @@ export function AsianTab({ values, onChange, onLoadExample, onReset }: Props) {
               <div><label className="text-xs text-text-muted mb-1.5 block">Dixon-Coles ρ<HelpTip text="Correção de dependência entre poucos gols (Dixon-Coles). Valores típicos entre -0.15 e 0; ~-0.05 é comum. 0 = Poisson pura." /></label><input type="text" inputMode="text" autoComplete="off" value={values['asiah-rho'] || ''} onChange={e => onChange('asiah-rho', e.target.value)} className="input-dark" placeholder="-0.05" /></div>
               <div>
                 <label className="text-xs text-text-muted mb-1.5 block">Lado</label>
-                <select value={values['asiah-side'] || 'home'} onChange={e => onChange('asiah-side', e.target.value)} className="input-dark">
-                  <option value="home">Casa</option>
-                  <option value="away">Fora</option>
-                </select>
+                <Select value={values['asiah-side'] || 'home'} onChange={v => onChange('asiah-side', v)} options={[
+                  { value: 'home', label: 'Casa' },
+                  { value: 'away', label: 'Fora' },
+                ]} />
               </div>
               <div><label className="text-xs text-text-muted mb-1.5 block">Handicap</label><input type="text" inputMode="text" autoComplete="off" value={values['asiah-line'] || ''} onChange={e => onChange('asiah-line', e.target.value)} className="input-dark" placeholder="-0.5" /></div>
             </div>
@@ -127,6 +129,10 @@ export function AsianTab({ values, onChange, onLoadExample, onReset }: Props) {
             </div>
           </div>
         )}
+
+        <button type="button" onClick={onCalculate} className="btn-primary w-full mt-4 py-3 text-base">
+          Calcular
+        </button>
       </div>
     </div>
   );

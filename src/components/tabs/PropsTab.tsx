@@ -1,14 +1,16 @@
 import { RotateCcw, Lightbulb } from 'lucide-react';
 import { MARGIN_PRESETS } from '../../lib/presets';
+import { Select } from '../Select';
 
 interface Props {
   values: Record<string, string>;
   onChange: (id: string, value: string) => void;
   onLoadExample: (key: string) => void;
   onReset: () => void;
+  onCalculate: () => void;
 }
 
-export function PropsTab({ values, onChange, onLoadExample, onReset }: Props) {
+export function PropsTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
   const propType = values['prop-type'] || 'simnao';
   const propFamily = values['prop-family'] || 'prop_gols';
   const marginOn = values['prop-margin-on'] !== 'false';
@@ -40,24 +42,32 @@ export function PropsTab({ values, onChange, onLoadExample, onReset }: Props) {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Formato</label>
-            <select value={propType} onChange={e => onChange('prop-type', e.target.value)} className="input-dark">
-              <option value="simnao">Sim/Não</option>
-              <option value="ou">Over/Under</option>
-              <option value="custom">Outro</option>
-            </select>
+            <Select
+              value={propType}
+              onChange={v => onChange('prop-type', v)}
+              options={[
+                { value: 'simnao', label: 'Sim/Não' },
+                { value: 'ou', label: 'Over/Under' },
+                { value: 'custom', label: 'Outro' },
+              ]}
+            />
           </div>
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Família da margem</label>
-            <select value={propFamily} onChange={e => { onChange('prop-family', e.target.value); applyPreset(e.target.value); }} className="input-dark">
-              <option value="prop_gols">Gols jogador — 5,0%</option>
-              <option value="prop_chutes">Chutes jogador — 8,0%</option>
-              <option value="prop_chutes_gol">Chutes no gol — 8,0%</option>
-              <option value="prop_cartao">Cartão jogador — 8,0%</option>
-              <option value="prop_tackles">Desarmes jogador — 8,0%</option>
-              <option value="prop_faltas">Faltas jogador — 7,0%</option>
-              <option value="prop_saves">Defesas goleiro — 7,0%</option>
-              <option value="custom">Personalizada</option>
-            </select>
+            <Select
+              value={propFamily}
+              onChange={v => { onChange('prop-family', v); applyPreset(v); }}
+              options={[
+                { value: 'prop_gols', label: 'Gols jogador — 5,0%' },
+                { value: 'prop_chutes', label: 'Chutes jogador — 8,0%' },
+                { value: 'prop_chutes_gol', label: 'Chutes no gol — 8,0%' },
+                { value: 'prop_cartao', label: 'Cartão jogador — 8,0%' },
+                { value: 'prop_tackles', label: 'Desarmes jogador — 8,0%' },
+                { value: 'prop_faltas', label: 'Faltas jogador — 7,0%' },
+                { value: 'prop_saves', label: 'Defesas goleiro — 7,0%' },
+                { value: 'custom', label: 'Personalizada' },
+              ]}
+            />
           </div>
         </div>
 
@@ -65,11 +75,11 @@ export function PropsTab({ values, onChange, onLoadExample, onReset }: Props) {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Ref. {evalLabel}</label>
-            <input type="text" inputMode="decimal" autoComplete="off" value={values['prop-ref-yes'] || ''} onChange={e => onChange('prop-ref-yes', e.target.value)} className="input-dark" placeholder="2.10" />
+            <input type="text" inputMode="decimal" autoComplete="off" value={values[evalNo ? 'prop-ref-no' : 'prop-ref-yes'] || ''} onChange={e => onChange(evalNo ? 'prop-ref-no' : 'prop-ref-yes', e.target.value)} className="input-dark" placeholder="2.10" />
           </div>
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Ref. {otherLabel}</label>
-            <input type="text" inputMode="decimal" autoComplete="off" value={values['prop-ref-no'] || ''} onChange={e => onChange('prop-ref-no', e.target.value)} className="input-dark" placeholder="1.80" />
+            <input type="text" inputMode="decimal" autoComplete="off" value={values[evalNo ? 'prop-ref-yes' : 'prop-ref-no'] || ''} onChange={e => onChange(evalNo ? 'prop-ref-yes' : 'prop-ref-no', e.target.value)} className="input-dark" placeholder="1.80" />
           </div>
         </div>
 
@@ -96,6 +106,10 @@ export function PropsTab({ values, onChange, onLoadExample, onReset }: Props) {
           </label>
         </div>
       </div>
+
+      <button type="button" onClick={onCalculate} className="btn-primary w-full mt-4 py-3 text-base">
+        Calcular
+      </button>
     </div>
   );
 }

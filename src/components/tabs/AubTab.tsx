@@ -6,6 +6,7 @@ interface Props {
   onChange: (id: string, value: string) => void;
   onLoadExample: (key: string) => void;
   onReset: () => void;
+  onCalculate: () => void;
 }
 
 function parseRows(oddsStr: string): { id: number; value: string }[] {
@@ -17,7 +18,7 @@ function parseRows(oddsStr: string): { id: number; value: string }[] {
   return rows;
 }
 
-export function AubTab({ values, onChange, onLoadExample, onReset }: Props) {
+export function AubTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
   const [rows, setRows] = useState<{ id: number; value: string }[]>([]);
 
   useEffect(() => {
@@ -85,6 +86,7 @@ export function AubTab({ values, onChange, onLoadExample, onReset }: Props) {
             <input type="text" inputMode="decimal" autoComplete="off" value={values['aub-your'] || ''} onChange={e => onChange('aub-your', e.target.value)} className="input-dark input-highlight" placeholder="1.85" />
           </div>
         </div>
+        <button type="button" onClick={onCalculate} className="btn-primary w-full mt-4">Calcular</button>
       </div>
     </div>
   );

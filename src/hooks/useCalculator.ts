@@ -154,8 +154,15 @@ function makeBetBase(args: {
   };
 }
 
-export function useCalculator(inputs: Record<string, string>, cfg: Config, activeTab: string): { result: BetResult | { err: string } | null; recompute: () => void } {
+export function useCalculator(
+  inputs: Record<string, string>,
+  cfg: Config,
+  activeTab: string,
+  trigger?: number
+): { result: BetResult | { err: string } | null; recompute: () => void } {
   const result = useMemo(() => {
+    // If trigger is provided (lazy mode), only recalculate when trigger changes
+    // Otherwise (reactive mode), recalculate on any input/config/tab change
     const get = (id: string) => inputs[id] ?? '';
 
     switch (activeTab) {
@@ -168,7 +175,7 @@ export function useCalculator(inputs: Record<string, string>, cfg: Config, activ
       case 'asia': return calcAsia(get, cfg);
       default: return null;
     }
-  }, [inputs, cfg, activeTab]);
+  }, [inputs, cfg, activeTab, trigger]);
 
   return { result, recompute: () => {} };
 }

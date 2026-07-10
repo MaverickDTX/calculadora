@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, RotateCcw, Lightbulb } from 'lucide-react';
 import { MARGIN_PRESETS } from '../../lib/presets';
+import { Select } from '../Select';
 
 interface ConsRow { id: number; odd: string; excl: boolean }
 
@@ -9,6 +10,7 @@ interface Props {
   onChange: (id: string, value: string) => void;
   onLoadExample: (key: string) => void;
   onReset: () => void;
+  onCalculate: () => void;
 }
 
 function parseConsRows(oddsStr: string, exclStr: string): ConsRow[] {
@@ -21,7 +23,7 @@ function parseConsRows(oddsStr: string, exclStr: string): ConsRow[] {
   return rows;
 }
 
-export function ProxyTab({ values, onChange, onLoadExample, onReset }: Props) {
+export function ProxyTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
   const mode = values['proxy-mode'] || 'single';
   const family = values['proxy-family'] || 'ou_gols_ft';
   const [consRows, setConsRows] = useState<ConsRow[]>([]);
@@ -77,31 +79,39 @@ export function ProxyTab({ values, onChange, onLoadExample, onReset }: Props) {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Tipo</label>
-            <select value={mode} onChange={e => onChange('proxy-mode', e.target.value)} className="input-dark">
-              <option value="single">Uma referência + margem</option>
-              <option value="consensus">Consenso de casas</option>
-            </select>
+            <Select
+              value={mode}
+              onChange={v => onChange('proxy-mode', v)}
+              options={[
+                { value: 'single', label: 'Uma referência + margem' },
+                { value: 'consensus', label: 'Consenso de casas' },
+              ]}
+            />
           </div>
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Família da margem</label>
-            <select value={family} onChange={e => { onChange('proxy-family', e.target.value); applyPreset(e.target.value); }} className="input-dark">
-              <option value="ou_gols_ft">O/U gols FT — 5,0%</option>
-              <option value="1x2_ft">1X2 FT — 6,0%</option>
-              <option value="asian_handicap_ft">Asian handicap FT — 5,0%</option>
-              <option value="btts_ft">BTTS FT — 5,0%</option>
-              <option value="dnb_ft">DNB FT — 5,0%</option>
-              <option value="handicap_europeu_ft">Handicap europeu FT — 6,0%</option>
-              <option value="corners_ou_ft">Corners O/U FT — 6,0%</option>
-              <option value="bookings_ou_ft">Cartões O/U FT — 6,5%</option>
-              <option value="prop_gols">Prop gols jogador — 5,0%</option>
-              <option value="prop_chutes">Prop chutes jogador — 8,0%</option>
-              <option value="prop_chutes_gol">Prop chutes no gol — 8,0%</option>
-              <option value="prop_cartao">Prop cartão jogador — 8,0%</option>
-              <option value="prop_tackles">Prop desarmes jogador — 8,0%</option>
-              <option value="prop_faltas">Prop faltas jogador — 7,0%</option>
-              <option value="prop_saves">Prop defesas goleiro — 7,0%</option>
-              <option value="custom">Personalizada</option>
-            </select>
+            <Select
+              value={family}
+              onChange={v => { onChange('proxy-family', v); applyPreset(v); }}
+              options={[
+                { value: 'ou_gols_ft', label: 'O/U gols FT — 5,0%' },
+                { value: '1x2_ft', label: '1X2 FT — 6,0%' },
+                { value: 'asian_handicap_ft', label: 'Asian handicap FT — 5,0%' },
+                { value: 'btts_ft', label: 'BTTS FT — 5,0%' },
+                { value: 'dnb_ft', label: 'DNB FT — 5,0%' },
+                { value: 'handicap_europeu_ft', label: 'Handicap europeu FT — 6,0%' },
+                { value: 'corners_ou_ft', label: 'Corners O/U FT — 6,0%' },
+                { value: 'bookings_ou_ft', label: 'Cartões O/U FT — 6,5%' },
+                { value: 'prop_gols', label: 'Prop gols jogador — 5,0%' },
+                { value: 'prop_chutes', label: 'Prop chutes jogador — 8,0%' },
+                { value: 'prop_chutes_gol', label: 'Prop chutes no gol — 8,0%' },
+                { value: 'prop_cartao', label: 'Prop cartão jogador — 8,0%' },
+                { value: 'prop_tackles', label: 'Prop desarmes jogador — 8,0%' },
+                { value: 'prop_faltas', label: 'Prop faltas jogador — 7,0%' },
+                { value: 'prop_saves', label: 'Prop defesas goleiro — 7,0%' },
+                { value: 'custom', label: 'Personalizada' },
+              ]}
+            />
           </div>
         </div>
 
@@ -122,6 +132,7 @@ export function ProxyTab({ values, onChange, onLoadExample, onReset }: Props) {
               <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
               <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-your'] || ''} onChange={e => onChange('proxy-your', e.target.value)} className="input-dark input-highlight" placeholder="2.20" />
             </div>
+            <button type="button" onClick={onCalculate} className="btn-primary w-full mt-4">Calcular</button>
           </>
         ) : (
           <>
@@ -149,6 +160,7 @@ export function ProxyTab({ values, onChange, onLoadExample, onReset }: Props) {
                 <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-cons-your'] || ''} onChange={e => onChange('proxy-cons-your', e.target.value)} className="input-dark input-highlight" placeholder="2.20" />
               </div>
             </div>
+            <button type="button" onClick={onCalculate} className="btn-primary w-full mt-4">Calcular</button>
           </>
         )}
       </div>
