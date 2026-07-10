@@ -108,6 +108,7 @@ function App() {
 
   // Reset = LIMPAR todos os campos da aba ativa (não recarregar exemplo pré-preenchido).
   const resetTab = useCallback(() => {
+    if (!window.confirm('Limpar todos os campos desta aba?')) return;
     const prefixes: Record<TabId, string[]> = {
       nres: ['nres-'], props: ['prop-'], proxy: ['proxy-'], aub: ['aub-'],
       combo: ['combo-'], poi: ['poi-'], asia: ['asia-', 'asiah-'],

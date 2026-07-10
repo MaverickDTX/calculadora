@@ -8,12 +8,12 @@ export default {
           DEFAULT: '#0B0F17',
           elevated: '#111827',
           hover: '#1F2937',
-          active: '#374151',
+          active: '#4B5563',
         },
         border: {
           DEFAULT: '#1F2937',
-          strong: '#374151',
-          focus: '#6366F1',
+          strong: '#4B5563',
+          focus: '#7777EE',
         },
         text: {
           primary: '#F9FAFB',
@@ -21,7 +21,7 @@ export default {
           muted: '#8B93A1',
         },
         accent: {
-          DEFAULT: '#6366F1',
+          DEFAULT: '#7777EE',
           hover: '#818CF8',
           soft: 'rgba(99,102,241,0.15)',
           glow: 'rgba(99,102,241,0.4)',
@@ -44,7 +44,7 @@ export default {
           soft: 'rgba(56,189,248,0.12)',
         },
         kelly: {
-          DEFAULT: '#8B5CF6',
+          DEFAULT: '#A78BFA',
           soft: 'rgba(139,92,246,0.12)',
         },
       },

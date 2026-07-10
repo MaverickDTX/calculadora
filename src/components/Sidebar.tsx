@@ -44,12 +44,13 @@ export function Sidebar({ activeTab, onChange, onConfig }: Props) {
           </div>
         </div>
 
-        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto scrollbar-thin">
-          <div className="section-title px-2">Mercados</div>
+        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto scrollbar-thin" role="tablist" aria-label="Mercados">
+          <div className="section-title px-2" aria-hidden="true">Mercados</div>
           {TABS.map(t => (
             <button
               key={t.id}
               type="button"
+              role="tab"
               onClick={() => onChange(t.id)}
               aria-selected={activeTab === t.id}
               className="nav-item"
@@ -61,8 +62,8 @@ export function Sidebar({ activeTab, onChange, onConfig }: Props) {
         </nav>
 
         <div className="px-3 py-4 border-t border-border space-y-0.5">
-          <div className="section-title px-2">Sistema</div>
-          <button type="button" onClick={onConfig} className="nav-item">
+          <div className="section-title px-2" aria-hidden="true">Sistema</div>
+          <button type="button" onClick={onConfig} className="nav-item" aria-label="Abrir configurações">
             <Settings size={16} aria-hidden="true" />
             <span>Configurações</span>
           </button>
@@ -71,6 +72,8 @@ export function Sidebar({ activeTab, onChange, onConfig }: Props) {
 
       {/* Mobile bottom nav — hidden on desktop */}
       <nav
+        role="tablist"
+        aria-label="Mercados"
         className="md:hidden fixed bottom-0 left-0 right-0 z-40 h-16 border-t border-border flex items-stretch"
         style={{ background: 'rgba(11, 15, 23, 0.95)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
       >
@@ -78,7 +81,10 @@ export function Sidebar({ activeTab, onChange, onConfig }: Props) {
           <button
             key={t.id}
             type="button"
+            role="tab"
+            aria-selected={activeTab === t.id}
             onClick={() => onChange(t.id)}
+            aria-label={t.label}
             className={`flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors ${
               activeTab === t.id ? 'text-accent' : 'text-text-muted'
             }`}
@@ -90,6 +96,7 @@ export function Sidebar({ activeTab, onChange, onConfig }: Props) {
         <button
           type="button"
           onClick={onConfig}
+          aria-label="Abrir configurações"
           className="flex-1 flex flex-col items-center justify-center gap-0.5 text-text-muted transition-colors"
         >
           <Settings size={18} aria-hidden="true" />

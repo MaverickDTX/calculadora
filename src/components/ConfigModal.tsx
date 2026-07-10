@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { X, Wallet, SlidersHorizontal, Percent, Shield, TrendingUp } from 'lucide-react';
 import type { Config, DevigMethod, BoostType } from '../types';
+import { useDialog } from '../hooks/useDialog';
 
 interface Props {
   config: Config;
   onChange: (c: Config) => void;
   onClose: () => void;
 }
+
+const TITLE_ID = 'config-modal-title';
 
 const METHODS: { id: DevigMethod; label: string; desc: string }[] = [
   { id: 'equal', label: 'Margem igual', desc: 'Distribui a margem igualmente entre todas as vias' },
@@ -19,6 +22,11 @@ const METHODS: { id: DevigMethod; label: string; desc: string }[] = [
 
 export function ConfigModal({ config, onChange, onClose }: Props) {
   const [local, setLocal] = useState<Config>(config);
+  const { ref, dialogProps } = useDialog<HTMLDivElement>({
+    open: true,
+    onClose,
+    labelId: TITLE_ID,
+  });
 
   const update = (patch: Partial<Config>) => {
     const next = { ...local, ...patch };
@@ -28,7 +36,8 @@ export function ConfigModal({ config, onChange, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md animate-fade-in" style={{ overscrollBehavior: 'contain' }} onClick={onClose}>
-      <div className="border border-border rounded-2xl shadow-float w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col animate-slide-up"
+      <div ref={ref} {...dialogProps}
+        className="border border-border rounded-2xl shadow-float w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col animate-slide-up"
         style={{ background: 'rgba(17, 24, 39, 0.85)', backdropFilter: 'blur(32px) saturate(150%)', WebkitBackdropFilter: 'blur(32px) saturate(150%)' }}
         onClick={e => e.stopPropagation()}
       >
@@ -38,7 +47,7 @@ export function ConfigModal({ config, onChange, onClose }: Props) {
               <SlidersHorizontal size={16} className="text-accent" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-text-primary">Configurações</h2>
+              <h2 id={TITLE_ID} className="text-sm font-semibold text-text-primary">Configurações</h2>
               <p className="text-xs text-text-muted">Ajuste a gestão de banca e o motor de cálculo</p>
             </div>
           </div>

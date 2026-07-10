@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react';
 import { X, AlertTriangle, ChevronRight, ChevronDown, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import type { BetResult, Config } from '../types';
 import { fpct, fbrl, fnum, gridStake, confFactor } from '../lib/math';
+import { useDialog, useMediaQuery } from '../hooks/useDialog';
 
 interface Props {
   result: BetResult | { err: string } | null;
   config: Config;
   onClose: () => void;
 }
+
+const TITLE_ID = 'results-drawer-title';
 
 function stakeFlow(B: BetResult) {
   const cf = confFactor(B.confClass, B.cfg.confAdj);
@@ -45,25 +48,49 @@ function setQuality(B: BetResult): { cls: string; label: string; pill: string; d
 
 export function ResultsDrawer({ result, config, onClose }: Props) {
   const [animateKey, setAnimateKey] = useState(0);
+  const isMobile = useMediaQuery('(max-width: 767px)');
+  const { ref, dialogProps } = useDialog<HTMLDivElement>({
+    open: true,
+    onClose,
+    enabled: isMobile,
+    labelId: TITLE_ID,
+  });
 
   useEffect(() => {
     setAnimateKey(k => k + 1);
   }, [result]);
 
+  // No desktop (md:relative) o painel não é modal — sem role/aria-modal. No mobile
+  // (bottom-sheet) comporta-se como diálogo: recebe semântica e trap de foco do hook.
+  const a11yProps = isMobile ? dialogProps : { ref };
+
   return (
-    <div className="fixed inset-0 z-50 flex flex-col md:relative md:inset-auto md:z-auto md:w-[400px] md:shrink-0 border-l border-border animate-slide-right"
-      style={{
-        background: 'rgba(11, 15, 23, 0.75)',
-        backdropFilter: 'blur(24px) saturate(150%)',
-        WebkitBackdropFilter: 'blur(24px) saturate(150%)',
-      }}
-    >
-      <div className="px-5 py-4 border-b border-border flex items-center justify-between"
+    <>
+      {isMobile && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm animate-fade-in"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
+      <div {...a11yProps}
+        className="fixed bottom-0 left-0 right-0 z-50 h-[60vh] flex flex-col rounded-t-2xl border border-border animate-slide-up md:relative md:inset-auto md:z-auto md:w-[400px] md:shrink-0 md:border-0 md:border-l md:border-border md:rounded-none"
+        style={{
+          background: 'rgba(11, 15, 23, 0.75)',
+          backdropFilter: 'blur(24px) saturate(150%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+        }}
+      >
+        {/* Handle de arraste — mobile */}
+        <div aria-hidden="true" className="md:hidden pt-2 pb-1 flex justify-center">
+          <div className="w-10 h-1 rounded-full bg-[#4B5563]" />
+        </div>
+        <div className="px-5 py-4 border-b border-border flex items-center justify-between shrink-0"
         style={{ background: 'rgba(11, 15, 23, 0.4)' }}
       >
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-accent animate-pulse-soft" />
-          <span className="text-sm font-semibold text-text-primary">Resultado</span>
+          <span id={TITLE_ID} className="text-sm font-semibold text-text-primary">Resultado</span>
         </div>
         <button type="button" onClick={onClose} aria-label="Fechar resultado" className="icon-btn text-text-muted hover:text-text-primary transition-colors">
           <X size={18} aria-hidden="true" />
@@ -76,6 +103,7 @@ export function ResultsDrawer({ result, config, onClose }: Props) {
         {result && !('err' in result) && <ResultContent key={animateKey} B={result} config={config} />}
       </div>
     </div>
+    </>
   );
 }
 

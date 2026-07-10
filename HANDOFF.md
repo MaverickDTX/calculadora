@@ -1,7 +1,8 @@
 # Handoff — Régua de Kelly (Kelly Stake Pro)
 
-> Última atualização: 2026-06-26 · Versão em produção: **v0.3** (`a7f57f6`)
+> Última atualização: 2026-07-09 · Versão em produção: **v0.3** (`a7f57f6`)
 > Memória detalhada do projeto: `memory/project_kelly.md` (índice em `memory/MEMORY.md`)
+> Handoff do coletor de dados: `HANDOFF-coletor-shots-time.md` (fora do git, em `C:\Projetos\calculadora\`)
 
 ## TL;DR
 Sessão fechada com **v0.3 em produção**. Tudo commitado e pushado — `main` em
@@ -44,12 +45,14 @@ corretos e migração de localStorage legado.
 ## Pendências (numeração de `project_kelly.md`)
 
 ### Abertas — acionáveis
-- **#11 Novas pernas Bet Builder (resto)** — "Ambas marcam: Não" feito. SOT/finalizações
-  por time/partida precisam de **calibração Poisson própria** — mesma família técnica de
-  escanteios. **Decisão pendente de produto:** de onde vem a calibração (escada de odds?
-  linha única O/U? base rate?). Alinhar com usuário antes de implementar.
-- **#13 Mercado de cartões** (O/U partida/time + 1X2) — mesma família do #11; o 1X2
-  reusa `cornerSideProb`. Mesma decisão de produto pendente.
+- **#11 Novas pernas Bet Builder (resto)** — "Ambas marcam: Não" feito. **Pipeline de
+  dados construído** (script Python `coletar_shots_time_sofasport.py`, fora do git):
+  coleta shots/SOT + cartões por time via SofaScore RapidAPI. Champions/Libertadores
+  corrigidos. Coleta completa **travada na quota free da API** (~317 chamadas usadas,
+  aguardar reset). Cache parcial com 224 eventos (Brasileirão + Libertadores).
+  **Decisão de calibração ainda pendente** (escada de odds / linha O-U / base rate).
+- **#13 Mercado de cartões** (O/U partida/time + 1X2) — dados de cartão já incluídos
+  no pipeline de coleta acima. Mesma decisão de calibração pendente.
 - **#10 Colapso de linha** ao limpar campo do meio (A ou B / N Resultados) — baixa prio.
 - **#2 Resumo do ajuste λ/erro** (paridade v14) — opcional, baixo valor.
 
@@ -74,18 +77,27 @@ corretos e migração de localStorage legado.
 ### Feitas
 #1, #3, #4 (Supabase confirmado), #6, #7, #8 (já estava OK),
 #9, #11 (bttsNo), #12 (ponto decimal global).
+**#11/#13 — pipeline de dados construído** (coletor SofaScore Python):
+  `coletar_shots_time_sofasport.py` com extração de shots/SOT/cartões,
+  resolução automática de ligas, cache incremental. Falta só rodar a
+  coleta completa (quota API) e a decisão de calibração.
 
 ## Próximo passo recomendado
-1. **#11 + #13** — alinhar com o usuário sobre a fonte de calibração antes de
-   implementar SOT/finalizações/cartões.
+1. **#11 + #13 — pipeline de dados pronto, falta coleta**:
+   - Aguardar quota da RapidAPI resetar
+   - Rodar `python coletar_shots_time_sofasport.py` em `C:\Projetos\calculadora\`
+   - Revisar `shots_time_sofasport.csv` gerado
+   - Só então decidir calibração (escada odds / linha O-U / base rate)
 2. **#10** — papercut de UX rápido se o usuário reportar incômodo.
 3. **Manutenção:** limpeza da camada externa de `C:\Projetos\calculadora` (fora do git)
    **executada em 2026-07-09** — 38 arquivos movidos para `old/{html,patches,tests,docs,misc}`,
    2 deletados. Ordens arquivadas em `old\docs\ORDENS-limpeza-legado.md`; mapa de
    reversão em `old\INVENTARIO-pre-limpeza-2026-07-09.txt`.
 
-> Antes de qualquer mercado novo (#11 SOT/finalizações, #13 cartões), **alinhar com
-> o usuário de onde vem a calibração** — é a decisão de produto que trava ambos.
+> Pipeline de dados (#11 SOT/finalizações + #13 cartões) **construído** em
+> `coletar_shots_time_sofasport.py` — aguardando quota da API resetar para coleta
+> completa. Depois do CSV em mãos, **decidir calibração** (escada odds / linha O-U
+> / base rate) que trava as mudanças no React.
 
 ## Arquivos-chave
 - `src/hooks/useCalculator.ts` — todos os cálculos (`calcPoi` Bet Builder, `calcAsia`

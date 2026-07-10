@@ -22,9 +22,28 @@
     min-height: 100vh;
     overflow-x: hidden;
   }
-  ::selection {
+  :  :selection {
     background: rgba(99,102,241,0.3);
     color: #F9FAFB;
+  }
+  /* Rede de segurança global: qualquer elemento interativo sem :focus-visible
+     específico ainda mostra indicador visível. Não sobrescreve os que já têm. */
+  :focus-visible {
+    outline: 2px solid rgba(99, 102, 241, 0.7);
+    outline-offset: 2px;
+  }
+  /* Elementos que já definem box-shadow como indicador removem o outline do
+     fallback para não duplicar. */
+  .btn-ghost:focus-visible,
+  .btn-primary:focus-visible,
+  .nav-item:focus-visible,
+  .icon-btn:focus-visible,
+  .input-dark:focus-visible,
+  .panel-collapsible > summary:focus-visible {
+    outline: none;
+  }
+  .btn-primary:focus-visible {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.45);
   }
   .skip-link {
     position: absolute;
@@ -33,7 +52,7 @@
     z-index: 100;
     padding: 8px 14px;
     border-radius: 10px;
-    background: #6366F1;
+    background: #5B5BD6;
     color: #fff;
     font-size: 13px;
     font-weight: 600;
@@ -99,7 +118,7 @@
     width: 100%;
   }
   .input-dark::placeholder {
-    color: #6B7280;
+    color: #9CA3AF;
   }
   .input-compact {
     height: auto;
@@ -128,7 +147,7 @@
   }
   .btn-primary {
     border-radius: 10px;
-    background: #6366F1;
+    background: #5B5BD6;
     color: #fff;
     font-size: 13px;
     font-weight: 600;
@@ -141,7 +160,7 @@
     gap: 6px;
   }
   .btn-primary:hover {
-    background: #818CF8;
+    background: #5D5DD9;
   }
   .btn-primary:active {
     transform: scale(0.98);
@@ -154,7 +173,7 @@
     border-radius: 10px;
     background: transparent;
     color: #9CA3AF;
-    border: 1px solid #374151;
+    border: 1px solid #4B5563;
     font-size: 13px;
     font-weight: 500;
     padding: 8px 14px;
@@ -267,7 +286,7 @@
   }
   .tag-kelly {
     background: rgba(139,92,246,0.12);
-    color: #8B5CF6;
+    color: #A78BFA;
     border: 1px solid rgba(139,92,246,0.2);
   }
   .quality-good {
@@ -283,7 +302,7 @@
     background: rgba(239,68,68,0.06);
   }
   .quality-off {
-    border-color: #374151;
+    border-color: #4B5563;
     background: #0B0F17;
   }
   .stake-display {
@@ -308,7 +327,7 @@
   }
   .divider {
     height: 1px;
-    background: linear-gradient(90deg, transparent, #374151, transparent);
+    background: linear-gradient(90deg, transparent, #4B5563, transparent);
     margin: 16px 0;
   }
   .icon-btn {
@@ -344,14 +363,16 @@
     font-size: 11px;
     padding: 6px 10px;
     border-radius: 8px;
-    white-space: nowrap;
+    max-width: 240px;
+    width: max-content;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.15s;
     z-index: 100;
-    border: 1px solid #374151;
+    border: 1px solid #4B5563;
   }
-  .tooltip:hover::after {
+  .tooltip:hover::after,
+  .tooltip:focus-within::after {
     opacity: 1;
   }
   .panel-collapsible {
@@ -434,7 +455,7 @@
     background: transparent;
   }
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: #374151;
+    background: #4B5563;
     border-radius: 4px;
   }
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
