@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { Plus, Trash2, ChevronDown, RotateCcw, Lightbulb } from 'lucide-react';
+import { HelpTip } from '../HelpTip';
 
 type LegKind = 'over' | 'under' | 'homewin' | 'draw' | 'awaywin' | 'homeNoLose' | 'awayNoLose' | 'btts' | 'bttsNo' | 'homeScores' | 'awayScores' | 'homeOver' | 'homeUnder' | 'awayOver' | 'awayUnder' | 'player' | 'playerprop' | 'cornerTotal' | 'cornerTeam' | 'cornerSide';
 
@@ -154,7 +155,7 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
         </div>
 
         <div>
-          <label className="text-xs text-text-muted mb-1.5 block" title="Correção de dependência entre poucos gols (Dixon-Coles). Valores típicos entre -0.15 e 0; ~-0.05 é comum. 0 = Poisson pura.">Correção Dixon-Coles ρ</label>
+          <label className="text-xs text-text-muted mb-1.5 block">Correção Dixon-Coles ρ<HelpTip text="Correção de dependência entre poucos gols (Dixon-Coles). Valores típicos entre -0.15 e 0; ~-0.05 é comum. 0 = Poisson pura." /></label>
           <input type="text" inputMode="text" autoComplete="off" value={values['poi-rho'] || ''} onChange={e => onChange('poi-rho', e.target.value)} className="input-dark" placeholder="-0.05" />
         </div>
 
@@ -258,7 +259,7 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
 
                 {isPP && (
                   <div className="mt-2 pl-3 border-l-2 border-border space-y-2">
-                    <div className="grid grid-cols-5 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                       <div><label className="text-[10px] text-text-muted mb-1 block">Over 0.5 *</label><input type="text" inputMode="decimal" autoComplete="off" value={leg.ppO0 || ''} onChange={e => updateLeg(leg.id, { ppO0: e.target.value })} placeholder="opt" className="input-dark input-compact w-full text-xs" /></div>
                       <div><label className="text-[10px] text-text-muted mb-1 block">Over 1.5</label><input type="text" inputMode="decimal" autoComplete="off" value={leg.ppO1 || ''} onChange={e => updateLeg(leg.id, { ppO1: e.target.value })} placeholder="opt" className="input-dark input-compact w-full text-xs" /></div>
                       <div><label className="text-[10px] text-text-muted mb-1 block">Over 2.5</label><input type="text" inputMode="decimal" autoComplete="off" value={leg.ppO2 || ''} onChange={e => updateLeg(leg.id, { ppO2: e.target.value })} placeholder="opt" className="input-dark input-compact w-full text-xs" /></div>
@@ -280,8 +281,8 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
                           <option value="4,5">Over 4,5</option>
                         </select>
                       </label>
-                      <label className="flex items-center gap-1.5 text-xs text-text-muted" title="Intensidade do acoplamento entre a prop do jogador e o resultado do jogo. 0 = independente; ~0.54 é o default calibrado.">
-                        β acoplamento <input type="text" inputMode="decimal" autoComplete="off" value={leg.ppBeta || '0.54'} onChange={e => updateLeg(leg.id, { ppBeta: e.target.value })} className="input-dark input-compact w-16 text-xs" />
+                      <label className="flex items-center gap-1.5 text-xs text-text-muted">
+                        <span className="inline-flex items-center">β acoplamento<HelpTip text="Intensidade do acoplamento entre a prop do jogador e o resultado do jogo. 0 = independente; ~0.54 é o default calibrado." /></span> <input type="text" inputMode="decimal" autoComplete="off" value={leg.ppBeta || '0.54'} onChange={e => updateLeg(leg.id, { ppBeta: e.target.value })} className="input-dark input-compact w-16 text-xs" />
                       </label>
                     </div>
                     <p className="text-[10px] text-text-muted leading-snug">A escada de odds calibra a intensidade (μ). A <b>linha</b> define qual evento entra na probabilidade conjunta: Over k,5 ⇒ P(SOT ≥ k+1). Cauda alta (3,5/4,5) tende a ser subestimada pela Poisson.</p>
@@ -290,8 +291,8 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset }: Prop
 
                 {isCorner && (
                   <div className="mt-2 pl-3 border-l-2 border-border">
-                    <label className="flex items-center gap-1.5 text-xs text-text-muted" title="Intensidade do acoplamento entre escanteios e resultado do jogo. 0 = independente; ~0.15 é o default.">
-                      β corner↔resultado <input type="text" inputMode="decimal" autoComplete="off" value={leg.cBeta || '0.15'} onChange={e => updateLeg(leg.id, { cBeta: e.target.value })} className="input-dark input-compact w-16 text-xs" />
+                    <label className="flex items-center gap-1.5 text-xs text-text-muted">
+                      <span className="inline-flex items-center">β corner↔resultado<HelpTip text="Intensidade do acoplamento entre escanteios e resultado do jogo. 0 = independente; ~0.15 é o default." /></span> <input type="text" inputMode="decimal" autoComplete="off" value={leg.cBeta || '0.15'} onChange={e => updateLeg(leg.id, { cBeta: e.target.value })} className="input-dark input-compact w-16 text-xs" />
                     </label>
                   </div>
                 )}

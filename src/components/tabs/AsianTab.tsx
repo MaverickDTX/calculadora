@@ -1,4 +1,5 @@
 import { RotateCcw, Lightbulb } from 'lucide-react';
+import { HelpTip } from '../HelpTip';
 
 interface Props {
   values: Record<string, string>;
@@ -55,7 +56,7 @@ export function AsianTab({ values, onChange, onLoadExample, onReset }: Props) {
             <div className="section-title">Calibração Poisson</div>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="text-xs text-text-muted mb-1.5 block" title="Linha de gols com odds Over/Under conhecidas, usada para estimar a intensidade (μ) da Poisson. Ex.: 2.5">Linha O/U calibradora</label>
+                <label className="text-xs text-text-muted mb-1.5 block">Linha O/U calibradora<HelpTip text="Linha de gols com odds Over/Under conhecidas, usada para estimar a intensidade (μ) da Poisson. Ex.: 2.5" /></label>
                 <input type="text" inputMode="decimal" autoComplete="off" value={values['asia-cal-line'] || ''} onChange={e => onChange('asia-cal-line', e.target.value)} className="input-dark" placeholder="2.5" />
               </div>
               <div>
@@ -98,7 +99,7 @@ export function AsianTab({ values, onChange, onLoadExample, onReset }: Props) {
               <div><label className="text-xs text-text-muted mb-1.5 block">Odd Under</label><input type="text" inputMode="decimal" autoComplete="off" value={values['asiah-under'] || ''} onChange={e => onChange('asiah-under', e.target.value)} className="input-dark" placeholder="1.95" /></div>
             </div>
             <div className="grid grid-cols-3 gap-3">
-              <div><label className="text-xs text-text-muted mb-1.5 block" title="Correção de dependência entre poucos gols (Dixon-Coles). Valores típicos entre -0.15 e 0; ~-0.05 é comum. 0 = Poisson pura.">Dixon-Coles ρ</label><input type="text" inputMode="text" autoComplete="off" value={values['asiah-rho'] || ''} onChange={e => onChange('asiah-rho', e.target.value)} className="input-dark" placeholder="-0.05" /></div>
+              <div><label className="text-xs text-text-muted mb-1.5 block">Dixon-Coles ρ<HelpTip text="Correção de dependência entre poucos gols (Dixon-Coles). Valores típicos entre -0.15 e 0; ~-0.05 é comum. 0 = Poisson pura." /></label><input type="text" inputMode="text" autoComplete="off" value={values['asiah-rho'] || ''} onChange={e => onChange('asiah-rho', e.target.value)} className="input-dark" placeholder="-0.05" /></div>
               <div>
                 <label className="text-xs text-text-muted mb-1.5 block">Lado</label>
                 <select value={values['asiah-side'] || 'home'} onChange={e => onChange('asiah-side', e.target.value)} className="input-dark">
