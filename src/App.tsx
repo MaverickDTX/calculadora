@@ -6,6 +6,7 @@ import { Sidebar } from './components/Sidebar';
 import { ResultsDrawer } from './components/ResultsDrawer';
 import { ConfigModal } from './components/ConfigModal';
 import { VizSection } from './components/VizSection';
+import { Toast } from './components/Toast';
 import { NResultsTab } from './components/tabs/NResultsTab';
 import { PropsTab } from './components/tabs/PropsTab';
 import { ProxyTab } from './components/tabs/ProxyTab';
@@ -85,6 +86,8 @@ function App() {
   const [inputs, setInputs] = useState<Record<string, string>>(DEFAULT_INPUTS);
   const [showConfig, setShowConfig] = useState(false);
   const [showResults, setShowResults] = useState(true);
+  // Snapshot dos inputs anterior ao último Reset, para o "Desfazer" do toast.
+  const [undoSnapshot, setUndoSnapshot] = useState<Record<string, string> | null>(null);
 
   const handleInputChange = useCallback((id: string, value: string) => {
     // Padroniza o decimal em ponto (formato das casas): vírgula digitada vira ponto na hora.
@@ -106,20 +109,28 @@ function App() {
     });
   }, []);
 
-  // Reset = LIMPAR todos os campos da aba ativa (não recarregar exemplo pré-preenchido).
+  // Reset = LIMPAR os campos da aba ativa. Sem diálogo bloqueante: limpa direto e
+  // oferece "Desfazer" via toast por alguns segundos (padrão do mockup M3).
   const resetTab = useCallback(() => {
-    if (!window.confirm('Limpar todos os campos desta aba?')) return;
     const prefixes: Record<TabId, string[]> = {
       nres: ['nres-'], props: ['prop-'], proxy: ['proxy-'], aub: ['aub-'],
       combo: ['combo-'], poi: ['poi-'], asia: ['asia-', 'asiah-'],
     };
     const pfx = prefixes[activeTab];
     setInputs(prev => {
+      // Guarda o estado anterior só se houver algo preenchido para desfazer.
+      const hadContent = Object.keys(prev).some(k => pfx.some(p => k.startsWith(p)) && prev[k] !== '');
+      if (hadContent) setUndoSnapshot(prev);
       const next = { ...prev };
       for (const k of Object.keys(next)) if (pfx.some(p => k.startsWith(p))) next[k] = '';
       return next;
     });
   }, [activeTab]);
+
+  const undoReset = useCallback(() => {
+    if (undoSnapshot) setInputs(undoSnapshot);
+    setUndoSnapshot(null);
+  }, [undoSnapshot]);
 
   const tabContent = useMemo(() => {
     const common = { values: inputs, onChange: handleInputChange, onLoadExample: loadExample, onReset: resetTab };
@@ -173,6 +184,15 @@ function App() {
       </main>
 
       {showConfig && <ConfigModal config={config} onChange={setConfig} onClose={() => setShowConfig(false)} />}
+
+      {undoSnapshot && (
+        <Toast
+          message="Campos limpos."
+          actionLabel="Desfazer"
+          onAction={undoReset}
+          onDismiss={() => setUndoSnapshot(null)}
+        />
+      )}
     </div>
   );
 }
