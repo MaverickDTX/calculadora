@@ -261,7 +261,15 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
       {sport === 'tennis' && (
         <>
           <div className="panel">
-            <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} aria-hidden="true" /> Reset</button>
+            <div className="flex items-center gap-2 mb-3">
+              <Lightbulb size={14} className="text-warn" aria-hidden="true" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Exemplos rápidos</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" onClick={() => onLoadExample('poi-tennis')} className="btn-ghost text-xs">Djokovic @1.33 + Over 22.5</button>
+              <button type="button" onClick={() => onLoadExample('poi-tennis-prop')} className="btn-ghost text-xs">Vencedor + Over + 1º set</button>
+              <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} aria-hidden="true" /> Reset</button>
+            </div>
           </div>
 
           <div className="panel panel-focus space-y-5">
