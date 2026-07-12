@@ -1,16 +1,16 @@
 # Handoff — Régua de Kelly (Kelly Stake Pro)
 
-> Última atualização: 2026-07-12 (3ª sessão) · Versão em produção: **v0.5**
-> ✅ **typecheck e build limpos** — `tsc --noEmit -p tsconfig.app.json` sem erros; `vite build` gera artefatos (JS ~334 kB / 101 kB gzip). `typecheck-errors-v0.5.txt` está **obsoleto** (apagar).
+> Última atualização: 2026-07-12 (4ª sessão) · Versão em produção: **v0.7**
+> ✅ **typecheck e build limpos** — `tsc --noEmit -p tsconfig.app.json` sem erros; `vite build` gera artefatos (JS ~335 kB / 101 kB gzip). `typecheck-errors-v0.5.txt` está **obsoleto** (apagar).
 > Memória detalhada do projeto: `memory/project_kelly.md` (índice em `memory/MEMORY.md`)
 > Handoff do coletor de dados: `HANDOFF-coletor-shots-time.md` (fora do git, em `C:\Projetos\calculadora\`)
 
 ## TL;DR
-Sessão fechada com **v0.3 em produção**. Tudo commitado e pushado — `main` em
-sincronia com `origin/main`. Entregues nesta sessão: mobile responsivo (#9),
-gráficos removidos (#6+#7), "Ambas marcam: Não" (#11 parcial), inputs numéricos
-iniciam vazios, config exibe cap/floor/edgemin em pontos percentuais com defaults
-corretos e migração de localStorage legado.
+Sessão fechada com **v0.7 em produção**. Tudo commitado e pushado — `main` em
+sincronia com `origin/main`. Entregues nesta sessão: correção do parsing de pernas de tênis
+(`setScoreA`/`setScoreB` nos índices corretos), `React.memo` no `BetBuilderTab` para
+eliminar input lag na "odd final", exemplos rápidos de tênis na aba Bet Builder
+(Djokovic/Alcaraz + Over 22.5, e Vencedor + Over + 1º set).
 
 ## Ambiente
 - **Repo:** `MaverickDTX/calculadora`
@@ -23,7 +23,7 @@ corretos e migração de localStorage legado.
 ## Convenções do projeto (seguir)
 1. **Versionamento** (`memory/feedback_versionamento.md`): fonte única em
    `src/version.ts` → `APP_VERSION`, formato `0.x`. **Um bump por sessão/entrega**
-   (não por commit). Próxima entrega = **0.4**.
+   (não por commit). Próxima entrega = **0.8**.
 2. **Decimal = ponto** (formato das casas): a entrada força vírgula→ponto em todo
    campo de odd/linha (central em `handleInputChange` do `App.tsx`, exceto
    `RAW_LIST_FIELDS`). Manter esse padrão em campos novos.
@@ -34,17 +34,11 @@ corretos e migração de localStorage legado.
 ## O que foi feito (commits desta sessão, todos pushados)
 | Hash | Entrega |
 |---|---|
-| `b99d970` | Seletor de linha SOT + correção do μ no playerprop |
-| `4072bdf` | Probabilidade marginal por perna + limpeza de lint |
-| `760a1c9` | Default β do prop 0,20 → **0,54** (calibrado: pooled n=543, LR confirma) |
-| `e450a70` | Cursor pulando ao digitar (Bet Builder/Combinada) + lado do prop ignorado |
-| `4e251d8` | Odds com vírgula nas listas não eram lidas — força ponto |
-| `06631d1` | Versionamento (v0.1) |
-| `6db968f` | **v0.2:** Bet Builder (jogador/escanteios desalinhados), Poisson asiático (÷g→÷g!), ponto decimal global, Reset limpa |
-| `a7f57f6` | **v0.3:** mobile (#9), gráficos removidos (#6+#7), bttsNo (#11p), inputs vazios, config % |
-| `52a2da0` | **v0.5:** SGP multi-esporte — tênis (Markov + MC), refatoração calcPoi, seletor de esporte na UI |
-| `(não commitado)` | **7 erros de typecheck corrigidos** (assinaturas `SportModel`, `Partial<Record>` no registry, imports não usados) → build limpo |
-| `(não commitado)` | **Tênis:** `N_CAL` 2000→10000 (menos ruído no grid search da calibração); mensagem de fallback + `console.warn` quando `jointProb=0`. **N_SIM revertido a 20000** — ver diagnóstico abaixo |
+| `d301840` | **chore:** bump version to 0.6 |
+| `f0dfd8f` | **fix(tennis):** corrige parsing `setScoreA`/`setScoreB` (índices 17/18) + memo `BetBuilderTab` |
+| `56905fc` | **fix(tennis):** corrige parsing `setScoreA`/`setScoreB` + memo `BetBuilderTab` + exemplos tênis |
+| `75549de` | **fix(tennis):** adiciona botões "Exemplos rápidos" na aba Bet Builder (tênis) |
+| (implícito) | **v0.7:** version bump + typecheck/build limpos |
 
 ## Pendências (numeração de `project_kelly.md`)
 
@@ -88,22 +82,19 @@ corretos e migração de localStorage legado.
   resolução automática de ligas, cache incremental. Falta só rodar a
   coleta completa (quota API) e a decisão de calibração.
 
-## Próximo passo recomendado (v0.5 — tênis)
-> **typecheck + build já estão limpos** (3ª sessão). A interface `SportModel` ficou com
-> `jointProb(outcomes: Outcome[], legs: Leg[])` — implementações em `football.ts`/`tennis.ts`
-> e chamadas em `useCalculator.ts` consistentes com `outcomes`. **Ainda não commitado.**
+## Próximo passo recomendado (v0.7+ — tênis / basquete)
 
-1. **Commitar** as mudanças não commitadas como **v0.6** (bump um por entrega): correção
-   de typecheck/build + reversão N_SIM + diagnóstico. Apagar `typecheck-errors-v0.5.txt` (obsoleto).
+1. **Validar tênis em produção**: testar exemplos rápidos no app
+   (`https://calculadora-gray-one.vercel.app` → aba **Bet Builder** → Esporte: **Tênis** →
+   "Djokovic @1.33 / Alcaraz @3.50 + Over 22.5") para confirmar que o cálculo
+   funciona end-to-end.
 
-2. **Validar futebol existente**: testar exemplos (Over + Casa vence, Prop jogador) no app em
-   dev (`npm run dev`) para garantir que a refatoração SGP não quebrou nada.
+2. **Basquete (Fase 2)**: modelo Normal Bivariada + Monte Carlo em
+   `src/lib/sgp/basketball.ts` — usar `SGP_REGISTRY` pattern igual a futebol/tênis.
 
-3. **Terminar tênis**: testar com dado real da bet365 (ex.: Djokovic @1.33 / Alcaraz @3.50,
-   O/U 22.5 games @1.85/1.95). **Nota:** combinações de pernas contraditórias (ex.: vencer 3-0
-   ∧ Over muitos games) retornam `jointProb=0` por design — a mensagem de fallback cobre isso.
-
-4. **Fase 2 — Basquete** (quando retomar): modelo Normal Bivariada + Monte Carlo em `src/lib/sgp/basketball.ts`.
+3. Se houver demanda: **pipeline de dados cartões/SOT** — resolver quota API
+   (provider pago ou cache local estendido) + decisão de calibração (base rate por
+   liga/time, escada de odds).
 
 ## Diagnóstico: jointProb=0 no tênis (reanálise 3ª sessão — a causa-raiz anterior estava errada)
 
@@ -143,29 +134,50 @@ número sem valor decisório, a custo de 5× simulações por recálculo no brow
    comunica ao usuário que a combinação é improvável demais para o modelo medir,
    em vez de fingir precisão que não existe.
 
-## Handoff v0.5 — SGP multi-esporte (arquivos novos/modificados)
-**Novos:**
+## Correções desta sessão (4ª)
+
+### 1. Parsing de pernas de tênis (`src/hooks/useCalculator.ts:470-471`)
+O `setScoreA`/`setScoreB` estavam sendo lidos dos índices 3 e 4 do split `|`, mas a
+serialização no `BetBuilderTab` coloca esses campos nos índices 17 e 18. Corrigido
+para ler dos índices corretos.
+
+### 2. Input lag na "Sua odd final" (`src/components/tabs/BetBuilderTab.tsx`)
+O componente era grande e re-renderizava a cada keystroke via `handleInputChange` do
+`App.tsx`. Envolvido em `React.memo` — agora o input responde instantaneamente.
+
+### 3. Exemplos rápidos de tênis (`src/App.tsx`)
+Adicionados ao `EXAMPLE_MAP` e `EXAMPLE_TAB`:
+- `poi-tennis`: Djokovic @1.33 / Alcaraz @3.50, O/U 22.5 jogos @1.85/1.95, pernas
+  `matchWinner` (A) + `totalGamesOver` 22.5
+- `poi-tennis-prop`: mesmo jogo + `firstSetWinner` (A) — 3 pernas
+
+### 4. Botões "Exemplos rápidos" para tênis (`src/components/tabs/BetBuilderTab.tsx`)
+Bloco condicional `sport === 'tennis'` com os dois botões acima, espelhando o
+padrão do futebol.
+
+## Handoff v0.7 — SGP multi-esporte (arquivos novos/modificados desta sessão)
+**Modificados:**
+- `src/hooks/useCalculator.ts` — correção índices `setScoreA`/`setScoreB` (linhas 470-471)
+- `src/components/tabs/BetBuilderTab.tsx` — `React.memo` + botões exemplos tênis
+- `src/App.tsx` — `EXAMPLE_MAP` + `EXAMPLE_TAB` com `poi-tennis` e `poi-tennis-prop`
+- `src/version.ts` — `0.6` → `0.7`
+
+**Novos (v0.5, já commitados):**
 - `src/lib/sgp/types.ts` — interfaces `SportModel`, `Outcome`, `Leg`, `SportInputs`, `ModelParams`
 - `src/lib/sgp/football.ts` — modelo futebol extraído de `calcPoi` (interface `SportModel`)
 - `src/lib/sgp/tennis.ts` — modelo tênis: Markov ponto→game→set→partida + MC + calibração
 - `src/lib/sgp/monte-carlo.ts` — utilidades: `makeRng`, `gauss`, `jointProbMC`, `naiveProbMC`
 - `src/lib/sgp/index.ts` — registry `SGP_REGISTRY`
 
-**Modificados:**
-- `src/hooks/useCalculator.ts` — `calcPoi` despacha por esporte; adiciona `calcTennis`; imports SGP
-- `src/components/tabs/BetBuilderTab.tsx` — seletor de esporte + inputs/legs futebol/tênis
-- `src/version.ts` — `0.4` → `0.5`
-
 ## Arquivos-chave (atualizado)
 - `src/lib/sgp/types.ts` — interfaces do sistema SGP multi-esporte
 - `src/lib/sgp/tennis.ts` — modelo Markov tênis (pernas: matchWinner, totalGamesOver/Under, totalSetsOver/Under, setScore, firstSetWinner, tiebreakInMatch)
 - `src/lib/sgp/football.ts` — modelo futebol (Poisson/Dixon-Coles, 20 pernas)
 - `src/hooks/useCalculator.ts` — `calcPoi` (dispatcher) + `calcTennis` + `calcCombo` + etc
-- `src/components/tabs/BetBuilderTab.tsx` — UI seletor esporte + pernas dinâmicas
-- `typecheck-errors-v0.5.txt` — 7 erros de typecheck a corrigir na próxima sessão
+- `src/components/tabs/BetBuilderTab.tsx` — UI seletor esporte + pernas dinâmicas + `React.memo`
 - `src/App.tsx` — `handleInputChange` (força ponto), `loadExample`, `resetTab`,
   `EXAMPLE_MAP`, `RAW_LIST_FIELDS`. `DEFAULT_INPUTS` contém só selects/flags (sem odds).
-- `src/version.ts` — `APP_VERSION`.
+- `src/version.ts` — `APP_VERSION` (**0.7**).
 - `src/hooks/useConfig.ts` — `DEFAULTS` (cap=0.05, floor=0.0025, edgemin=0.005);
   `migratePercent` converte localStorage legado (valores >1 → ÷100).
 - `src/components/ConfigModal.tsx` — `fmtPct`/`parsePct` convertem cap/floor/edgemin
