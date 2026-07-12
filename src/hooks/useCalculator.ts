@@ -467,8 +467,9 @@ function calcTennis(get: (id: string) => string, cfg: Config): BetResult | { err
     const kind = parts[0];
     const side = (parts[2] as 'A' | 'B') || undefined;
     const line = parts[1] ? numDec(parts[1]) : undefined;
-    const setScoreA = parts[3] ? parseInt(parts[3]) : undefined;
-    const setScoreB = parts[4] ? parseInt(parts[4]) : undefined;
+    // setScoreA/setScoreB are at indices 17 and 18 in the serialization (BetBuilderTab)
+    const setScoreA = parts[17] ? parseInt(parts[17]) : undefined;
+    const setScoreB = parts[18] ? parseInt(parts[18]) : undefined;
 
     const def = legKinds.find(l => l.kind === kind);
     if (!def) { legErr = `Perna desconhecida: ${kind}`; break; }

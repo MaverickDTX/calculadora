@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, memo } from 'react';
 import { Plus, Trash2, ChevronDown, RotateCcw, Lightbulb } from 'lucide-react';
 import { HelpTip } from '../HelpTip';
 import { Select } from '../Select';
@@ -117,7 +117,7 @@ function serializeLegs(legs: Leg[]): string {
   ].join('|')).join(';');
 }
 
-export function BetBuilderTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
+export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
   const [legs, setLegs] = useState<Leg[]>([]);
   const [cornerOpen, setCornerOpen] = useState(false);
   const [tennisExtra, setTennisExtra] = useState(false);
@@ -508,4 +508,4 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset, onCalc
       </button>
     </div>
   );
-}
+});
