@@ -9,6 +9,9 @@ import {
   probTotalOver, fitLambdaTotal, cornerLambdaEff, poisTotalProb, cornerSideProb,
   fitCornerLambdas, fitMuFromLadder, splitComboOdds,
 } from '../lib/math';
+import { tennisModel } from '../lib/sgp/tennis';
+import type { SportInputs, Leg } from '../lib/sgp/types';
+import { DEFAULT_N_SIM } from '../lib/sgp/monte-carlo';
 
 function calcSensitivity(B: {
   sens: Sensitivity | null;
@@ -412,7 +415,105 @@ function calcCombo(get: (id: string) => string, cfg: Config): BetResult | { err:
   });
 }
 
+// ─── Tennis SGP (Markov + Monte Carlo) ───
+function calcTennis(get: (id: string) => string, cfg: Config): BetResult | { err: string } {
+  const mlA = numDec(get('poi-mlA'));
+  const mlB = numDec(get('poi-mlB'));
+  const gamesLine = numDec(get('poi-gamesLine'));
+  const gamesOver = numDec(get('poi-gamesOver'));
+  const gamesUnder = numDec(get('poi-gamesUnder'));
+  const bestOf = (get('poi-bestOf') === '5' ? 5 : 3) as 3 | 5;
+  const firstSetA = numDec(get('poi-firstSetA'));
+  const firstSetB = numDec(get('poi-firstSetB'));
+  const your = numDec(get('poi-your'));
+  let rho = numDec(get('poi-rho'));
+
+  if (!(mlA > 1 && mlB > 1)) return { err: 'Preencha as odds ML de A e B (>1).' };
+  if (!(gamesOver > 1 && gamesUnder > 1 && gamesLine > 0)) return { err: 'Preencha linha e odds Over/Under jogos (>1).' };
+  if (!(your > 1)) return { err: 'Preencha sua odd (>1).' };
+  if (!Number.isFinite(rho)) rho = -0.05;
+
+  const inputs: SportInputs = {
+    sport: 'tennis',
+    mlA, mlB,
+    gamesLine, gamesOver, gamesUnder,
+    bestOf,
+    firstSetA: firstSetA > 1 ? firstSetA : undefined,
+    firstSetB: firstSetB > 1 ? firstSetB : undefined,
+    your,
+    rho,
+  };
+
+  const { calibrate, sample, legAt, jointProb, naiveProb, legKinds } = tennisModel;
+
+  const params = calibrate(inputs, cfg.method);
+  if ('err' in params) return params;
+
+  const warnings: string[] = [];
+  if (params.fitError! > 0.004) warnings.push('Erro residual alto na calibração; trate o preço como estimativa frágil.');
+
+  const N_SIM = DEFAULT_N_SIM;
+  const outcomes = sample(params, N_SIM);
+
+  // Parse legs
+  const legsRaw = get('poi-legs');
+  if (!legsRaw) return { err: 'Adicione ao menos uma perna.' };
+  const legStrs = legsRaw.split(';');
+  const legs: Leg[] = [];
+  let legErr: string | null = null;
+
+  for (const legStr of legStrs) {
+    const parts = legStr.split('|');
+    const kind = parts[0];
+    const side = (parts[2] as 'A' | 'B') || undefined;
+    const line = parts[1] ? numDec(parts[1]) : undefined;
+    const setScoreA = parts[3] ? parseInt(parts[3]) : undefined;
+    const setScoreB = parts[4] ? parseInt(parts[4]) : undefined;
+
+    const def = legKinds.find(l => l.kind === kind);
+    if (!def) { legErr = `Perna desconhecida: ${kind}`; break; }
+    const label = side
+      ? `${def.label} — ${side === 'A' ? 'A' : 'B'}`
+      : def.label;
+
+    legs.push({ kind, side, line, setScoreA, setScoreB, label });
+  }
+
+  if (legErr) return { err: legErr };
+  if (legs.length < 1) return { err: 'Adicione ao menos uma perna.' };
+
+  const p = jointProb(outcomes, legs);
+  if (!(p > 0 && p < 1)) return { err: 'Probabilidade conjunta inválida.' };
+
+  const naive = naiveProb(outcomes, legs);
+
+  const conf = warnings.length ? 'mid' : 'high';
+  let txt = 'Modelo Markov por ponto (calibração via ML + O/U jogos). ';
+  txt += `Produto ingênuo ${(naive * 100).toFixed(1).replace('.', ',')}%; modelo ${(p * 100).toFixed(1).replace('.', ',')}%.`;
+
+  return makeBetBase({
+    label: 'Bet Builder · Tênis',
+    decomp: `${legs.length} perna(s): ${legs.map(l => l.label).join(' + ')}`,
+    p,
+    fair: 1 / p,
+    your,
+    confClass: conf,
+    confTxt: txt,
+    warnings,
+    saveable: true,
+    cfg,
+  });
+}
+
+// ─── Bet Builder dispatcher (multi-sport) ───
 function calcPoi(get: (id: string) => string, cfg: Config): BetResult | { err: string } {
+  // Check sport selector
+  const sport = get('poi-sport') || 'football';
+
+  if (sport === 'tennis') return calcTennis(get, cfg);
+  // if (sport === 'basketball') return calcBasketball(get, cfg); // Fase 2
+
+  // ─── Football (existing logic below) ───
   const h = numDec(get('poi-h'));
   const d = numDec(get('poi-d'));
   const a = numDec(get('poi-a'));

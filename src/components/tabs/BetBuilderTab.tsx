@@ -3,7 +3,16 @@ import { Plus, Trash2, ChevronDown, RotateCcw, Lightbulb } from 'lucide-react';
 import { HelpTip } from '../HelpTip';
 import { Select } from '../Select';
 
-type LegKind = 'over' | 'under' | 'homewin' | 'draw' | 'awaywin' | 'homeNoLose' | 'awayNoLose' | 'btts' | 'bttsNo' | 'homeScores' | 'awayScores' | 'homeOver' | 'homeUnder' | 'awayOver' | 'awayUnder' | 'player' | 'playerprop' | 'cornerTotal' | 'cornerTeam' | 'cornerSide';
+type SportId = 'football' | 'tennis';
+
+type LegKind =
+  | 'over' | 'under' | 'homewin' | 'draw' | 'awaywin' | 'homeNoLose' | 'awayNoLose'
+  | 'btts' | 'bttsNo' | 'homeScores' | 'awayScores'
+  | 'homeOver' | 'homeUnder' | 'awayOver' | 'awayUnder'
+  | 'player' | 'playerprop' | 'cornerTotal' | 'cornerTeam' | 'cornerSide'
+  // Tennis
+  | 'matchWinner' | 'totalGamesOver' | 'totalGamesUnder' | 'totalSetsOver' | 'totalSetsUnder'
+  | 'setScore' | 'firstSetWinner' | 'tiebreakInMatch';
 
 interface Leg {
   id: number;
@@ -24,6 +33,9 @@ interface Leg {
   ppBeta?: string;
   cBeta?: string;
   ppLine?: string;
+  // Tennis-specific
+  setScoreA?: string;
+  setScoreB?: string;
 }
 
 interface Props {
@@ -34,7 +46,8 @@ interface Props {
   onCalculate: () => void;
 }
 
-const LEG_OPTIONS: { value: LegKind; label: string }[] = [
+// ─── Football leg options ───
+const FOOTBALL_LEG_OPTIONS: { value: LegKind; label: string }[] = [
   { value: 'over', label: 'Over' },
   { value: 'under', label: 'Under' },
   { value: 'homewin', label: 'Casa vence' },
@@ -57,6 +70,23 @@ const LEG_OPTIONS: { value: LegKind; label: string }[] = [
   { value: 'cornerSide', label: 'Escanteios 1X2' },
 ];
 
+// ─── Tennis leg options ───
+const TENNIS_LEG_OPTIONS: { value: LegKind; label: string }[] = [
+  { value: 'matchWinner', label: 'Vencedor da partida' },
+  { value: 'totalGamesOver', label: 'Over jogos totais' },
+  { value: 'totalGamesUnder', label: 'Under jogos totais' },
+  { value: 'totalSetsOver', label: 'Over sets totais' },
+  { value: 'totalSetsUnder', label: 'Under sets totais' },
+  { value: 'setScore', label: 'Placar de sets exato' },
+  { value: 'firstSetWinner', label: 'Vencedor do 1º set' },
+  { value: 'tiebreakInMatch', label: 'Tiebreak na partida' },
+];
+
+const SPORT_OPTIONS: { value: SportId; label: string }[] = [
+  { value: 'football', label: 'Futebol' },
+  { value: 'tennis', label: 'Tênis' },
+];
+
 function parseLegs(saved: string): Leg[] {
   if (!saved) return [];
   return saved.split(';').map(s => {
@@ -73,6 +103,7 @@ function parseLegs(saved: string): Leg[] {
       anytimeNo: p[7],
       ppO0: p[8], ppO1: p[9], ppO2: p[10], ppO3: p[11], ppO4: p[12],
       ppSide: p[13], ppBeta: p[14], cBeta: p[15], ppLine: p[16],
+      setScoreA: p[17], setScoreB: p[18],
     };
   });
 }
@@ -82,13 +113,18 @@ function serializeLegs(legs: Leg[]): string {
     l.kind, l.line, l.side, l.cSide, l.cDir, l.c1x2,
     l.anytime, l.anytimeNo, l.ppO0, l.ppO1, l.ppO2, l.ppO3, l.ppO4,
     l.ppSide, l.ppBeta, l.cBeta, l.ppLine,
+    l.setScoreA, l.setScoreB,
   ].join('|')).join(';');
 }
 
 export function BetBuilderTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
   const [legs, setLegs] = useState<Leg[]>([]);
   const [cornerOpen, setCornerOpen] = useState(false);
+  const [tennisExtra, setTennisExtra] = useState(false);
   const prevLegsRef = useRef(values['poi-legs']);
+
+  const sport = (values['poi-sport'] as SportId) || 'football';
+  const legOptions = sport === 'tennis' ? TENNIS_LEG_OPTIONS : FOOTBALL_LEG_OPTIONS;
 
   if (values['poi-legs'] !== prevLegsRef.current) {
     prevLegsRef.current = values['poi-legs'];
@@ -98,10 +134,20 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset, onCalc
 
   const addLeg = (kind: LegKind = 'over') => {
     if (legs.length < 8) {
-      const next = [...legs, {
-        id: Date.now(), kind,
-        line: kind === 'over' || kind === 'under' ? '2.5' : kind.includes('corner') ? '9.5' : undefined,
-      }];
+      const defaults: Partial<Leg> = { kind };
+      if (sport === 'football') {
+        if (kind === 'over' || kind === 'under') defaults.line = '2.5';
+        if (kind.includes('corner')) defaults.line = '9.5';
+      }
+      if (sport === 'tennis') {
+        if (kind === 'totalGamesOver' || kind === 'totalGamesUnder') defaults.line = '22.5';
+        if (kind === 'totalSetsOver' || kind === 'totalSetsUnder') defaults.line = '2.5';
+        if (kind === 'setScore') {
+          defaults.setScoreA = '2';
+          defaults.setScoreB = '0';
+        }
+      }
+      const next = [...legs, { id: Date.now(), ...defaults } as Leg];
       setLegs(next);
       onChange('poi-legs', serializeLegs(next));
     }
@@ -112,7 +158,6 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset, onCalc
     onChange('poi-legs', serializeLegs(next));
   };
   const updateLeg = (id: number, updates: Partial<Leg>) => {
-    // força ponto nos campos decimais (odds/linha); selects/enums (ppLine, side, etc.) ficam intactos
     const u: Partial<Leg> = { ...updates };
     const rec = u as Record<string, string | undefined>;
     for (const f of ['line', 'anytime', 'anytimeNo', 'ppO0', 'ppO1', 'ppO2', 'ppO3', 'ppO4', 'ppBeta']) {
@@ -125,69 +170,147 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset, onCalc
 
   return (
     <div className="space-y-5 animate-fade-in">
+      {/* Sport selector */}
+      <div className="panel">
+        <div className="flex items-center gap-3 mb-3">
+          <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Esporte</span>
+        </div>
+        <Select
+          value={sport}
+          onChange={v => {
+            const s = v as SportId;
+            onChange('poi-sport', s);
+            onChange('poi-legs', '');
+          }}
+          options={SPORT_OPTIONS}
+        />
+      </div>
+
       <div className="panel border-warn/30" style={{ background: 'rgba(245, 158, 11, 0.04)' }}>
         <p className="text-xs text-text-secondary leading-relaxed">
-          Use para bet builders do <b>mesmo jogo</b>, quando a correlação entre pernas importa. O modelo Poisson/Dixon-Coles calibra a distribuição de placar a partir das odds simples.
+          {sport === 'tennis' ? (
+            <>Use para bet builders de <b>tênis</b>. O modelo Markov por ponto (ponto→game→set→partida) calibra a distribuição conjunta a partir das odds simples via Monte Carlo.</>
+          ) : (
+            <>Use para bet builders do <b>mesmo jogo</b>, quando a correlação entre pernas importa. O modelo Poisson/Dixon-Coles calibra a distribuição de placar a partir das odds simples.</>
+          )}
         </p>
       </div>
 
-      <div className="panel">
-        <div className="flex items-center gap-2 mb-3">
-          <Lightbulb size={14} className="text-warn" aria-hidden="true" />
-          <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Exemplos rápidos</span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={() => onLoadExample('poi-builder')} className="btn-ghost text-xs">Over + Casa vence</button>
-          <button type="button" onClick={() => onLoadExample('poi-playerprop')} className="btn-ghost text-xs">Prop jogador</button>
-          <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} aria-hidden="true" /> Reset</button>
-        </div>
-      </div>
-
-      <div className="panel panel-focus space-y-5">
-        <div className="section-title">Odds simples do jogo</div>
-        <div className="grid grid-cols-3 gap-3">
-          <div><label className="text-xs text-text-muted mb-1.5 block">Casa (1)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-h'] || ''} onChange={e => onChange('poi-h', e.target.value)} className="input-dark" placeholder="1.80" /></div>
-          <div><label className="text-xs text-text-muted mb-1.5 block">Empate (X)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-d'] || ''} onChange={e => onChange('poi-d', e.target.value)} className="input-dark" placeholder="3.60" /></div>
-          <div><label className="text-xs text-text-muted mb-1.5 block">Fora (2)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-a'] || ''} onChange={e => onChange('poi-a', e.target.value)} className="input-dark" placeholder="4.50" /></div>
-        </div>
-        <div className="grid grid-cols-3 gap-3">
-          <div><label className="text-xs text-text-muted mb-1.5 block">Linha O/U gols</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-ouline'] || ''} onChange={e => onChange('poi-ouline', e.target.value)} className="input-dark" placeholder="2.5" /></div>
-          <div><label className="text-xs text-text-muted mb-1.5 block">Odd Over</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-over'] || ''} onChange={e => onChange('poi-over', e.target.value)} className="input-dark" placeholder="1.95" /></div>
-          <div><label className="text-xs text-text-muted mb-1.5 block">Odd Under</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-under'] || ''} onChange={e => onChange('poi-under', e.target.value)} className="input-dark" placeholder="1.95" /></div>
-        </div>
-
-        <div>
-          <label className="text-xs text-text-muted mb-1.5 block">Correção Dixon-Coles ρ<HelpTip text="Correção de dependência entre poucos gols (Dixon-Coles). Valores típicos entre -0.15 e 0; ~-0.05 é comum. 0 = Poisson pura." /></label>
-          <input type="text" inputMode="text" autoComplete="off" value={values['poi-rho'] || ''} onChange={e => onChange('poi-rho', e.target.value)} className="input-dark" placeholder="-0.05" />
-        </div>
-
-        <div className="pt-3 border-t border-border">
-          <button type="button" onClick={() => setCornerOpen(!cornerOpen)} className="flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">
-            <ChevronDown size={16} aria-hidden="true" className={`transition-transform ${cornerOpen ? 'rotate-180' : ''}`} />
-            Calibração de escanteios
-            <span className="text-xs text-text-muted font-normal">— preencha só se houver perna de escanteio</span>
-          </button>
-          {cornerOpen && (
-            <div className="mt-3 space-y-3 animate-fade-in">
-              <div className="grid grid-cols-3 gap-3">
-                <div><label className="text-xs text-text-muted mb-1.5 block">Linha O/U corners</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-line'] || ''} onChange={e => onChange('poi-c-line', e.target.value)} className="input-dark" placeholder="9.5" /></div>
-                <div><label className="text-xs text-text-muted mb-1.5 block">Odd Over corners</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-over'] || ''} onChange={e => onChange('poi-c-over', e.target.value)} className="input-dark" placeholder="1.90" /></div>
-                <div><label className="text-xs text-text-muted mb-1.5 block">Odd Under corners</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-under'] || ''} onChange={e => onChange('poi-c-under', e.target.value)} className="input-dark" placeholder="1.90" /></div>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div><label className="text-xs text-text-muted mb-1.5 block">Corner 1X2 — Casa (1) <span className="text-text-muted/70">opcional</span></label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-1'] || ''} onChange={e => onChange('poi-c-1', e.target.value)} className="input-dark" placeholder="opt" /></div>
-                <div><label className="text-xs text-text-muted mb-1.5 block">Empate corners (X)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-x'] || ''} onChange={e => onChange('poi-c-x', e.target.value)} className="input-dark" placeholder="opt" /></div>
-                <div><label className="text-xs text-text-muted mb-1.5 block">Visitante (2)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-2'] || ''} onChange={e => onChange('poi-c-2', e.target.value)} className="input-dark" placeholder="opt" /></div>
-              </div>
-              <p className="text-xs text-text-muted leading-relaxed">
-                Sem o 1X2 de escanteios, o total é dividido entre os times pela proporção de domínio do jogo (split de gols). Com o 1X2, o split de escanteios é calibrado diretamente. Escanteios costumam ser levemente <b>sobredispersos</b> vs. Poisson — a cauda alta pode ser subestimada (ressalva análoga à de SOT/props).
-              </p>
+      {/* ─── Football inputs ─── */}
+      {sport === 'football' && (
+        <>
+          <div className="panel">
+            <div className="flex items-center gap-2 mb-3">
+              <Lightbulb size={14} className="text-warn" aria-hidden="true" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Exemplos rápidos</span>
             </div>
-          )}
-        </div>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" onClick={() => onLoadExample('poi-builder')} className="btn-ghost text-xs">Over + Casa vence</button>
+              <button type="button" onClick={() => onLoadExample('poi-playerprop')} className="btn-ghost text-xs">Prop jogador</button>
+              <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} aria-hidden="true" /> Reset</button>
+            </div>
+          </div>
 
-        <div className="divider" />
+          <div className="panel panel-focus space-y-5">
+            <div className="section-title">Odds simples do jogo</div>
+            <div className="grid grid-cols-3 gap-3">
+              <div><label className="text-xs text-text-muted mb-1.5 block">Casa (1)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-h'] || ''} onChange={e => onChange('poi-h', e.target.value)} className="input-dark" placeholder="1.80" /></div>
+              <div><label className="text-xs text-text-muted mb-1.5 block">Empate (X)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-d'] || ''} onChange={e => onChange('poi-d', e.target.value)} className="input-dark" placeholder="3.60" /></div>
+              <div><label className="text-xs text-text-muted mb-1.5 block">Fora (2)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-a'] || ''} onChange={e => onChange('poi-a', e.target.value)} className="input-dark" placeholder="4.50" /></div>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div><label className="text-xs text-text-muted mb-1.5 block">Linha O/U gols</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-ouline'] || ''} onChange={e => onChange('poi-ouline', e.target.value)} className="input-dark" placeholder="2.5" /></div>
+              <div><label className="text-xs text-text-muted mb-1.5 block">Odd Over</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-over'] || ''} onChange={e => onChange('poi-over', e.target.value)} className="input-dark" placeholder="1.95" /></div>
+              <div><label className="text-xs text-text-muted mb-1.5 block">Odd Under</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-under'] || ''} onChange={e => onChange('poi-under', e.target.value)} className="input-dark" placeholder="1.95" /></div>
+            </div>
 
+            <div>
+              <label className="text-xs text-text-muted mb-1.5 block">Correção Dixon-Coles ρ<HelpTip text="Correção de dependência entre poucos gols (Dixon-Coles). Valores típicos entre -0.15 e 0; ~-0.05 é comum. 0 = Poisson pura." /></label>
+              <input type="text" inputMode="text" autoComplete="off" value={values['poi-rho'] || ''} onChange={e => onChange('poi-rho', e.target.value)} className="input-dark" placeholder="-0.05" />
+            </div>
+
+            <div className="pt-3 border-t border-border">
+              <button type="button" onClick={() => setCornerOpen(!cornerOpen)} className="flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">
+                <ChevronDown size={16} aria-hidden="true" className={`transition-transform ${cornerOpen ? 'rotate-180' : ''}`} />
+                Calibração de escanteios
+                <span className="text-xs text-text-muted font-normal">— preencha só se houver perna de escanteio</span>
+              </button>
+              {cornerOpen && (
+                <div className="mt-3 space-y-3 animate-fade-in">
+                  <div className="grid grid-cols-3 gap-3">
+                    <div><label className="text-xs text-text-muted mb-1.5 block">Linha O/U corners</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-line'] || ''} onChange={e => onChange('poi-c-line', e.target.value)} className="input-dark" placeholder="9.5" /></div>
+                    <div><label className="text-xs text-text-muted mb-1.5 block">Odd Over corners</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-over'] || ''} onChange={e => onChange('poi-c-over', e.target.value)} className="input-dark" placeholder="1.90" /></div>
+                    <div><label className="text-xs text-text-muted mb-1.5 block">Odd Under corners</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-under'] || ''} onChange={e => onChange('poi-c-under', e.target.value)} className="input-dark" placeholder="1.90" /></div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div><label className="text-xs text-text-muted mb-1.5 block">Corner 1X2 — Casa (1) <span className="text-text-muted/70">opcional</span></label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-1'] || ''} onChange={e => onChange('poi-c-1', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                    <div><label className="text-xs text-text-muted mb-1.5 block">Empate corners (X)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-x'] || ''} onChange={e => onChange('poi-c-x', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                    <div><label className="text-xs text-text-muted mb-1.5 block">Visitante (2)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-2'] || ''} onChange={e => onChange('poi-c-2', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                  </div>
+                  <p className="text-xs text-text-muted leading-relaxed">
+                    Sem o 1X2 de escanteios, o total é dividido entre os times pela proporção de domínio do jogo (split de gols). Com o 1X2, o split de escanteios é calibrado diretamente. Escanteios costumam ser levemente <b>sobredispersos</b> vs. Poisson — a cauda alta pode ser subestimada (ressalva análoga à de SOT/props).
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ─── Tennis inputs ─── */}
+      {sport === 'tennis' && (
+        <>
+          <div className="panel">
+            <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} aria-hidden="true" /> Reset</button>
+          </div>
+
+          <div className="panel panel-focus space-y-5">
+            <div className="section-title">Odds simples do jogo</div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className="text-xs text-text-muted mb-1.5 block">Jogador A — ML</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-mlA'] || ''} onChange={e => onChange('poi-mlA', e.target.value)} className="input-dark" placeholder="1.80" /></div>
+              <div><label className="text-xs text-text-muted mb-1.5 block">Jogador B — ML</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-mlB'] || ''} onChange={e => onChange('poi-mlB', e.target.value)} className="input-dark" placeholder="2.10" /></div>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div><label className="text-xs text-text-muted mb-1.5 block">Linha O/U jogos</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-gamesLine'] || ''} onChange={e => onChange('poi-gamesLine', e.target.value)} className="input-dark" placeholder="22.5" /></div>
+              <div><label className="text-xs text-text-muted mb-1.5 block">Odd Over</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-gamesOver'] || ''} onChange={e => onChange('poi-gamesOver', e.target.value)} className="input-dark" placeholder="1.90" /></div>
+              <div><label className="text-xs text-text-muted mb-1.5 block">Odd Under</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-gamesUnder'] || ''} onChange={e => onChange('poi-gamesUnder', e.target.value)} className="input-dark" placeholder="1.90" /></div>
+            </div>
+            <div className="flex items-center gap-3">
+              <label className="text-xs text-text-muted">Formato</label>
+              <Select
+                value={values['poi-bestOf'] || '3'}
+                onChange={v => onChange('poi-bestOf', v)}
+                options={[
+                  { value: '3', label: 'Melhor de 3 sets' },
+                  { value: '5', label: 'Melhor de 5 sets' },
+                ]}
+              />
+            </div>
+
+            <div className="pt-3 border-t border-border">
+              <button type="button" onClick={() => setTennisExtra(!tennisExtra)} className="flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">
+                <ChevronDown size={16} aria-hidden="true" className={`transition-transform ${tennisExtra ? 'rotate-180' : ''}`} />
+                Calibração extra (1º set)
+                <span className="text-xs text-text-muted font-normal">— opcional, melhora o fit</span>
+              </button>
+              {tennisExtra && (
+                <div className="mt-3 space-y-3 animate-fade-in">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div><label className="text-xs text-text-muted mb-1.5 block">A vence 1º set</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-firstSetA'] || ''} onChange={e => onChange('poi-firstSetA', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                    <div><label className="text-xs text-text-muted mb-1.5 block">B vence 1º set</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-firstSetB'] || ''} onChange={e => onChange('poi-firstSetB', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                  </div>
+                  <p className="text-xs text-text-muted leading-relaxed">
+                    Quando preenchidas, as odds do 1º set fornecem um ponto extra de calibração para o modelo Markov, melhorando a estimativa de `pA_serve` e `pB_serve`.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ─── Legs (shared, but options depend on sport) ─── */}
+      <div className="panel panel-focus space-y-5">
         <div className="section-title">Pernas da combinada</div>
         <div className="space-y-3">
           {legs.map(leg => {
@@ -199,6 +322,11 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset, onCalc
             const isCSide = leg.kind === 'cornerSide';
             const isCorner = isCT || isCTeam || isCSide;
 
+            // Tennis leg flags
+            const isTennisOU = ['totalGamesOver', 'totalGamesUnder', 'totalSetsOver', 'totalSetsUnder'].includes(leg.kind);
+            const isTennisSide = ['matchWinner', 'firstSetWinner'].includes(leg.kind);
+            const isTennisSetScore = leg.kind === 'setScore';
+
             return (
               <div key={leg.id} className="panel p-3 space-y-2.5">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -207,16 +335,30 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset, onCalc
                     onChange={v => {
                       const k = v as LegKind;
                       const defaults: Partial<Leg> = { kind: k };
-                      if (k === 'over' || k === 'under') defaults.line = '2.5';
-                      if (['homeOver', 'homeUnder', 'awayOver', 'awayUnder'].includes(k)) defaults.line = '1.5';
-                      if (k === 'cornerTotal') defaults.line = '9.5';
-                      if (k === 'cornerTeam') defaults.line = '5.5';
+                      if (sport === 'football') {
+                        if (k === 'over' || k === 'under') defaults.line = '2.5';
+                        if (['homeOver', 'homeUnder', 'awayOver', 'awayUnder'].includes(k)) defaults.line = '1.5';
+                        if (k === 'cornerTotal') defaults.line = '9.5';
+                        if (k === 'cornerTeam') defaults.line = '5.5';
+                      }
+                      if (sport === 'tennis') {
+                        if (k === 'totalGamesOver' || k === 'totalGamesUnder') defaults.line = '22.5';
+                        if (k === 'totalSetsOver' || k === 'totalSetsUnder') defaults.line = '2.5';
+                        if (k === 'setScore') {
+                          defaults.setScoreA = '2';
+                          defaults.setScoreB = '0';
+                        }
+                      }
                       updateLeg(leg.id, defaults);
                     }}
-                    options={LEG_OPTIONS}
+                    options={legOptions}
                   />
 
                   {(isOU || isCT || isCTeam) && (
+                    <input type="text" inputMode="decimal" autoComplete="off" value={leg.line || ''} onChange={e => updateLeg(leg.id, { line: e.target.value })} placeholder="linha" className="input-dark w-20 h-9 text-xs" />
+                  )}
+
+                  {(isTennisOU) && (
                     <input type="text" inputMode="decimal" autoComplete="off" value={leg.line || ''} onChange={e => updateLeg(leg.id, { line: e.target.value })} placeholder="linha" className="input-dark w-20 h-9 text-xs" />
                   )}
 
@@ -229,6 +371,25 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset, onCalc
                         { value: 'away', label: 'visitante' },
                       ]}
                     />
+                  )}
+
+                  {isTennisSide && (
+                    <Select
+                      value={leg.side || 'A'}
+                      onChange={v => updateLeg(leg.id, { side: v })}
+                      options={[
+                        { value: 'A', label: 'Jogador A' },
+                        { value: 'B', label: 'Jogador B' },
+                      ]}
+                    />
+                  )}
+
+                  {isTennisSetScore && (
+                    <>
+                      <input type="text" inputMode="numeric" autoComplete="off" value={leg.setScoreA || ''} onChange={e => updateLeg(leg.id, { setScoreA: e.target.value })} placeholder="sets A" className="input-dark w-16 h-9 text-xs" />
+                      <span className="text-xs text-text-muted">×</span>
+                      <input type="text" inputMode="numeric" autoComplete="off" value={leg.setScoreB || ''} onChange={e => updateLeg(leg.id, { setScoreB: e.target.value })} placeholder="sets B" className="input-dark w-16 h-9 text-xs" />
+                    </>
                   )}
 
                   {isCT && (
@@ -328,7 +489,7 @@ export function BetBuilderTab({ values, onChange, onLoadExample, onReset, onCalc
             );
           })}
         </div>
-        <button type="button" onClick={() => addLeg('over')} className="btn-ghost text-xs flex items-center gap-1.5">
+        <button type="button" onClick={() => addLeg(sport === 'tennis' ? 'matchWinner' : 'over')} className="btn-ghost text-xs flex items-center gap-1.5">
           <Plus size={14} aria-hidden="true" /> Perna
         </button>
 
