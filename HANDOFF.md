@@ -46,10 +46,12 @@ eliminar input lag na "odd final", exemplos rápidos de tênis na aba Bet Builde
 - **#11 Novas pernas Bet Builder (resto)** — "Ambas marcam: Não" feito. **Pipeline de
   dados construído** (script Python `coletar_shots_time_sofasport.py`, fora do git):
   coleta shots/SOT + cartões por time via SofaScore RapidAPI (provider atual:
-  **sportapi7 / RapidSportAPI**). Cache: 376 eventos com stats + 13 times com
-  metadados (de 156 times). Coleta completa **travada na quota free** (500 req/mês
-  esgotados em ~130 chamadas Fase 1). **Decisão de calibração ainda pendente**
-  (escada de odds / linha O-U / base rate).
+  **sportapi7 / RapidSportAPI**). Cache persistido: **só** `sofasport_cache.json`
+  (376 eventos com stats) — metadados de time/evento vivem em memória e a Fase 1
+  reprocessa os 156 times a cada execução. Coleta completa **travada na quota free**
+  (500 req/mês; custo total estimado ~1.900–2.400 req → uma chave free não basta —
+  detalhes e opções em `HANDOFF-coletor-shots-time.md`, auditado 2026-07-12).
+  **Decisão de calibração ainda pendente** (escada de odds / linha O-U / base rate).
 - **#13 Mercado de cartões** (O/U partida/time + 1X2) — dados de cartão já incluídos
   no pipeline acima (`yellowCards` confirmado, `redCards` condicional). Mesma decisão
   de calibração pendente.

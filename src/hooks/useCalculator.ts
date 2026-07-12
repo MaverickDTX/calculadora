@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import type { Config, BetResult, Sensitivity, SensitivityInfo, EvPoint, ReturnState } from '../types';
 import {
   numDec, readPctInput, confFactor, boostOdd, binaryBet, evReturns, kellyReturns,
@@ -163,10 +163,23 @@ export function useCalculator(
   activeTab: string,
   trigger?: number
 ): { result: BetResult | { err: string } | null; recompute: () => void } {
+  // Ref sempre atualizada: o modo lazy lê os inputs vigentes no momento do
+  // trigger sem tê-los nas dependências do useMemo (senão o cálculo pesado
+  // — ex.: calibração Monte Carlo do tênis — rodaria a cada caractere digitado).
+  const inputsRef = useRef(inputs);
+  inputsRef.current = inputs;
+
+  const isLazy = trigger !== undefined;
+
+  // Modo lazy (abas pesadas): recalcula SÓ quando trigger/aba/config mudam.
+  // Modo reativo (abas leves): recalcula a cada mudança de input.
+  // Os dois arrays têm o mesmo tamanho — exigência do React para deps condicionais.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const result = useMemo(() => {
-    // If trigger is provided (lazy mode), only recalculate when trigger changes
-    // Otherwise (reactive mode), recalculate on any input/config/tab change
-    const get = (id: string) => inputs[id] ?? '';
+    // Lazy sem nenhum "Calcular" ainda: não roda o cálculo pesado no mount/troca de aba.
+    if (isLazy && trigger === 0) return null;
+
+    const get = (id: string) => inputsRef.current[id] ?? '';
 
     switch (activeTab) {
       case 'nres': return calcNres(get, cfg);
@@ -178,7 +191,7 @@ export function useCalculator(
       case 'asia': return calcAsia(get, cfg);
       default: return null;
     }
-  }, [inputs, cfg, activeTab, trigger]);
+  }, isLazy ? [cfg, activeTab, trigger, isLazy] : [cfg, activeTab, inputs, isLazy]);
 
   return { result, recompute: () => {} };
 }

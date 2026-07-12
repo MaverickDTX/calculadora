@@ -1,9 +1,10 @@
-// ─── Tennis SGP model (Markov chain by point + Monte Carlo) ───
+// ─── Tennis SGP model (Markov chain by point) ───
 //
 // Hierarchy: point → game → set → match
 // Parameters: pA_serve, pB_serve (prob. of winning a point on serve)
-// Calibration: fit pA_serve, pB_serve to de-vigged ML + O/U games odds
-// SGP: simulate N matches, evaluate legs per simulation
+// Calibration (exact): fit pA_serve, pB_serve via DP over the Markov chain
+//   (game → set → match) — no Monte Carlo needed in calibrateTennis.
+// SGP (final sample): simulate N matches via MC, evaluate legs per simulation.
 
 import { devigN } from '../math';
 import type { DevigMethod } from '../../types';
@@ -63,6 +64,237 @@ function factorial(n: number): number {
   return f;
 }
 
+// ─── Exact DP: probability of winning a tiebreak (point-by-point Markov) ───
+// Standard tiebreak: first to 7 points, win by 2.
+// Serve rotation (A serves first): A serves point 1; after that, serve
+// switches every 2 points: B serves {2,3}, A serves {4,5}, B serves {6,7}, ...
+// Returns P(A wins the tiebreak) given point-on-serve probabilities.
+export function probWinTiebreakDP(pA_serve: number, pB_serve: number): number {
+  const pA_when_A_serves = pA_serve;       // P(A wins point) when A is serving
+  const pA_when_B_serves = 1 - pB_serve;   // P(A wins point) when B is serving (= B is broken)
+
+  // dp[a][b] = P(reaching tiebreak score a-b from 0-0)
+  const MAX = 20; // cap; tail beyond 20-20 has probability < 1e-15 for realistic p
+  const dp: number[][] = Array.from({ length: MAX + 1 }, () => new Array(MAX + 1).fill(0));
+  dp[0][0] = 1;
+
+  let pAWin = 0;
+  // Process states in order of total points played so far (a+b) so we never
+  // read a value we already overwrote.
+  for (let tot = 0; tot <= 2 * MAX - 1; tot++) {
+    for (let a = Math.max(0, tot - MAX); a <= Math.min(MAX, tot); a++) {
+      const b = tot - a;
+      const cur = dp[a][b];
+      if (cur === 0) continue;
+      // If this state is terminal (someone already won), skip — it should not
+      // propagate further (and its probability was already captured when the
+      // winning point was placed).
+      if ((a >= 7 || b >= 7) && Math.abs(a - b) >= 2) continue;
+
+      const ptNum = tot + 1; // 1-indexed number of the point about to be played
+      const aServes = aServesNext(ptNum);
+      const pAPoint = aServes ? pA_when_A_serves : pA_when_B_serves;
+
+      // A wins the next point
+      const na = a + 1, nb = b;
+      if (na >= 7 && na - nb >= 2) {
+        pAWin += cur * pAPoint;
+      } else if (na <= MAX) {
+        dp[na][nb] += cur * pAPoint;
+      }
+      // B wins the next point
+      const mb = b + 1;
+      if (mb >= 7 && mb - a >= 2) {
+        // B wins the tiebreak — no contribution to pAWin
+      } else if (mb <= MAX) {
+        dp[a][mb] += cur * (1 - pAPoint);
+      }
+    }
+  }
+  return pAWin;
+}
+
+// Serve rotation in a tiebreak (A serves first):
+//   pt 1          → A
+//   pt 2, 3       → B
+//   pt 4, 5       → A
+//   pt 6, 7       → B
+//   pt 8, 9       → A
+//   ...
+// After the opening A serve (pt 1), the remaining points (pt 2,3,4,...) come in
+// pairs that alternate server: block 0 = pt 2-3 (B), block 1 = pt 4-5 (A),
+// block 2 = pt 6-7 (B), etc. So A serves the odd-indexed blocks (1, 3, 5, ...).
+function aServesNext(ptNum: number): boolean {
+  if (ptNum === 1) return true;
+  const r = ptNum - 2;          // 0,1,2,3,...
+  const block = Math.floor(r / 2); // 0,0,1,1,2,2,...
+  return (block % 2 === 1);       // odd blocks → A serves
+}
+
+// ─── Exact DP: joint distribution of a single set (winner × gameCount) ───
+// A serves games 1,3,5,7,9,11,13 (odd game numbers); B serves 2,4,6,8,10,12.
+// First to 6 games with 2-game lead; tiebreak at 6-6 (decided by probWinTiebreakDP).
+interface SetDistJoint {
+  pAwinSet: number;
+  pBwinSet: number;
+  // byCountAWin[n] = P(A wins the set with exactly n total games), n in [6..13].
+  // byCountBWin[n] = P(B wins the set with exactly n total games).
+  // n=13 always means the set was decided by tiebreak (7-6).
+  byCountAWin: number[]; // length 14 (only indices 6..13 are nonzero)
+  byCountBWin: number[]; // length 14
+  pTiebreak: number;
+}
+
+export function probWinSetDPJoint(
+  pA_game: number, pB_game: number, pA_serve: number, pB_serve: number
+): SetDistJoint {
+  // dp[gA][gB] = P(reaching game score (gA, gB)). gA, gB ∈ [0..7]; 7 represents
+  // "got to 7 games" (used for 7-5 and 7-6 finishes after going past 5-5).
+  const dp: number[][] = Array.from({ length: 8 }, () => new Array(8).fill(0));
+  dp[0][0] = 1;
+
+  const byCountAWin = new Array(14).fill(0);
+  const byCountBWin = new Array(14).fill(0);
+  let pTiebreak = 0;
+
+  // Iterate in order of total games played (gA + gB) so writes to (gA+1, gB)
+  // and (gA, gB+1) — which have a higher total — are never read in the same pass.
+  for (let tot = 0; tot <= 13; tot++) {
+    for (let gA = Math.max(0, tot - 7); gA <= Math.min(7, tot); gA++) {
+      const gB = tot - gA;
+      const cur = dp[gA][gB];
+      if (cur === 0) continue;
+
+      // Terminal: A wins the set (6-0..6-4, or 7-5, or 7-6)
+      if ((gA === 6 && gB <= 4) || (gA === 7 && (gB === 5 || gB === 6))) {
+        const tg = gA + gB;
+        if (gB === 6) { byCountAWin[13] += cur; pTiebreak += cur; }
+        else byCountAWin[tg] += cur;
+        continue;
+      }
+      // Terminal: B wins the set (mirror)
+      if ((gB === 6 && gA <= 4) || (gB === 7 && (gA === 5 || gA === 6))) {
+        const tg = gA + gB;
+        if (gA === 6) { byCountBWin[13] += cur; pTiebreak += cur; }
+        else byCountBWin[tg] += cur;
+        continue;
+      }
+      // 6-6 → tiebreak (decided point-by-point)
+      if (gA === 6 && gB === 6) {
+        const pAtb = probWinTiebreakDP(pA_serve, pB_serve);
+        byCountAWin[13] += cur * pAtb;
+        byCountBWin[13] += cur * (1 - pAtb);
+        pTiebreak += cur;
+        continue;
+      }
+
+      // Play another game. A serves odd-numbered games, B serves even.
+      const gameNum = tot + 1;
+      const aServes = (gameNum % 2 === 1);
+      const pServer = aServes ? pA_game : pB_game;
+      if (aServes) {
+        if (gA + 1 <= 7) dp[gA + 1][gB] += cur * pServer;       // A holds
+        if (gB + 1 <= 7) dp[gA][gB + 1] += cur * (1 - pServer); // A broken
+      } else {
+        if (gB + 1 <= 7) dp[gA][gB + 1] += cur * pServer;       // B holds
+        if (gA + 1 <= 7) dp[gA + 1][gB] += cur * (1 - pServer); // B broken
+      }
+    }
+  }
+
+  const pAwinSet = byCountAWin.reduce((s, v) => s + v, 0);
+  const pBwinSet = byCountBWin.reduce((s, v) => s + v, 0);
+  return { pAwinSet, pBwinSet, byCountAWin, byCountBWin, pTiebreak };
+}
+
+// ─── Exact DP: distribution of a full match ───
+// Tracks state (setsA, setsB, totalGamesAccum, hadTB, firstSetWinner):
+//   - hadTB ∈ {0, 1}: whether any set so far went to tiebreak (OR across sets)
+//   - firstSetWinner ∈ {0=A, 1=B, 2=unset}: determined at the first set only
+// Returns the match-level probabilities used by calibrateTennis's objective.
+interface MatchDist {
+  pA_win_match: number;
+  pB_win_match: number;
+  totalGamesProb: number[]; // index = total games in the match (P(match totals N games))
+  pFirstSetA: number;       // P(A wins the first set)
+  pTiebreakInMatch: number; // P(at least one set goes to tiebreak)
+}
+
+export function probMatchDP(pA_serve: number, pB_serve: number, bestOf: 3 | 5): MatchDist {
+  const pA_game = probWinGame(pA_serve);
+  const pB_game = probWinGame(pB_serve);
+  const sd = probWinSetDPJoint(pA_game, pB_game, pA_serve, pB_serve);
+
+  const setsToWin = bestOf === 3 ? 2 : 3;
+  const maxSets = 2 * setsToWin - 1; // 3 (best-of-3) or 5 (best-of-5)
+  const TGP = 13 * maxSets + 1;      // 40 or 66; index = total games accumulated
+
+  // Slice indexing: hadTB(2) × firstSetWinner(3). fsw: 0 = A won first set, 1 = B
+  // won first set, 2 = unset (only at the start). NSL = 6 slices total.
+  const NSL = 6;
+  const slice = (had: number, fsw: number) => had * 3 + fsw;
+
+  // dp[sA][sB][sl][tg] = P(state (sA, sB) with slice sl and accumulated tg games)
+  const dp: number[][][][] = Array.from({ length: setsToWin + 1 }, () =>
+    Array.from({ length: setsToWin + 1 }, () =>
+      Array.from({ length: NSL }, () => new Array(TGP).fill(0))
+    )
+  );
+  dp[0][0][slice(0, 2)][0] = 1;
+
+  let pA_win_match = 0, pB_win_match = 0, pFirstSetA = 0, pTiebreakInMatch = 0;
+  const totalGamesProb = new Array(TGP).fill(0);
+
+  // Process states by stage (sA + sB) to ensure all predecessors are computed.
+  for (let stage = 0; stage <= maxSets; stage++) {
+    for (let sA = Math.max(0, stage - setsToWin); sA <= Math.min(setsToWin, stage); sA++) {
+      const sB = stage - sA;
+      if (sB < 0 || sB > setsToWin) continue;
+
+      for (let sl = 0; sl < NSL; sl++) {
+        const arr = dp[sA][sB][sl];
+        let mass = 0;
+        for (let tg = 0; tg < TGP; tg++) mass += arr[tg];
+        if (mass === 0) continue;
+
+        if (sA === setsToWin || sB === setsToWin) {
+          const had = Math.floor(sl / 3);
+          const fsw = sl % 3;
+          if (sA === setsToWin) pA_win_match += mass; else pB_win_match += mass;
+          if (had === 1) pTiebreakInMatch += mass;
+          if (sA + sB > 0 && fsw === 0) pFirstSetA += mass;
+          for (let tg = 0; tg < TGP; tg++) totalGamesProb[tg] += arr[tg];
+          continue;
+        }
+
+        const isFirstSet = (stage === 0);
+        for (let tg = 0; tg < TGP; tg++) {
+          const cur = arr[tg];
+          if (cur === 0) continue;
+          // For each set outcome (A wins with N games, or B wins with N games),
+          // transition to the next state.
+          for (let n = 6; n <= 13; n++) {
+            const pA = sd.byCountAWin[n];
+            if (pA > 0 && sA + 1 <= setsToWin && tg + n < TGP) {
+              const newHad = (sl >= 3 ? 1 : 0) | (n === 13 ? 1 : 0);
+              const newFsw = isFirstSet ? 0 : (sl % 3);
+              dp[sA + 1][sB][slice(newHad, newFsw)][tg + n] += cur * pA;
+            }
+            const pB = sd.byCountBWin[n];
+            if (pB > 0 && sB + 1 <= setsToWin && tg + n < TGP) {
+              const newHad = (sl >= 3 ? 1 : 0) | (n === 13 ? 1 : 0);
+              const newFsw = isFirstSet ? 1 : (sl % 3);
+              dp[sA][sB + 1][slice(newHad, newFsw)][tg + n] += cur * pB;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return { pA_win_match, pB_win_match, totalGamesProb, pFirstSetA, pTiebreakInMatch };
+}
+
 // ─── Markov chain: probability of winning a set ───
 // Set is first to 6 games with 2-game lead, tiebreak at 6-6.
 // pS = prob. server (A) wins their service game
@@ -81,11 +313,13 @@ export interface SetResult {
   winner: 'A' | 'B';
 }
 
-// Simulate a single set given per-game probabilities
-// pA_game = P(A wins game on serve), pB_game = P(B wins game on serve)
-// A serves first → games: A serves games 1,3,5,...; B serves 2,4,6,...
+// Simulate a single set given per-game and per-point probabilities.
+// pA_game/pB_game drive regular service games; pA_serve/pB_serve drive the
+// tiebreak (point-by-point, with real serve rotation). A serves first.
 function simulateSet(
-  pA_game: number, pB_game: number, rng: () => number
+  pA_game: number, pB_game: number,
+  pA_serve: number, pB_serve: number,
+  rng: () => number
 ): SetResult {
   let gamesA = 0, gamesB = 0;
   let server: 'A' | 'B' = 'A';  // A serves first
@@ -99,19 +333,11 @@ function simulateSet(
     if (gamesB >= 6 && gamesB - gamesA >= 2) {
       return { pAwin: 0, pBwin: 1, pTiebreak: tiebreak, totalGames: gamesA + gamesB, winner: 'B' };
     }
-    // Tiebreak at 6-6
+    // Tiebreak at 6-6 — point-by-point with real serve rotation (mirrors probWinTiebreakDP)
     if (gamesA === 6 && gamesB === 6) {
       tiebreak = true;
-      // Tiebreak: alternate points, first to 7 with 2-point lead
-      // Simplified model: pTB = (pA_serve + (1-pB_serve)) / 2 as point win prob for A
-      // Since we only have game-level probs, approximate tiebreak as:
-      // P(A wins TB) ≈ function of pA_game and pB_game
-      // Use a weighted average: A has slight advantage serving first
-      const pA_tb = 0.5 + 0.5 * (pA_game - 0.5) - 0.5 * (pB_game - 0.5);
-      // Simulate tiebreak points
       let ptsA = 0, ptsB = 0;
-      let tbServer: 'A' | 'B' = 'A';
-      let tbPointCount = 0;
+      let ptNum = 1; // 1-indexed point of the tiebreak
       while (true) {
         if (ptsA >= 7 && ptsA - ptsB >= 2) {
           return { pAwin: 1, pBwin: 0, pTiebreak: true, totalGames: 13, winner: 'A' };
@@ -119,18 +345,11 @@ function simulateSet(
         if (ptsB >= 7 && ptsB - ptsA >= 2) {
           return { pAwin: 0, pBwin: 1, pTiebreak: true, totalGames: 13, winner: 'B' };
         }
-        const pWin = tbServer === 'A' ? pA_tb : 1 - pA_tb;
-        if (rng() < pWin) {
-          if (tbServer === 'A') ptsA++; else ptsB++;
-        } else {
-          if (tbServer === 'A') ptsB++; else ptsA++;
-        }
-        // Alternate serve: A serves points 1,2,5,6,9,10,... (1-2, then every 4)
-        tbPointCount++;
-        // In real tennis, serve switches every 2 points within tiebreak
-        if (tbPointCount % 2 === 0) {
-          tbServer = tbServer === 'A' ? 'B' : 'A';
-        }
+        // Serve rotation: pt 1 → A; then pairs alternating: {2,3}→B, {4,5}→A, {6,7}→B, ...
+        const aServes = aServesNext(ptNum);
+        const pAPoint = aServes ? pA_serve : (1 - pB_serve);
+        if (rng() < pAPoint) ptsA++; else ptsB++;
+        ptNum++;
       }
     }
 
@@ -148,7 +367,7 @@ function simulateSet(
 }
 
 // ─── Simulate a full match ───
-function simulateMatch(
+export function simulateMatch(
   pA_serve: number, pB_serve: number, bestOf: 3 | 5, rng: () => number
 ): Outcome {
   const pA_game = probWinGame(pA_serve);
@@ -163,7 +382,7 @@ function simulateMatch(
   const setScoresArr: number[] = [];
 
   while (setsA < setsToWin && setsB < setsToWin) {
-    const setRes = simulateSet(pA_game, pB_game, rng);
+    const setRes = simulateSet(pA_game, pB_game, pA_serve, pB_serve, rng);
     totalGames += setRes.totalGames;
     if (setRes.pTiebreak) hadTiebreak = true;
     if (firstSetWinner === null) firstSetWinner = setRes.winner;
@@ -190,7 +409,13 @@ function simulateMatch(
   };
 }
 
-// ─── Calibration: fit pA_serve, pB_serve to match de-vigged ML + O/U games ───
+// ─── Calibration: fit pA_serve, pB_serve to de-vigged ML + O/U games ───
+//
+// The calibration problem: given target probabilities for (P(A wins match),
+// P(total games > line), [P(A wins first set)]), find (pA_serve, pB_serve)
+// whose exact Markov-DP predictions reproduce those targets as closely as
+// possible. The objective is now exact and deterministic (no MC noise), so the
+// grid search sees a smooth error surface.
 export function calibrateTennis(
   inputs: SportInputs, method: DevigMethod
 ): ModelParams | { err: string } {
@@ -214,57 +439,37 @@ export function calibrateTennis(
     pFirstSetA_target = devigN([fsA!, fsB!], method).probs[0];
   }
 
-  // Grid search over (pA_serve, pB_serve) ∈ [0.50, 0.85] × [0.50, 0.85]
-  // For each candidate, simulate N matches and compute error vs targets
-  const N_CAL = 10000;
-  const rng = makeRng(DEFAULT_SEED);
+  // Objective: exact squared error vs targets for a given (pA_serve, pB_serve).
+  const line = gamesLine!;
+  const objective = (pA: number, pB: number): number => {
+    const m = probMatchDP(pA, pB, bo);
+    let pOver = 0;
+    for (let n = Math.floor(line) + 1; n < m.totalGamesProb.length; n++) pOver += m.totalGamesProb[n];
+    let err = Math.pow(m.pA_win_match - pA_target, 2) + Math.pow(pOver - pOver_target, 2);
+    if (pFirstSetA_target !== null) {
+      err += Math.pow(m.pFirstSetA - pFirstSetA_target, 2);
+    }
+    return err;
+  };
 
+  // Coarse grid (11 × 11 = 121 candidates) over [0.52, 0.82]².
   let best: { err: number; pA: number; pB: number } | null = null;
-
-  for (let pA = 0.52; pA <= 0.82; pA += 0.03) {
-    for (let pB = 0.52; pB <= 0.82; pB += 0.03) {
-      let pAWin = 0, pOver = 0, pFS = 0;
-      for (let i = 0; i < N_CAL; i++) {
-        const o = simulateMatch(pA, pB, bo, rng);
-        if (o.winner === 'A') pAWin++;
-        if ((o.totalGames ?? 0) > gamesLine!) pOver++;
-        if (pFirstSetA_target !== null && o.firstSetWinner === 'A') pFS++;
-      }
-      const pAWinEst = pAWin / N_CAL;
-      const pOverEst = pOver / N_CAL;
-      const pFSEst = pFS / N_CAL;
-
-      let err = Math.pow(pAWinEst - pA_target, 2) + Math.pow(pOverEst - pOver_target, 2);
-      if (pFirstSetA_target !== null) {
-        err += Math.pow(pFSEst - pFirstSetA_target, 2);
-      }
-
-      if (!best || err < best.err) best = { err, pA, pB };
+  for (let pa = 0.52; pa <= 0.82 + 1e-9; pa += 0.03) {
+    for (let pb = 0.52; pb <= 0.82 + 1e-9; pb += 0.03) {
+      const err = objective(pa, pb);
+      if (!best || err < best.err) best = { err, pA: pa, pB: pb };
     }
   }
 
-  // Fine-tune around best
-  const b = best!;
-  for (let pA = b.pA - 0.03; pA <= b.pA + 0.03; pA += 0.005) {
-    for (let pB = b.pB - 0.03; pB <= b.pB + 0.03; pB += 0.005) {
-      if (pA <= 0.5 || pB <= 0.5) continue;
-      let pAWin = 0, pOver = 0, pFS = 0;
-      for (let i = 0; i < N_CAL; i++) {
-        const o = simulateMatch(pA, pB, bo, rng);
-        if (o.winner === 'A') pAWin++;
-        if ((o.totalGames ?? 0) > gamesLine!) pOver++;
-        if (pFirstSetA_target !== null && o.firstSetWinner === 'A') pFS++;
-      }
-      const pAWinEst = pAWin / N_CAL;
-      const pOverEst = pOver / N_CAL;
-      const pFSEst = pFS / N_CAL;
-
-      let err = Math.pow(pAWinEst - pA_target, 2) + Math.pow(pOverEst - pOver_target, 2);
-      if (pFirstSetA_target !== null) {
-        err += Math.pow(pFSEst - pFirstSetA_target, 2);
-      }
-
-      if (err < best!.err) best = { err, pA, pB };
+  // Fine-tune around best (13 × 13 = 169 candidates, step 0.005).
+  let b = best;
+  if (!b) return { err: 'Calibração falhou — nenhum candidato válido.' };
+  const { pA: bpA, pB: bpB } = b;
+  for (let pa = bpA - 0.03; pa <= bpA + 0.03 + 1e-9; pa += 0.005) {
+    for (let pb = bpB - 0.03; pb <= bpB + 0.03 + 1e-9; pb += 0.005) {
+      if (pa <= 0.5 || pb <= 0.5) continue;
+      const err = objective(pa, pb);
+      if (err < b.err) b = { err, pA: pa, pB: pb };
     }
   }
 
