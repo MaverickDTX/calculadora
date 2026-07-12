@@ -3,7 +3,7 @@ import { Plus, Trash2, ChevronDown, RotateCcw, Lightbulb } from 'lucide-react';
 import { HelpTip } from '../HelpTip';
 import { Select } from '../Select';
 
-type SportId = 'football' | 'tennis';
+type SportId = 'football' | 'tennis' | 'basketball';
 
 type LegKind =
   | 'over' | 'under' | 'homewin' | 'draw' | 'awaywin' | 'homeNoLose' | 'awayNoLose'
@@ -12,7 +12,9 @@ type LegKind =
   | 'player' | 'playerprop' | 'cornerTotal' | 'cornerTeam' | 'cornerSide'
   // Tennis
   | 'matchWinner' | 'totalGamesOver' | 'totalGamesUnder' | 'totalSetsOver' | 'totalSetsUnder'
-  | 'setScore' | 'firstSetWinner' | 'tiebreakInMatch';
+  | 'setScore' | 'firstSetWinner' | 'tiebreakInMatch'
+  // Basketball
+  | 'moneyline' | 'spreadCover' | 'totalOver' | 'totalUnder' | 'teamTotalOver' | 'teamTotalUnder' | 'marginRange';
 
 interface Leg {
   id: number;
@@ -36,6 +38,9 @@ interface Leg {
   // Tennis-specific
   setScoreA?: string;
   setScoreB?: string;
+  // Basketball-specific
+  marginMin?: string;
+  marginMax?: string;
 }
 
 interface Props {
@@ -82,9 +87,20 @@ const TENNIS_LEG_OPTIONS: { value: LegKind; label: string }[] = [
   { value: 'tiebreakInMatch', label: 'Tiebreak na partida' },
 ];
 
+const BASKETBALL_LEG_OPTIONS: { value: LegKind; label: string }[] = [
+  { value: 'moneyline', label: 'Vencedor (moneyline)' },
+  { value: 'spreadCover', label: 'Cobre o spread' },
+  { value: 'totalOver', label: 'Over pontos totais' },
+  { value: 'totalUnder', label: 'Under pontos totais' },
+  { value: 'teamTotalOver', label: 'Over pontos do time' },
+  { value: 'teamTotalUnder', label: 'Under pontos do time' },
+  { value: 'marginRange', label: 'Margem de vitória (faixa)' },
+];
+
 const SPORT_OPTIONS: { value: SportId; label: string }[] = [
   { value: 'football', label: 'Futebol' },
   { value: 'tennis', label: 'Tênis' },
+  { value: 'basketball', label: 'Basquete' },
 ];
 
 function parseLegs(saved: string): Leg[] {
@@ -104,6 +120,7 @@ function parseLegs(saved: string): Leg[] {
       ppO0: p[8], ppO1: p[9], ppO2: p[10], ppO3: p[11], ppO4: p[12],
       ppSide: p[13], ppBeta: p[14], cBeta: p[15], ppLine: p[16],
       setScoreA: p[17], setScoreB: p[18],
+      marginMin: p[19], marginMax: p[20],
     };
   });
 }
@@ -114,6 +131,7 @@ function serializeLegs(legs: Leg[]): string {
     l.anytime, l.anytimeNo, l.ppO0, l.ppO1, l.ppO2, l.ppO3, l.ppO4,
     l.ppSide, l.ppBeta, l.cBeta, l.ppLine,
     l.setScoreA, l.setScoreB,
+    l.marginMin, l.marginMax,
   ].join('|')).join(';');
 }
 
@@ -121,10 +139,11 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
   const [legs, setLegs] = useState<Leg[]>([]);
   const [cornerOpen, setCornerOpen] = useState(false);
   const [tennisExtra, setTennisExtra] = useState(false);
+  const [basketExtra, setBasketExtra] = useState(false);
   const prevLegsRef = useRef(values['poi-legs']);
 
   const sport = (values['poi-sport'] as SportId) || 'football';
-  const legOptions = sport === 'tennis' ? TENNIS_LEG_OPTIONS : FOOTBALL_LEG_OPTIONS;
+  const legOptions = sport === 'tennis' ? TENNIS_LEG_OPTIONS : sport === 'basketball' ? BASKETBALL_LEG_OPTIONS : FOOTBALL_LEG_OPTIONS;
 
   if (values['poi-legs'] !== prevLegsRef.current) {
     prevLegsRef.current = values['poi-legs'];
@@ -142,9 +161,22 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
       if (sport === 'tennis') {
         if (kind === 'totalGamesOver' || kind === 'totalGamesUnder') defaults.line = '22.5';
         if (kind === 'totalSetsOver' || kind === 'totalSetsUnder') defaults.line = '2.5';
+        // Gravar o default que o select exibe — sem isso o estado fica com
+        // side=undefined enquanto a UI mostra "Jogador A" selecionado.
+        if (kind === 'matchWinner' || kind === 'firstSetWinner') defaults.side = 'A';
         if (kind === 'setScore') {
           defaults.setScoreA = '2';
           defaults.setScoreB = '0';
+        }
+      }
+      if (sport === 'basketball') {
+        if (kind === 'totalOver' || kind === 'totalUnder') defaults.line = '224.5';
+        if (kind === 'spreadCover') defaults.line = '-5.5';
+        if (kind === 'teamTotalOver' || kind === 'teamTotalUnder') defaults.line = '112.5';
+        if (kind === 'moneyline' || kind === 'spreadCover' || kind === 'teamTotalOver' || kind === 'teamTotalUnder' || kind === 'marginRange') defaults.side = 'A';
+        if (kind === 'marginRange') {
+          defaults.marginMin = '1';
+          defaults.marginMax = '10';
         }
       }
       const next = [...legs, { id: Date.now(), ...defaults } as Leg];
@@ -160,7 +192,7 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
   const updateLeg = (id: number, updates: Partial<Leg>) => {
     const u: Partial<Leg> = { ...updates };
     const rec = u as Record<string, string | undefined>;
-    for (const f of ['line', 'anytime', 'anytimeNo', 'ppO0', 'ppO1', 'ppO2', 'ppO3', 'ppO4', 'ppBeta']) {
+    for (const f of ['line', 'anytime', 'anytimeNo', 'ppO0', 'ppO1', 'ppO2', 'ppO3', 'ppO4', 'ppBeta', 'marginMin', 'marginMax']) {
       const v = rec[f]; if (typeof v === 'string') rec[f] = v.replace(/,/g, '.');
     }
     const next = legs.map(l => l.id === id ? { ...l, ...u } : l);
@@ -186,10 +218,12 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
         />
       </div>
 
-      <div className="panel border-warn/30" style={{ background: 'rgba(245, 158, 11, 0.04)' }}>
+      <div className="panel border-warn/30">
         <p className="text-xs text-text-secondary leading-relaxed">
           {sport === 'tennis' ? (
             <>Use para bet builders de <b>tênis</b>. O modelo Markov por ponto (ponto→game→set→partida) calibra a distribuição conjunta a partir das odds simples via Monte Carlo.</>
+          ) : sport === 'basketball' ? (
+            <>Use para bet builders de <b>basquete</b>. O modelo Normal Bivariada calibra as médias dos times a partir do total e spread, preservando a correlação de ritmo entre as pontuações.</>
           ) : (
             <>Use para bet builders do <b>mesmo jogo</b>, quando a correlação entre pernas importa. O modelo Poisson/Dixon-Coles calibra a distribuição de placar a partir das odds simples.</>
           )}
@@ -317,6 +351,49 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
         </>
       )}
 
+      {/* ─── Basketball inputs ─── */}
+      {sport === 'basketball' && (
+        <div className="panel panel-focus space-y-5">
+          <div className="section-title">Odds simples do jogo</div>
+          <div className="grid grid-cols-3 gap-3">
+            <div><label className="text-xs text-text-muted mb-1.5 block">Linha total</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-totalLine'] || ''} onChange={e => onChange('poi-totalLine', e.target.value)} className="input-dark" placeholder="224.5" /></div>
+            <div><label className="text-xs text-text-muted mb-1.5 block">Odd Over</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-totalOver'] || ''} onChange={e => onChange('poi-totalOver', e.target.value)} className="input-dark" placeholder="1.91" /></div>
+            <div><label className="text-xs text-text-muted mb-1.5 block">Odd Under</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-totalUnder'] || ''} onChange={e => onChange('poi-totalUnder', e.target.value)} className="input-dark" placeholder="1.91" /></div>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div><label className="text-xs text-text-muted mb-1.5 block">Spread A</label><input type="text" inputMode="text" autoComplete="off" value={values['poi-spread'] || ''} onChange={e => onChange('poi-spread', e.target.value)} className="input-dark" placeholder="-5.5" /></div>
+            <div><label className="text-xs text-text-muted mb-1.5 block">Odd Spread A</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-spreadA'] || ''} onChange={e => onChange('poi-spreadA', e.target.value)} className="input-dark" placeholder="1.91" /></div>
+            <div><label className="text-xs text-text-muted mb-1.5 block">Odd Spread B</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-spreadB'] || ''} onChange={e => onChange('poi-spreadB', e.target.value)} className="input-dark" placeholder="1.91" /></div>
+          </div>
+          <div className="pt-3 border-t border-border">
+            <button type="button" onClick={() => setBasketExtra(!basketExtra)} className="flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">
+              <ChevronDown size={16} aria-hidden="true" className={`transition-transform ${basketExtra ? 'rotate-180' : ''}`} />
+              Calibração avançada
+              <span className="text-xs text-text-muted font-normal">— totals por time, dispersão e correlação</span>
+            </button>
+            {basketExtra && (
+              <div className="mt-3 space-y-3 animate-fade-in">
+                <div className="grid grid-cols-3 gap-3">
+                  <div><label className="text-xs text-text-muted mb-1.5 block">Total Time A</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-teamTotalA'] || ''} onChange={e => onChange('poi-teamTotalA', e.target.value)} className="input-dark" placeholder="112.5" /></div>
+                  <div><label className="text-xs text-text-muted mb-1.5 block">Over A</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-teamTotalAOver'] || ''} onChange={e => onChange('poi-teamTotalAOver', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                  <div><label className="text-xs text-text-muted mb-1.5 block">Under A</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-teamTotalAUnder'] || ''} onChange={e => onChange('poi-teamTotalAUnder', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div><label className="text-xs text-text-muted mb-1.5 block">Total Time B</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-teamTotalB'] || ''} onChange={e => onChange('poi-teamTotalB', e.target.value)} className="input-dark" placeholder="111.5" /></div>
+                  <div><label className="text-xs text-text-muted mb-1.5 block">Over B</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-teamTotalBOver'] || ''} onChange={e => onChange('poi-teamTotalBOver', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                  <div><label className="text-xs text-text-muted mb-1.5 block">Under B</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-teamTotalBUnder'] || ''} onChange={e => onChange('poi-teamTotalBUnder', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div><label className="text-xs text-text-muted mb-1.5 block">σ A</label><input type="text" inputMode="text" autoComplete="off" value={values['poi-sigmaA'] || ''} onChange={e => onChange('poi-sigmaA', e.target.value)} className="input-dark" placeholder="12" /></div>
+                  <div><label className="text-xs text-text-muted mb-1.5 block">σ B</label><input type="text" inputMode="text" autoComplete="off" value={values['poi-sigmaB'] || ''} onChange={e => onChange('poi-sigmaB', e.target.value)} className="input-dark" placeholder="12" /></div>
+                  <div><label className="text-xs text-text-muted mb-1.5 block">ρ</label><input type="text" inputMode="text" autoComplete="off" value={values['poi-rhoBB'] || ''} onChange={e => onChange('poi-rhoBB', e.target.value)} className="input-dark" placeholder="0.25" /></div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ─── Legs (shared, but options depend on sport) ─── */}
       <div className="panel panel-focus space-y-5">
         <div className="section-title">Pernas da combinada</div>
@@ -334,6 +411,9 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
             const isTennisOU = ['totalGamesOver', 'totalGamesUnder', 'totalSetsOver', 'totalSetsUnder'].includes(leg.kind);
             const isTennisSide = ['matchWinner', 'firstSetWinner'].includes(leg.kind);
             const isTennisSetScore = leg.kind === 'setScore';
+            const isBasketballLine = ['spreadCover', 'totalOver', 'totalUnder', 'teamTotalOver', 'teamTotalUnder'].includes(leg.kind);
+            const isBasketballSide = ['moneyline', 'spreadCover', 'teamTotalOver', 'teamTotalUnder', 'marginRange'].includes(leg.kind);
+            const isBasketballRange = leg.kind === 'marginRange';
 
             return (
               <div key={leg.id} className="panel p-3 space-y-2.5">
@@ -352,9 +432,21 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                       if (sport === 'tennis') {
                         if (k === 'totalGamesOver' || k === 'totalGamesUnder') defaults.line = '22.5';
                         if (k === 'totalSetsOver' || k === 'totalSetsUnder') defaults.line = '2.5';
+                        // Gravar o default exibido pelo select (ver addLeg).
+                        if (k === 'matchWinner' || k === 'firstSetWinner') defaults.side = 'A';
                         if (k === 'setScore') {
                           defaults.setScoreA = '2';
                           defaults.setScoreB = '0';
+                        }
+                      }
+                      if (sport === 'basketball') {
+                        if (k === 'totalOver' || k === 'totalUnder') defaults.line = '224.5';
+                        if (k === 'spreadCover') defaults.line = '-5.5';
+                        if (k === 'teamTotalOver' || k === 'teamTotalUnder') defaults.line = '112.5';
+                        if (k === 'moneyline' || k === 'spreadCover' || k === 'teamTotalOver' || k === 'teamTotalUnder' || k === 'marginRange') defaults.side = 'A';
+                        if (k === 'marginRange') {
+                          defaults.marginMin = '1';
+                          defaults.marginMax = '10';
                         }
                       }
                       updateLeg(leg.id, defaults);
@@ -363,11 +455,15 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                   />
 
                   {(isOU || isCT || isCTeam) && (
-                    <input type="text" inputMode="decimal" autoComplete="off" value={leg.line || ''} onChange={e => updateLeg(leg.id, { line: e.target.value })} placeholder="linha" className="input-dark w-20 h-9 text-xs" />
+                    <input type="text" inputMode="decimal" autoComplete="off" value={leg.line || ''} onChange={e => updateLeg(leg.id, { line: e.target.value })} placeholder="linha" className="input-dark w-20" />
                   )}
 
                   {(isTennisOU) && (
-                    <input type="text" inputMode="decimal" autoComplete="off" value={leg.line || ''} onChange={e => updateLeg(leg.id, { line: e.target.value })} placeholder="linha" className="input-dark w-20 h-9 text-xs" />
+                    <input type="text" inputMode="decimal" autoComplete="off" value={leg.line || ''} onChange={e => updateLeg(leg.id, { line: e.target.value })} placeholder="linha" className="input-dark w-20" />
+                  )}
+
+                  {isBasketballLine && (
+                    <input type="text" inputMode={leg.kind === 'spreadCover' ? 'text' : 'decimal'} autoComplete="off" value={leg.line || ''} onChange={e => updateLeg(leg.id, { line: e.target.value })} placeholder="linha" className="input-dark w-20" />
                   )}
 
                   {(isP || isCTeam) && (
@@ -392,11 +488,30 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                     />
                   )}
 
+                  {isBasketballSide && (
+                    <Select
+                      value={leg.side || 'A'}
+                      onChange={v => updateLeg(leg.id, { side: v })}
+                      options={[
+                        { value: 'A', label: 'Time A' },
+                        { value: 'B', label: 'Time B' },
+                      ]}
+                    />
+                  )}
+
+                  {isBasketballRange && (
+                    <>
+                      <input type="text" inputMode="numeric" autoComplete="off" value={leg.marginMin || ''} onChange={e => updateLeg(leg.id, { marginMin: e.target.value })} placeholder="mín." className="input-dark w-16" />
+                      <span className="text-xs text-text-muted">a</span>
+                      <input type="text" inputMode="numeric" autoComplete="off" value={leg.marginMax || ''} onChange={e => updateLeg(leg.id, { marginMax: e.target.value })} placeholder="máx." className="input-dark w-16" />
+                    </>
+                  )}
+
                   {isTennisSetScore && (
                     <>
-                      <input type="text" inputMode="numeric" autoComplete="off" value={leg.setScoreA || ''} onChange={e => updateLeg(leg.id, { setScoreA: e.target.value })} placeholder="sets A" className="input-dark w-16 h-9 text-xs" />
+                      <input type="text" inputMode="numeric" autoComplete="off" value={leg.setScoreA || ''} onChange={e => updateLeg(leg.id, { setScoreA: e.target.value })} placeholder="sets A" className="input-dark w-16" />
                       <span className="text-xs text-text-muted">×</span>
-                      <input type="text" inputMode="numeric" autoComplete="off" value={leg.setScoreB || ''} onChange={e => updateLeg(leg.id, { setScoreB: e.target.value })} placeholder="sets B" className="input-dark w-16 h-9 text-xs" />
+                      <input type="text" inputMode="numeric" autoComplete="off" value={leg.setScoreB || ''} onChange={e => updateLeg(leg.id, { setScoreB: e.target.value })} placeholder="sets B" className="input-dark w-16" />
                     </>
                   )}
 
@@ -436,8 +551,8 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
 
                   {isP && (
                     <>
-                      <input type="text" inputMode="decimal" autoComplete="off" value={leg.anytime || ''} onChange={e => updateLeg(leg.id, { anytime: e.target.value })} placeholder="odd Sim" className="input-dark w-24 h-9 text-xs" />
-                      <input type="text" inputMode="decimal" autoComplete="off" value={leg.anytimeNo || ''} onChange={e => updateLeg(leg.id, { anytimeNo: e.target.value })} placeholder="odd Não" className="input-dark w-24 h-9 text-xs" />
+                      <input type="text" inputMode="decimal" autoComplete="off" value={leg.anytime || ''} onChange={e => updateLeg(leg.id, { anytime: e.target.value })} placeholder="odd Sim" className="input-dark w-24" />
+                      <input type="text" inputMode="decimal" autoComplete="off" value={leg.anytimeNo || ''} onChange={e => updateLeg(leg.id, { anytimeNo: e.target.value })} placeholder="odd Não" className="input-dark w-24" />
                     </>
                   )}
 
@@ -497,7 +612,7 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
             );
           })}
         </div>
-        <button type="button" onClick={() => addLeg(sport === 'tennis' ? 'matchWinner' : 'over')} className="btn-ghost text-xs flex items-center gap-1.5">
+        <button type="button" onClick={() => addLeg(sport === 'tennis' ? 'matchWinner' : sport === 'basketball' ? 'moneyline' : 'over')} className="btn-ghost text-xs flex items-center gap-1.5">
           <Plus size={14} aria-hidden="true" /> Perna
         </button>
 

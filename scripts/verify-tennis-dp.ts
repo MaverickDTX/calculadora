@@ -1,8 +1,8 @@
 // ─── Verify tennis DP calibration (round-trip + MC comparison) ───
 // Run: npx tsx scripts/verify-tennis-dp.ts
 
-import { probWinGame, probWinTiebreakDP, probWinSetDPJoint, probMatchDP, calibrateTennis, sampleTennis, simulateMatch } from '../src/lib/sgp/tennis';
-import { makeRng, DEFAULT_SEED } from '../src/lib/sgp/monte-carlo';
+import { probWinGame, probWinTiebreakDP, probMatchDP, calibrateTennis, simulateMatch } from '../src/lib/sgp/tennis';
+import { makeRng } from '../src/lib/sgp/monte-carlo';
 import type { SportInputs } from '../src/lib/sgp/types';
 
 function assert(cond: boolean, msg: string) {
@@ -32,7 +32,8 @@ console.log('2. probWinTiebreakDP vs MC (1M points)...');
     const block = Math.floor(r / 2);
     return block % 2 === 1;
   };
-  let aWins = 0, N = 200000;
+  let aWins = 0;
+  const N = 200000;
   for (let i = 0; i < N; i++) {
     let ptsA = 0, ptsB = 0, ptNum = 1;
     while (true) {
@@ -49,30 +50,8 @@ console.log('2. probWinTiebreakDP vs MC (1M points)...');
   console.log(`   DP=${pAtb.toFixed(5)}  MC=${pAtbMC.toFixed(5)}  diff=${Math.abs(pAtb-pAtbMC).toFixed(5)}  OK`);
 }
 
-// 3. probWinSetDPJoint — compare with simulateMatch MC
-console.log('3. Set DP joint vs MC (500k sets)...');
-{
-  const pA = 0.62, pB = 0.58;
-  const pA_game = probWinGame(pA);
-  const pB_game = probWinGame(pB);
-  const sd = probWinSetDPJoint(pA_game, pB_game, pA, pB);
-  const rng = makeRng(9999);
-  let aWins = 0, tb = 0, N = 500000;
-  const countA: number[] = new Array(14).fill(0);
-  const countB: number[] = new Array(14).fill(0);
-  for (let i = 0; i < N; i++) {
-    const sr = simulateMatch(pA, pB, 3, rng);
-    // Extract first set: we only check if the first set in the match had tiebreak etc.
-    // Actually simulateSet is a helper within simulateMatch — we can't call it directly
-    // in its current form. Instead, check overall match outcomes from first set.
-    // For a single set, we can simulate a "best-of-1" match conceptually — but the
-    // function uses best-of-3/5. For now, just verify tiebreak rate and A win rate.
-    // (This comparison is approximate because simulateMatch runs full 2/3 sets.)
-    // Instead, we trust the game-level DP (which is well-tested) + tiebreak DP (tested above).
-  }
-  console.log('   (Set DP joint truncated — full set-level MC comparison not available without exporting simulateSet)');
-  // Use match-level comparison instead.
-}
+// 3. probWinSetDPJoint — skipped: requires simulateSet export
+console.log('3. Set DP joint vs MC... SKIP (requires simulateSet export)');
 
 // 4. probMatchDP — compare with simulateMatch MC
 console.log('4. Match DP vs MC (best-of-3, 200k matches)...');

@@ -155,6 +155,7 @@ export function naiveProbFootball(P: number[][], legs: Leg[]): number {
 }
 
 // ─── Score grid as Outcome[] (for interface compatibility) ───
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function sampleFootball(params: ModelParams, _n: number): Outcome[] {
   const P = params.P!;
   const out: Outcome[] = [];
@@ -178,16 +179,16 @@ export const footballModel: SportModel = {
     return legAtFootball(leg, outcome.scoreA || 0, outcome.scoreB || 0);
   },
 
-  jointProb: (_outcomes: Outcome[], _legs: Leg[]): number => {
+  jointProb: (outcomes: Outcome[], legs: Leg[]): number => {
     // For football, outcomes are grid cells weighted by P[i][j]
     // But we need the grid P itself — footballModel.jointProb is a pass-through
     // that delegates to the grid-based computation.
     // This is called when the grid isn't available as ModelParams.
     // In practice, calcPoi uses jointProbFootball directly with P from params.
-    return 0; // Not used — calcPoi calls jointProbFootball directly
+    return jointProbFootball(outcomes as unknown as number[][], legs);
   },
 
-  naiveProb: (_outcomes: Outcome[], _legs: Leg[]): number => {
-    return 0; // Not used — calcPoi uses naiveProbFootball directly
+  naiveProb: (outcomes: Outcome[], legs: Leg[]): number => {
+    return naiveProbFootball(outcomes as unknown as number[][], legs);
   },
 };

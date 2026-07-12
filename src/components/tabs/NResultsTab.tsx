@@ -1,5 +1,6 @@
 import { Plus, Minus, RotateCcw, Lightbulb } from 'lucide-react';
 import { Select } from '../Select';
+import { NumberInput } from '../NumberInput';
 
 interface Props {
   values: Record<string, string>;
@@ -51,31 +52,31 @@ export function NResultsTab({ values, onChange, onLoadExample, onReset, onCalcul
 
       <div className="panel panel-focus">
         <div className="section-title">Mercado</div>
-<div className="mb-4">
-            <label className="text-xs text-text-muted mb-1.5 block">Tipo do mercado</label>
-            <Select
-              value={values['nres-type'] || '1X2 / Moneyline'}
-              onChange={v => { onChange('nres-type', v); onChange('nres-name', v); }}
-              options={[
-                { value: '1X2 / Moneyline', label: '1X2 / Moneyline' },
-                { value: 'Over/Under', label: 'Over/Under' },
-                { value: 'Dupla chance', label: 'Dupla chance' },
-                { value: 'Ambas marcam', label: 'Ambas marcam' },
-                { value: 'Handicap asiático (3 vias)', label: 'Handicap asiático (3 vias)' },
-                { value: 'Outro', label: 'Outro' },
-              ]}
-            />
-          </div>
+        <div className="mb-4">
+          <label className="text-xs text-text-muted mb-1.5 block">Tipo do mercado</label>
+          <Select
+            value={values['nres-type'] || '1X2 / Moneyline'}
+            onChange={v => { onChange('nres-type', v); onChange('nres-name', v); }}
+            options={[
+              { value: '1X2 / Moneyline', label: '1X2 / Moneyline' },
+              { value: 'Over/Under', label: 'Over/Under' },
+              { value: 'Dupla chance', label: 'Dupla chance' },
+              { value: 'Ambas marcam', label: 'Ambas marcam' },
+              { value: 'Handicap asiático (3 vias)', label: 'Handicap asiático (3 vias)' },
+              { value: 'Outro', label: 'Outro' },
+            ]}
+          />
+        </div>
 
         <div className="section-title">Odds de referência</div>
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Resultado avaliado</label>
-            <input type="text" inputMode="decimal" autoComplete="off" value={values['nres-eval'] || ''} onChange={e => onChange('nres-eval', e.target.value)} className="input-dark" placeholder="2.50" />
+            <NumberInput value={values['nres-eval'] || ''} onChange={v => onChange('nres-eval', v)} placeholder="2.50" min={1.01} />
           </div>
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
-            <input type="text" inputMode="decimal" autoComplete="off" value={values['nres-your'] || ''} onChange={e => onChange('nres-your', e.target.value)} className="input-dark input-highlight" placeholder="2.65" />
+            <NumberInput value={values['nres-your'] || ''} onChange={v => onChange('nres-your', v)} className="input-highlight" placeholder="2.65" min={1.01} />
           </div>
         </div>
 
@@ -83,7 +84,7 @@ export function NResultsTab({ values, onChange, onLoadExample, onReset, onCalcul
         <div className="space-y-2">
           {others.map((v, i) => (
             <div key={i} className="flex items-center gap-2">
-              <input type="text" inputMode="decimal" autoComplete="off" value={v} onChange={e => changeOther(i, e.target.value)} className="input-dark flex-1" placeholder={`Odd do resultado ${i + 2}`} />
+              <NumberInput value={v} onChange={v => changeOther(i, v)} placeholder={`Odd do resultado ${i + 2}`} min={1.01} />
               {others.length > 1 && (
                 <button type="button" aria-label="Remover resultado" onClick={() => removeOther(i)} className="icon-btn text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors"><Minus size={16} aria-hidden="true" /></button>
               )}

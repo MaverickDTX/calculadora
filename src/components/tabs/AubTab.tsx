@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, RotateCcw, Lightbulb } from 'lucide-react';
+import { NumberInput } from '../NumberInput';
 
 interface Props {
   values: Record<string, string>;
@@ -38,7 +39,7 @@ export function AubTab({ values, onChange, onLoadExample, onReset, onCalculate }
     onChange('aub-odds', next.map(r => r.value).filter(Boolean).join(','));
   };
   const updateRow = (id: number, value: string) => {
-    value = value.replace(/,/g, '.'); // força ponto (padrão das casas); evita colisão com o separador ','
+    value = value.replace(/,/g, '.');
     const next = rows.map(r => r.id === id ? { ...r, value } : r);
     setRows(next);
     onChange('aub-odds', next.map(r => r.value).filter(Boolean).join(','));
@@ -67,7 +68,7 @@ export function AubTab({ values, onChange, onLoadExample, onReset, onCalculate }
           {rows.map((row, idx) => (
             <div key={row.id} className="flex items-center gap-2">
               <span className="text-xs text-text-muted w-6 shrink-0">{String.fromCharCode(65 + idx)}</span>
-              <input type="text" inputMode="decimal" autoComplete="off" value={row.value} onChange={e => updateRow(row.id, e.target.value)} className="input-dark flex-1" placeholder={`odd seleção ${String.fromCharCode(65 + idx)}`} />
+              <NumberInput value={row.value} onChange={v => updateRow(row.id, v)} placeholder={`odd seleção ${String.fromCharCode(65 + idx)}`} min={1.01} />
               {rows.length > 1 && (
                 <button type="button" aria-label="Remover seleção" onClick={() => removeRow(row.id)} className="icon-btn text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors"><Trash2 size={14} aria-hidden="true" /></button>
               )}
@@ -79,11 +80,11 @@ export function AubTab({ values, onChange, onLoadExample, onReset, onCalculate }
         <div className="grid grid-cols-2 gap-3 pt-3 border-t border-border">
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Desconto correlação (%)</label>
-            <input type="text" inputMode="decimal" autoComplete="off" value={values['aub-discount'] || ''} onChange={e => onChange('aub-discount', e.target.value)} className="input-dark" placeholder="8" />
+            <NumberInput value={values['aub-discount'] || ''} onChange={v => onChange('aub-discount', v)} placeholder="8" min={0} max={100} />
           </div>
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
-            <input type="text" inputMode="decimal" autoComplete="off" value={values['aub-your'] || ''} onChange={e => onChange('aub-your', e.target.value)} className="input-dark input-highlight" placeholder="1.85" />
+            <NumberInput value={values['aub-your'] || ''} onChange={v => onChange('aub-your', v)} className="input-highlight" placeholder="1.85" min={1.01} />
           </div>
         </div>
         <button type="button" onClick={onCalculate} className="btn-primary w-full mt-4">Calcular</button>

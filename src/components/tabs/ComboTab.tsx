@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Trash2, AlertTriangle, RotateCcw, Lightbulb } from 'lucide-react';
 import { numDec, splitComboOdds } from '../../lib/math';
 import { Select } from '../Select';
+import { NumberInput } from '../NumberInput';
 
 interface ComboLeg {
   id: number;
@@ -69,7 +70,7 @@ export function ComboTab({ values, onChange, onLoadExample, onReset, onCalculate
 
   return (
     <div className="space-y-5 animate-fade-in">
-      <div className="panel border-warn/30" style={{ background: 'rgba(245, 158, 11, 0.04)' }}>
+      <div className="panel border-warn/30">
         <div className="flex items-start gap-2">
           <AlertTriangle size={16} className="text-warn shrink-0 mt-0.5" aria-hidden="true" />
           <p className="text-xs text-text-secondary leading-relaxed">
@@ -93,7 +94,7 @@ export function ComboTab({ values, onChange, onLoadExample, onReset, onCalculate
         <div className="section-title">Sua odd</div>
         <div>
           <label className="text-xs text-text-muted mb-1.5 block">Odd combinada (com boost se houver)</label>
-          <input type="text" inputMode="decimal" autoComplete="off" value={values['combo-your'] || ''} onChange={e => onChange('combo-your', e.target.value)} className="input-dark input-highlight" placeholder="7.03" />
+          <NumberInput value={values['combo-your'] || ''} onChange={v => onChange('combo-your', v)} className="input-highlight" placeholder="7.03" min={1.01} />
         </div>
 
         <div className="divider" />
@@ -128,7 +129,7 @@ export function ComboTab({ values, onChange, onLoadExample, onReset, onCalculate
                 {leg.odds.map((o, i) => (
                   <div key={i}>
                     <label className="text-[10px] text-text-muted mb-1 block">Odd via {i + 1}</label>
-                    <input type="text" inputMode="decimal" autoComplete="off" value={o} onChange={e => updateOdd(leg.id, i, e.target.value)} className="input-dark h-9 text-xs" />
+                    <NumberInput value={o} onChange={v => updateOdd(leg.id, i, v)} />
                   </div>
                 ))}
               </div>

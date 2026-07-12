@@ -1,6 +1,7 @@
 import { RotateCcw, Lightbulb } from 'lucide-react';
 import { MARGIN_PRESETS } from '../../lib/presets';
 import { Select } from '../Select';
+import { NumberInput } from '../NumberInput';
 
 interface Props {
   values: Record<string, string>;
@@ -75,24 +76,24 @@ export function PropsTab({ values, onChange, onLoadExample, onReset, onCalculate
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Ref. {evalLabel}</label>
-            <input type="text" inputMode="decimal" autoComplete="off" value={values[evalNo ? 'prop-ref-no' : 'prop-ref-yes'] || ''} onChange={e => onChange(evalNo ? 'prop-ref-no' : 'prop-ref-yes', e.target.value)} className="input-dark" placeholder="2.10" />
+            <NumberInput value={values[evalNo ? 'prop-ref-no' : 'prop-ref-yes'] || ''} onChange={v => onChange(evalNo ? 'prop-ref-no' : 'prop-ref-yes', v)} placeholder="2.10" min={1.01} />
           </div>
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Ref. {otherLabel}</label>
-            <input type="text" inputMode="decimal" autoComplete="off" value={values[evalNo ? 'prop-ref-yes' : 'prop-ref-no'] || ''} onChange={e => onChange(evalNo ? 'prop-ref-yes' : 'prop-ref-no', e.target.value)} className="input-dark" placeholder="1.80" />
+            <NumberInput value={values[evalNo ? 'prop-ref-yes' : 'prop-ref-no'] || ''} onChange={v => onChange(evalNo ? 'prop-ref-yes' : 'prop-ref-no', v)} placeholder="1.80" min={1.01} />
           </div>
         </div>
 
         {marginOn && (
           <div>
             <label className="text-xs text-text-muted mb-1.5 block">Margem presumida (%)</label>
-            <input type="text" inputMode="decimal" autoComplete="off" value={values['prop-margin'] || ''} onChange={e => onChange('prop-margin', e.target.value)} className="input-dark" placeholder="5.0" />
+            <NumberInput value={values['prop-margin'] || ''} onChange={v => onChange('prop-margin', v)} placeholder="5.0" min={0} max={30} />
           </div>
         )}
 
         <div>
           <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
-          <input type="text" inputMode="decimal" autoComplete="off" value={values['prop-your'] || ''} onChange={e => onChange('prop-your', e.target.value)} className="input-dark input-highlight" placeholder="2.30" />
+          <NumberInput value={values['prop-your'] || ''} onChange={v => onChange('prop-your', v)} className="input-highlight" placeholder="2.30" min={1.01} />
         </div>
 
         <div className="space-y-3 pt-2 border-t border-border">

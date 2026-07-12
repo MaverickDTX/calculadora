@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Trash2, RotateCcw, Lightbulb } from 'lucide-react';
 import { MARGIN_PRESETS } from '../../lib/presets';
 import { Select } from '../Select';
+import { NumberInput } from '../NumberInput';
 
 interface ConsRow { id: number; odd: string; excl: boolean }
 
@@ -54,7 +55,7 @@ export function ProxyTab({ values, onChange, onLoadExample, onReset, onCalculate
     onChange('proxy-cons-excl', next.map(r => String(r.excl)).join(','));
   };
   const updateCons = (id: number, field: 'odd' | 'excl', value: string | boolean) => {
-    if (field === 'odd' && typeof value === 'string') value = value.replace(/,/g, '.'); // força ponto; evita colisão com ','
+    if (field === 'odd' && typeof value === 'string') value = value.replace(/,/g, '.');
     const next = consRows.map(r => r.id === id ? { ...r, [field]: value } : r);
     setConsRows(next);
     onChange('proxy-cons-odds', next.map(r => r.odd).join(','));
@@ -121,16 +122,16 @@ export function ProxyTab({ values, onChange, onLoadExample, onReset, onCalculate
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs text-text-muted mb-1.5 block">Odd de referência</label>
-                <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-ref'] || ''} onChange={e => onChange('proxy-ref', e.target.value)} className="input-dark" placeholder="1.70" />
+                <NumberInput value={values['proxy-ref'] || ''} onChange={v => onChange('proxy-ref', v)} placeholder="1.70" min={1.01} />
               </div>
               <div>
                 <label className="text-xs text-text-muted mb-1.5 block">Margem presumida (%)</label>
-                <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-margin'] || ''} onChange={e => onChange('proxy-margin', e.target.value)} className="input-dark" placeholder="5.0" />
+                <NumberInput value={values['proxy-margin'] || ''} onChange={v => onChange('proxy-margin', v)} placeholder="5.0" min={0} max={30} />
               </div>
             </div>
             <div>
               <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
-              <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-your'] || ''} onChange={e => onChange('proxy-your', e.target.value)} className="input-dark input-highlight" placeholder="2.20" />
+              <NumberInput value={values['proxy-your'] || ''} onChange={v => onChange('proxy-your', v)} className="input-highlight" placeholder="2.20" min={1.01} />
             </div>
             <button type="button" onClick={onCalculate} className="btn-primary w-full mt-4">Calcular</button>
           </>
@@ -140,7 +141,7 @@ export function ProxyTab({ values, onChange, onLoadExample, onReset, onCalculate
             <div className="space-y-2">
               {consRows.map(row => (
                 <div key={row.id} className="flex items-center gap-2">
-                  <input type="text" inputMode="decimal" autoComplete="off" value={row.odd} onChange={e => updateCons(row.id, 'odd', e.target.value)} className="input-dark flex-1" placeholder="Odd" />
+                  <NumberInput value={row.odd} onChange={v => updateCons(row.id, 'odd', v)} placeholder="Odd" min={1.01} />
                   <label className="flex items-center gap-1.5 text-xs text-text-muted cursor-pointer shrink-0">
                     <input type="checkbox" checked={row.excl} onChange={e => updateCons(row.id, 'excl', e.target.checked)} className="w-4 h-4 rounded border-border bg-surface text-accent" />
                     alvo
@@ -153,11 +154,11 @@ export function ProxyTab({ values, onChange, onLoadExample, onReset, onCalculate
             <div className="grid grid-cols-2 gap-3 mt-3">
               <div>
                 <label className="text-xs text-text-muted mb-1.5 block">Margem presumida (%)</label>
-                <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-cons-margin'] || ''} onChange={e => onChange('proxy-cons-margin', e.target.value)} className="input-dark" placeholder="5.0" />
+                <NumberInput value={values['proxy-cons-margin'] || ''} onChange={v => onChange('proxy-cons-margin', v)} placeholder="5.0" min={0} max={30} />
               </div>
               <div>
                 <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
-                <input type="text" inputMode="decimal" autoComplete="off" value={values['proxy-cons-your'] || ''} onChange={e => onChange('proxy-cons-your', e.target.value)} className="input-dark input-highlight" placeholder="2.20" />
+                <NumberInput value={values['proxy-cons-your'] || ''} onChange={v => onChange('proxy-cons-your', v)} className="input-highlight" placeholder="2.20" min={1.01} />
               </div>
             </div>
             <button type="button" onClick={onCalculate} className="btn-primary w-full mt-4">Calcular</button>

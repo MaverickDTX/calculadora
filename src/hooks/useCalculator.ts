@@ -10,6 +10,7 @@ import {
   fitCornerLambdas, fitMuFromLadder, splitComboOdds,
 } from '../lib/math';
 import { tennisModel } from '../lib/sgp/tennis';
+import { basketballModel } from '../lib/sgp/basketball';
 import type { SportInputs, Leg } from '../lib/sgp/types';
 import { DEFAULT_N_SIM } from '../lib/sgp/monte-carlo';
 
@@ -478,14 +479,19 @@ function calcTennis(get: (id: string) => string, cfg: Config): BetResult | { err
   for (const legStr of legStrs) {
     const parts = legStr.split('|');
     const kind = parts[0];
-    const side = (parts[2] as 'A' | 'B') || undefined;
+
+    const def = legKinds.find(l => l.kind === kind);
+    if (!def) { legErr = `Perna desconhecida: ${kind}`; break; }
+
+    // Fallback 'A' para pernas que exigem lado: a UI exibe "Jogador A" como
+    // default do select sem gravar no estado (mesma convenção do parser de
+    // futebol, que faz || 'home' / || 'over'). Sem isso, side=undefined faz
+    // legAtTennis retornar 0 em toda simulação → jointProb=0 → erro falso.
+    const side = (parts[2] as 'A' | 'B') || (def.needsSide ? 'A' : undefined);
     const line = parts[1] ? numDec(parts[1]) : undefined;
     // setScoreA/setScoreB are at indices 17 and 18 in the serialization (BetBuilderTab)
     const setScoreA = parts[17] ? parseInt(parts[17]) : undefined;
     const setScoreB = parts[18] ? parseInt(parts[18]) : undefined;
-
-    const def = legKinds.find(l => l.kind === kind);
-    if (!def) { legErr = `Perna desconhecida: ${kind}`; break; }
     const label = side
       ? `${def.label} — ${side === 'A' ? 'A' : 'B'}`
       : def.label;
@@ -522,13 +528,114 @@ function calcTennis(get: (id: string) => string, cfg: Config): BetResult | { err
   });
 }
 
+function calcBasketball(get: (id: string) => string, cfg: Config): BetResult | { err: string } {
+  const totalLine = numDec(get('poi-totalLine'));
+  const totalOver = numDec(get('poi-totalOver'));
+  const totalUnder = numDec(get('poi-totalUnder'));
+  const spread = numDec(get('poi-spread'));
+  const spreadA = numDec(get('poi-spreadA'));
+  const spreadB = numDec(get('poi-spreadB'));
+  const your = numDec(get('poi-your'));
+  const sigmaA = numDec(get('poi-sigmaA'));
+  const sigmaB = numDec(get('poi-sigmaB'));
+  let rhoBB = numDec(get('poi-rhoBB'));
+  const teamTotalA = numDec(get('poi-teamTotalA'));
+  const teamTotalAOver = numDec(get('poi-teamTotalAOver'));
+  const teamTotalAUnder = numDec(get('poi-teamTotalAUnder'));
+  const teamTotalB = numDec(get('poi-teamTotalB'));
+  const teamTotalBOver = numDec(get('poi-teamTotalBOver'));
+  const teamTotalBUnder = numDec(get('poi-teamTotalBUnder'));
+
+  if (!(totalOver > 1 && totalUnder > 1 && totalLine > 0)) return { err: 'Preencha linha e odds Over/Under total (>1).' };
+  if (!(spreadA > 1 && spreadB > 1 && Number.isFinite(spread))) return { err: 'Preencha linha e odds Spread A/B (>1).' };
+  if (!(your > 1)) return { err: 'Preencha sua odd (>1).' };
+  if (!Number.isFinite(rhoBB)) rhoBB = 0.25;
+
+  const inputs: SportInputs = {
+    sport: 'basketball',
+    totalLine, totalOver, totalUnder,
+    spread, spreadA, spreadB,
+    your,
+    sigmaA: Number.isFinite(sigmaA) ? sigmaA : undefined,
+    sigmaB: Number.isFinite(sigmaB) ? sigmaB : undefined,
+    rhoBB,
+    teamTotalA: Number.isFinite(teamTotalA) ? teamTotalA : undefined,
+    teamTotalAOver: Number.isFinite(teamTotalAOver) ? teamTotalAOver : undefined,
+    teamTotalAUnder: Number.isFinite(teamTotalAUnder) ? teamTotalAUnder : undefined,
+    teamTotalB: Number.isFinite(teamTotalB) ? teamTotalB : undefined,
+    teamTotalBOver: Number.isFinite(teamTotalBOver) ? teamTotalBOver : undefined,
+    teamTotalBUnder: Number.isFinite(teamTotalBUnder) ? teamTotalBUnder : undefined,
+  };
+
+  const { calibrate, sample, jointProb, naiveProb, legKinds } = basketballModel;
+
+  const params = calibrate(inputs, cfg.method);
+  if ('err' in params) return params;
+
+  const warnings: string[] = [];
+  if (params.fitError! > 0.004) warnings.push('Erro residual alto na calibração; trate o preço como estimativa frágil.');
+
+  const N_SIM = DEFAULT_N_SIM;
+  const outcomes = sample(params, N_SIM);
+
+  // Parse legs
+  const legsRaw = get('poi-legs');
+  if (!legsRaw) return { err: 'Adicione ao menos uma perna.' };
+  const legStrs = legsRaw.split(';');
+  const legs: Leg[] = [];
+  let legErr: string | null = null;
+
+  for (const legStr of legStrs) {
+    const parts = legStr.split('|');
+    const kind = parts[0];
+
+    const def = legKinds.find(l => l.kind === kind);
+    if (!def) { legErr = `Perna desconhecida: ${kind}`; break; }
+
+    const side = (parts[2] as 'A' | 'B') || (def.needsSide ? 'A' : undefined);
+    const line = parts[1] ? numDec(parts[1]) : undefined;
+    const marginMin = parts[19] ? parseInt(parts[19]) : undefined;
+    const marginMax = parts[20] ? parseInt(parts[20]) : undefined;
+    const label = side
+      ? `${def.label} — ${side === 'A' ? 'A' : 'B'}`
+      : def.label;
+
+    legs.push({ kind, side, line, marginMin, marginMax, label });
+  }
+
+  if (legErr) return { err: legErr };
+  if (legs.length < 1) return { err: 'Adicione ao menos uma perna.' };
+
+  const p = jointProb(outcomes, legs);
+  if (!(p > 0 && p < 1)) return { err: 'Probabilidade conjunta inválida. Verifique as pernas — a combinação pode ser muito improvável para o modelo capturar nas simulações.' };
+
+  const naive = naiveProb(outcomes, legs);
+
+  const conf = warnings.length ? 'mid' : 'high';
+  let txt = 'Modelo Normal Bivariada (calibração analítica via spread + total). ';
+  txt += `Produto ingênuo ${(naive * 100).toFixed(1).replace('.', ',')}%; modelo ${(p * 100).toFixed(1).replace('.', ',')}%`;
+
+  return makeBetBase({
+    label: 'Bet Builder · Basquete',
+    decomp: `${legs.length} perna(s): ${legs.map(l => l.label).join(' + ')}`,
+    p,
+    fair: 1 / p,
+    your,
+    confClass: conf,
+    confTxt: txt,
+    warnings,
+    saveable: true,
+    cfg,
+  });
+}
+
 // ─── Bet Builder dispatcher (multi-sport) ───
 function calcPoi(get: (id: string) => string, cfg: Config): BetResult | { err: string } {
   // Check sport selector
   const sport = get('poi-sport') || 'football';
 
   if (sport === 'tennis') return calcTennis(get, cfg);
-  // if (sport === 'basketball') return calcBasketball(get, cfg); // Fase 2
+  if (sport === 'basketball') return calcBasketball(get, cfg);
 
   // ─── Football (existing logic below) ───
   const h = numDec(get('poi-h'));
