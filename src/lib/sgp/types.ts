@@ -114,7 +114,7 @@ export interface SportModel {
   jointProb(outcomes: Outcome[], legs: Leg[]): number;
 
   // Compute the naive (independent) product of marginal leg probabilities
-  naiveProb(params: ModelParams, legs: Leg[]): number;
+  naiveProb(outcomes: Outcome[], legs: Leg[]): number;
 }
 
 // ─── De-vigged probabilities for calibration ───

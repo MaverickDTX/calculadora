@@ -3,7 +3,7 @@ import type { SportId, SportModel } from './types';
 import { footballModel } from './football';
 import { tennisModel } from './tennis';
 
-export const SGP_REGISTRY: Record<SportId, SportModel> = {
+export const SGP_REGISTRY: Partial<Record<SportId, SportModel>> = {
   football: footballModel,
   tennis: tennisModel,
   // basketball: basketballModel, // Fase 2

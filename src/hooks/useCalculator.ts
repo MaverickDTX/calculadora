@@ -444,7 +444,7 @@ function calcTennis(get: (id: string) => string, cfg: Config): BetResult | { err
     rho,
   };
 
-  const { calibrate, sample, legAt, jointProb, naiveProb, legKinds } = tennisModel;
+  const { calibrate, sample, jointProb, naiveProb, legKinds } = tennisModel;
 
   const params = calibrate(inputs, cfg.method);
   if ('err' in params) return params;
@@ -483,7 +483,10 @@ function calcTennis(get: (id: string) => string, cfg: Config): BetResult | { err
   if (legs.length < 1) return { err: 'Adicione ao menos uma perna.' };
 
   const p = jointProb(outcomes, legs);
-  if (!(p > 0 && p < 1)) return { err: 'Probabilidade conjunta inválida.' };
+  if (p === 0) {
+    console.warn(`jointProb=0 — pA_serve=${params.pA_serve?.toFixed(3)} pB_serve=${params.pB_serve?.toFixed(3)} fitError=${params.fitError?.toFixed(5)} N_SIM=${N_SIM} legs=${legs.map(l => l.kind).join(',')}`);
+  }
+  if (!(p > 0 && p < 1)) return { err: 'Probabilidade conjunta inválida. Verifique as pernas — a combinação pode ser muito improvável para o modelo capturar nas simulações.' };
 
   const naive = naiveProb(outcomes, legs);
 

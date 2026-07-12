@@ -3,7 +3,7 @@
 // The score grid P[i][j] is the joint distribution over (goals_home, goals_away).
 
 import {
-  devigN, fitLambdas, scoreMatrix, solveTheta,
+  devigN, fitLambdas, scoreMatrix,
   poisTotalProb, cornerLambdaEff, cornerSideProb,
 } from '../math';
 import type { DevigMethod } from '../../types';
@@ -178,7 +178,7 @@ export const footballModel: SportModel = {
     return legAtFootball(leg, outcome.scoreA || 0, outcome.scoreB || 0);
   },
 
-  jointProb: (outcomes: Outcome[], legs: Leg[]): number => {
+  jointProb: (_outcomes: Outcome[], _legs: Leg[]): number => {
     // For football, outcomes are grid cells weighted by P[i][j]
     // But we need the grid P itself — footballModel.jointProb is a pass-through
     // that delegates to the grid-based computation.
@@ -187,7 +187,7 @@ export const footballModel: SportModel = {
     return 0; // Not used — calcPoi calls jointProbFootball directly
   },
 
-  naiveProb: (_params: ModelParams, _legs: Leg[]): number => {
+  naiveProb: (_outcomes: Outcome[], _legs: Leg[]): number => {
     return 0; // Not used — calcPoi uses naiveProbFootball directly
   },
 };

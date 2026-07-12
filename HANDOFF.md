@@ -1,6 +1,7 @@
 # Handoff — Régua de Kelly (Kelly Stake Pro)
 
-> Última atualização: 2026-07-10 · Versão em produção: **v0.4**
+> Última atualização: 2026-07-12 (3ª sessão) · Versão em produção: **v0.5**
+> ✅ **typecheck e build limpos** — `tsc --noEmit -p tsconfig.app.json` sem erros; `vite build` gera artefatos (JS ~334 kB / 101 kB gzip). `typecheck-errors-v0.5.txt` está **obsoleto** (apagar).
 > Memória detalhada do projeto: `memory/project_kelly.md` (índice em `memory/MEMORY.md`)
 > Handoff do coletor de dados: `HANDOFF-coletor-shots-time.md` (fora do git, em `C:\Projetos\calculadora\`)
 
@@ -41,6 +42,9 @@ corretos e migração de localStorage legado.
 | `06631d1` | Versionamento (v0.1) |
 | `6db968f` | **v0.2:** Bet Builder (jogador/escanteios desalinhados), Poisson asiático (÷g→÷g!), ponto decimal global, Reset limpa |
 | `a7f57f6` | **v0.3:** mobile (#9), gráficos removidos (#6+#7), bttsNo (#11p), inputs vazios, config % |
+| `52a2da0` | **v0.5:** SGP multi-esporte — tênis (Markov + MC), refatoração calcPoi, seletor de esporte na UI |
+| `(não commitado)` | **7 erros de typecheck corrigidos** (assinaturas `SportModel`, `Partial<Record>` no registry, imports não usados) → build limpo |
+| `(não commitado)` | **Tênis:** `N_CAL` 2000→10000 (menos ruído no grid search da calibração); mensagem de fallback + `console.warn` quando `jointProb=0`. **N_SIM revertido a 20000** — ver diagnóstico abaixo |
 
 ## Pendências (numeração de `project_kelly.md`)
 
@@ -84,30 +88,81 @@ corretos e migração de localStorage legado.
   resolução automática de ligas, cache incremental. Falta só rodar a
   coleta completa (quota API) e a decisão de calibração.
 
-## Próximo passo recomendado
-1. **#11 + #13 — pipeline de dados pronto, falta coleta**:
-   - Aguardar quota da RapidAPI resetar
-   - Rodar `python coletar_shots_time_sofasport.py` em `C:\Projetos\calculadora\`
-   - Revisar `shots_time_sofasport.csv` gerado
-   - Só então decidir calibração (escada odds / linha O-U / base rate)
-2. **#10** — papercut de UX rápido se o usuário reportar incômodo.
-3. **Manutenção:** limpeza da camada externa de `C:\Projetos\calculadora` (fora do git)
-   **executada em 2026-07-09** — 38 arquivos movidos para `old/{html,patches,tests,docs,misc}`,
-   2 deletados. Ordens arquivadas em `old\docs\ORDENS-limpeza-legado.md`; mapa de
-   reversão em `old\INVENTARIO-pre-limpeza-2026-07-09.txt`.
+## Próximo passo recomendado (v0.5 — tênis)
+> **typecheck + build já estão limpos** (3ª sessão). A interface `SportModel` ficou com
+> `jointProb(outcomes: Outcome[], legs: Leg[])` — implementações em `football.ts`/`tennis.ts`
+> e chamadas em `useCalculator.ts` consistentes com `outcomes`. **Ainda não commitado.**
 
-> Pipeline de dados (#11 SOT/finalizações + #13 cartões) **construído** em
-> `coletar_shots_time_sofasport.py` — aguardando quota da API resetar para coleta
-> completa. Depois do CSV em mãos, **decidir calibração** (escada odds / linha O-U
-> / base rate) que trava as mudanças no React.
+1. **Commitar** as mudanças não commitadas como **v0.6** (bump um por entrega): correção
+   de typecheck/build + reversão N_SIM + diagnóstico. Apagar `typecheck-errors-v0.5.txt` (obsoleto).
 
-## Arquivos-chave
-- `src/hooks/useCalculator.ts` — todos os cálculos (`calcPoi` Bet Builder, `calcAsia`
-  asiáticos, `calcCombo`, `calcNRes`, `calcProps`, `calcAub`, `calcProxy`).
-- `src/components/tabs/BetBuilderTab.tsx` — `serializeLegs`/`parseLegs` (posições:
-  `kind0|line1|side2|cSide3|cDir4|c1x2_5|anytime6|anytimeNo7|ppO0..4 8-12|ppSide13|ppBeta14|cBeta15|ppLine16`).
-- `src/lib/math.ts` — helpers (`poisPmf`, `fitLambdas`, `cornerLambdaEff`,
-  `fitMuFromLadder`, `splitComboOdds`, `confFactor`).
+2. **Validar futebol existente**: testar exemplos (Over + Casa vence, Prop jogador) no app em
+   dev (`npm run dev`) para garantir que a refatoração SGP não quebrou nada.
+
+3. **Terminar tênis**: testar com dado real da bet365 (ex.: Djokovic @1.33 / Alcaraz @3.50,
+   O/U 22.5 games @1.85/1.95). **Nota:** combinações de pernas contraditórias (ex.: vencer 3-0
+   ∧ Over muitos games) retornam `jointProb=0` por design — a mensagem de fallback cobre isso.
+
+4. **Fase 2 — Basquete** (quando retomar): modelo Normal Bivariada + Monte Carlo em `src/lib/sgp/basketball.ts`.
+
+## Diagnóstico: jointProb=0 no tênis (reanálise 3ª sessão — a causa-raiz anterior estava errada)
+
+**A explicação registrada na 2ª sessão não se sustenta na aritmética.** O cenário
+citado (A @1.226 / B @4.20, O/U 37.5 @1.819/2.060, Melhor de 5) foi rodado com o
+próprio motor (`calibrateTennis` + `sampleTennis` + `tennisModel.jointProb`):
+
+| N_SIM | jointProb (A vence ∧ Over 37.5) | P(A vence) | P(Over 37.5) |
+|---|---|---|---|
+| 20 000 | **0,4124** | 0,843 | 0,535 |
+| 100 000 | **0,4137** | 0,841 | 0,539 |
+
+Calibração: `pA_serve≈0,67`, `pB_serve≈0,61`, `fitError≈0,0026`. A conjunta é ~41%,
+**não** <5% — e um evento de 41% não zera nem com 20 000 sims (erro-padrão ≈0,0035).
+As duas pernas são prováveis e positivamente correlacionadas (favorito que estende
+a partida faz mais games), então a interseção é alta, não rara.
+
+**O que de fato produz `jointProb=0`:** combinações *logicamente quase-impossíveis*,
+não meramente raras. Testado no motor:
+
+- `A vence 3-0 ∧ Over 40,5 games` → **0,000000** com 20k **e** com 100k
+- `B vence 3-2 ∧ Under 30,5 games` → **0,000000** com 20k **e** com 100k
+
+Vencer 3-0 em Bo5 são ≤3 sets; passar de 40,5 games em 3 sets exigiria média de
+13,5 games/set — a interseção é estruturalmente nula. **Aumentar N_SIM não cria
+hits quando P≈0.** O bump 20k→100k só teria efeito numa faixa estreita de P
+(~0,003%–0,02%), onde o EV já seria rejeitado pelo `edgemin` de qualquer forma —
+número sem valor decisório, a custo de 5× simulações por recálculo no browser.
+
+**Decisão desta sessão:**
+1. `src/lib/sgp/monte-carlo.ts` — `DEFAULT_N_SIM` **revertido a 20000** (o bump não
+   resolvia o caso real e só encarecia o cálculo).
+2. `src/lib/sgp/tennis.ts` — `N_CAL` 2000 → **10000** **mantido** (é independente do
+   jointProb; reduz ruído na estimativa de `pA_serve`/`pB_serve` no grid search).
+3. `src/hooks/useCalculator.ts` — `console.warn` diagnóstico + **mensagem de fallback**
+   explicativa quando `p===0` **mantidos**. Esta é a mitigação correta e suficiente:
+   comunica ao usuário que a combinação é improvável demais para o modelo medir,
+   em vez de fingir precisão que não existe.
+
+## Handoff v0.5 — SGP multi-esporte (arquivos novos/modificados)
+**Novos:**
+- `src/lib/sgp/types.ts` — interfaces `SportModel`, `Outcome`, `Leg`, `SportInputs`, `ModelParams`
+- `src/lib/sgp/football.ts` — modelo futebol extraído de `calcPoi` (interface `SportModel`)
+- `src/lib/sgp/tennis.ts` — modelo tênis: Markov ponto→game→set→partida + MC + calibração
+- `src/lib/sgp/monte-carlo.ts` — utilidades: `makeRng`, `gauss`, `jointProbMC`, `naiveProbMC`
+- `src/lib/sgp/index.ts` — registry `SGP_REGISTRY`
+
+**Modificados:**
+- `src/hooks/useCalculator.ts` — `calcPoi` despacha por esporte; adiciona `calcTennis`; imports SGP
+- `src/components/tabs/BetBuilderTab.tsx` — seletor de esporte + inputs/legs futebol/tênis
+- `src/version.ts` — `0.4` → `0.5`
+
+## Arquivos-chave (atualizado)
+- `src/lib/sgp/types.ts` — interfaces do sistema SGP multi-esporte
+- `src/lib/sgp/tennis.ts` — modelo Markov tênis (pernas: matchWinner, totalGamesOver/Under, totalSetsOver/Under, setScore, firstSetWinner, tiebreakInMatch)
+- `src/lib/sgp/football.ts` — modelo futebol (Poisson/Dixon-Coles, 20 pernas)
+- `src/hooks/useCalculator.ts` — `calcPoi` (dispatcher) + `calcTennis` + `calcCombo` + etc
+- `src/components/tabs/BetBuilderTab.tsx` — UI seletor esporte + pernas dinâmicas
+- `typecheck-errors-v0.5.txt` — 7 erros de typecheck a corrigir na próxima sessão
 - `src/App.tsx` — `handleInputChange` (força ponto), `loadExample`, `resetTab`,
   `EXAMPLE_MAP`, `RAW_LIST_FIELDS`. `DEFAULT_INPUTS` contém só selects/flags (sem odds).
 - `src/version.ts` — `APP_VERSION`.

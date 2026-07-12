@@ -8,13 +8,13 @@
 import { devigN } from '../math';
 import type { DevigMethod } from '../../types';
 import type { SportModel, SportInputs, ModelParams, Outcome, Leg, LegKindDef } from './types';
-import { makeRng, jointProbMC, naiveProbMC, DEFAULT_SEED, DEFAULT_N_SIM } from './monte-carlo';
+import { makeRng, jointProbMC, naiveProbMC, DEFAULT_SEED } from './monte-carlo';
 
 // ─── Tennis leg kinds ───
 export const TENNIS_LEGS: LegKindDef[] = [
   { kind: 'matchWinner', label: 'Vencedor da partida', needsSide: true, sport: 'tennis' },
-  { kind: 'totalGamesOver', label: 'Over jogos totais', needsLine: true, sport: 'tennis' },
-  { kind: 'totalGamesUnder', label: 'Under jogos totais', needsLine: true, sport: 'tennis' },
+  { kind: 'totalGamesOver', label: 'Over games totais', needsLine: true, sport: 'tennis' },
+  { kind: 'totalGamesUnder', label: 'Under games totais', needsLine: true, sport: 'tennis' },
   { kind: 'totalSetsOver', label: 'Over sets totais', needsLine: true, sport: 'tennis' },
   { kind: 'totalSetsUnder', label: 'Under sets totais', needsLine: true, sport: 'tennis' },
   { kind: 'setScore', label: 'Placar de sets exato', sport: 'tennis' },
@@ -61,10 +61,6 @@ function factorial(n: number): number {
   let f = 1;
   for (let i = 2; i <= n; i++) f *= i;
   return f;
-}
-
-function binom(n: number, k: number): number {
-  return factorial(n) / (factorial(k) * factorial(n - k));
 }
 
 // ─── Markov chain: probability of winning a set ───
@@ -220,7 +216,7 @@ export function calibrateTennis(
 
   // Grid search over (pA_serve, pB_serve) ∈ [0.50, 0.85] × [0.50, 0.85]
   // For each candidate, simulate N matches and compute error vs targets
-  const N_CAL = 2000;
+  const N_CAL = 10000;
   const rng = makeRng(DEFAULT_SEED);
 
   let best: { err: number; pA: number; pB: number } | null = null;
