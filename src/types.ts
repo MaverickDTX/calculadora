@@ -16,6 +16,23 @@ export type BoostType = 'none' | 'profit' | 'mult';
 
 export type ConfClass = 'high' | 'mid' | 'low';
 
+/**
+ * Resultado do cálculo — CONTRATO CONGELADO.
+ *
+ * Esta interface é a API pública entre o motor de cálculo (calc.ts)
+ * e a camada de UI (ResultsPanel, tabs). NENHUM campo pode ser
+ * renomeado, removido ou ter seu tipo alterado sem justificativa
+ * documentada no changelog e validação cruzada dos snapshots de
+ * engine (verify-engine.ts) e dos scripts verify-basketball.ts e
+ * verify-tennis-dp.ts.
+ *
+ * Para adicionar um campo: (1) adicione aqui como opcional,
+ * (2) popule em makeBetBase em calc.ts, (3) renderize no
+ * ResultsPanel. Não remova campos existentes.
+ *
+ * @readonly
+ * @freeze
+ */
 export interface BetResult {
   label: string;
   decomp: string;
