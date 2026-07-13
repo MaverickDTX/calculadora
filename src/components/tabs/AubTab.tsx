@@ -8,6 +8,7 @@ interface Props {
   onLoadExample: (key: string) => void;
   onReset: () => void;
   onCalculate: () => void;
+  isLoading?: boolean;
 }
 
 function parseRows(oddsStr: string): { id: number; value: string }[] {

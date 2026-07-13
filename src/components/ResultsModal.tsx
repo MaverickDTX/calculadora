@@ -6,12 +6,13 @@ import { ResultView } from './ResultView';
 interface Props {
   result: BetResult | { err: string } | null;
   config: Config;
+  isLoading?: boolean;
   onClose: () => void;
 }
 
 const TITLE_ID = 'results-modal-title';
 
-export function ResultsModal({ result, config, onClose }: Props) {
+export function ResultsModal({ result, config, isLoading, onClose }: Props) {
   const { dialogProps } = useDialog<HTMLDivElement>({
     open: true,
     onClose,
@@ -40,7 +41,7 @@ export function ResultsModal({ result, config, onClose }: Props) {
           </button>
         </div>
 
-        <ResultView result={result} config={config} />
+        <ResultView result={result} config={config} isLoading={isLoading} />
       </div>
     </div>
   );

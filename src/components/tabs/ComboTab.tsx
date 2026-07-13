@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, AlertTriangle, RotateCcw, Lightbulb } from 'lucide-react';
+import { Plus, Trash2, AlertTriangle, RotateCcw, Lightbulb, Loader2 } from 'lucide-react';
 import { numDec, splitComboOdds } from '../../lib/math';
 import { Select } from '../Select';
 import { NumberInput } from '../NumberInput';
@@ -17,6 +17,7 @@ interface Props {
   onLoadExample: (key: string) => void;
   onReset: () => void;
   onCalculate: () => void;
+  isLoading?: boolean;
 }
 
 function parseLegs(saved: string): ComboLeg[] {
@@ -33,7 +34,7 @@ function serializeLegs(legs: ComboLeg[]): string {
   return legs.map(l => `${l.nWays}|${l.sideIdx}|${l.odds.join(',')}`).join(';');
 }
 
-export function ComboTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
+export function ComboTab({ values, onChange, onLoadExample, onReset, onCalculate, isLoading }: Props) {
   const [legs, setLegs] = useState<ComboLeg[]>([]);
 
   // Só re-parseia quando a mudança vem de FORA (exemplo/reset). Em edições próprias o
@@ -158,7 +159,9 @@ export function ComboTab({ values, onChange, onLoadExample, onReset, onCalculate
             Para pernas do mesmo jogo, use a aba <b>Bet Builder</b> — o produto de independentes é inválido quando correlacionado.
           </div>
         )}
-        <button type="button" onClick={onCalculate} className="btn-primary w-full mt-4">Calcular</button>
+        <button type="button" onClick={onCalculate} disabled={isLoading} className="btn-primary w-full mt-4">
+          {isLoading ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Calculando...</> : 'Calcular'}
+        </button>
       </div>
     </div>
   );

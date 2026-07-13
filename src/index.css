@@ -57,6 +57,7 @@
   --animate-fade-in: fadeIn 0.3s ease-out;
   --animate-slide-up: slideUp 0.4s ease-out;
   --animate-pulse-soft: pulseSoft 2s ease-in-out infinite;
+  --animate-shimmer: shimmer 1.5s ease-in-out infinite;
 }
 
 @keyframes fadeIn {
@@ -72,6 +73,12 @@
 @keyframes pulseSoft {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.6; }
+}
+
+@keyframes shimmer {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
 }
 
 @layer base {
@@ -143,6 +150,10 @@
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
+  }
+  .animate-shimmer {
+    animation: none !important;
+    opacity: 0.7 !important;
   }
   .skip-link {
     transition: none;

@@ -12,6 +12,7 @@ interface Props {
   onLoadExample: (key: string) => void;
   onReset: () => void;
   onCalculate: () => void;
+  isLoading?: boolean;
 }
 
 function parseConsRows(oddsStr: string, exclStr: string): ConsRow[] {

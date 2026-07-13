@@ -9,6 +9,7 @@ interface Props {
   onLoadExample: (key: string) => void;
   onReset: () => void;
   onCalculate: () => void;
+  isLoading?: boolean;
 }
 
 export function PropsTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {

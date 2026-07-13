@@ -1,5 +1,5 @@
 import { useState, useRef, memo } from 'react';
-import { Plus, Trash2, ChevronDown, RotateCcw, Lightbulb } from 'lucide-react';
+import { Plus, Trash2, ChevronDown, RotateCcw, Lightbulb, Loader2 } from 'lucide-react';
 import { HelpTip } from '../HelpTip';
 import { Select } from '../Select';
 
@@ -49,6 +49,7 @@ interface Props {
   onLoadExample: (key: string) => void;
   onReset: () => void;
   onCalculate: () => void;
+  isLoading?: boolean;
 }
 
 // ─── Football leg options ───
@@ -135,7 +136,7 @@ function serializeLegs(legs: Leg[]): string {
   ].join('|')).join(';');
 }
 
-export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
+export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onLoadExample, onReset, onCalculate, isLoading }: Props) {
   const [legs, setLegs] = useState<Leg[]>([]);
   const [cornerOpen, setCornerOpen] = useState(false);
   const [tennisExtra, setTennisExtra] = useState(false);
@@ -626,8 +627,8 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
         </div>
       </div>
 
-      <button type="button" onClick={onCalculate} className="btn-primary w-full mt-4 py-3 text-base">
-        Calcular
+      <button type="button" onClick={onCalculate} disabled={isLoading} className="btn-primary w-full mt-4 py-3 text-base">
+        {isLoading ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Calculando...</> : 'Calcular'}
       </button>
     </div>
   );

@@ -1,4 +1,4 @@
-import { RotateCcw, Lightbulb } from 'lucide-react';
+import { RotateCcw, Lightbulb, Loader2 } from 'lucide-react';
 import { HelpTip } from '../HelpTip';
 import { Select } from '../Select';
 import { NumberInput } from '../NumberInput';
@@ -9,9 +9,10 @@ interface Props {
   onLoadExample: (key: string) => void;
   onReset: () => void;
   onCalculate: () => void;
+  isLoading?: boolean;
 }
 
-export function AsianTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
+export function AsianTab({ values, onChange, onLoadExample, onReset, onCalculate, isLoading }: Props) {
   const mode = values['asia-mode'] || 'total';
 
   return (
@@ -134,8 +135,8 @@ export function AsianTab({ values, onChange, onLoadExample, onReset, onCalculate
           </div>
         )}
 
-        <button type="button" onClick={onCalculate} className="btn-primary w-full mt-4 py-3 text-base">
-          Calcular
+        <button type="button" onClick={onCalculate} disabled={isLoading} className="btn-primary w-full mt-4 py-3 text-base">
+          {isLoading ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Calculando...</> : 'Calcular'}
         </button>
       </div>
     </div>

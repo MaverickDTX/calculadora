@@ -6,12 +6,13 @@ import { ResultView } from './ResultView';
 interface Props {
   result: BetResult | { err: string } | null;
   config: Config;
+  isLoading?: boolean;
   onClose: () => void;
 }
 
 const TITLE_ID = 'results-drawer-title';
 
-export function ResultsDrawer({ result, config, onClose }: Props) {
+export function ResultsDrawer({ result, config, isLoading, onClose }: Props) {
   const isMobile = useMediaQuery('(max-width: 767px)');
   const { ref, dialogProps } = useDialog<HTMLDivElement>({
     open: true,
@@ -54,7 +55,7 @@ export function ResultsDrawer({ result, config, onClose }: Props) {
           </button>
         </div>
 
-        <ResultView result={result} config={config} />
+        <ResultView result={result} config={config} isLoading={isLoading} />
       </div>
     </>
   );

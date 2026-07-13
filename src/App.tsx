@@ -117,7 +117,7 @@ function App() {
   }, []);
 
   const isLazyTab = LAZY_TABS.has(activeTab);
-  const { result } = useCalculator(inputs, config, activeTab, isLazyTab ? calcTrigger : undefined);
+  const { result, isLoading } = useCalculator(inputs, config, activeTab, isLazyTab ? calcTrigger : undefined);
 
   const loadExample = useCallback((key: string) => {
     const example = EXAMPLE_MAP[key];
@@ -158,7 +158,7 @@ function App() {
   }, []);
 
   const tabContent = useMemo(() => {
-    const common = { values: inputs, onChange: handleInputChange, onLoadExample: loadExample, onReset: resetTab, onCalculate: handleCalculate };
+    const common = { values: inputs, onChange: handleInputChange, onLoadExample: loadExample, onReset: resetTab, onCalculate: handleCalculate, isLoading };
     switch (activeTab) {
       case 'nres': return <NResultsTab {...common} />;
       case 'props': return <PropsTab {...common} />;
@@ -168,7 +168,7 @@ function App() {
       case 'poi': return <BetBuilderTab {...common} />;
       case 'asia': return <AsianTab {...common} />;
     }
-  }, [activeTab, inputs, handleInputChange, loadExample, resetTab, handleCalculate]);
+  }, [activeTab, inputs, handleInputChange, loadExample, resetTab, handleCalculate, isLoading]);
 
   return (
     <div className="min-h-screen flex">
@@ -201,6 +201,7 @@ function App() {
         <ResultsModal
           result={result}
           config={config}
+          isLoading={isLoading}
           onClose={() => setShowResultsModal(false)}
         />
       )}
