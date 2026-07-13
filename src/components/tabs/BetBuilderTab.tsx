@@ -603,7 +603,7 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-[11px] text-text-muted mb-1.5 block">Sua odd do Bet Builder</label>
+            <label className="text-[11px] text-text-muted mb-1.5 block">Sua odd do bet builder</label>
             <input type="text" inputMode="decimal" autoComplete="off" value={values['poi-your'] || ''} onChange={e => onChange('poi-your', e.target.value)} className="input-dark input-highlight" placeholder="3.15" />
           </div>
         </div>
