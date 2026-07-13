@@ -71,7 +71,6 @@
   }
   .animate-fade-in,
   .animate-slide-up,
-  .animate-slide-right,
   .animate-pulse-soft {
     animation: none !important;
     opacity: 1 !important;

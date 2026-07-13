@@ -70,9 +70,7 @@ export default {
       animation: {
         'fade-in': 'fadeIn 0.3s ease-out',
         'slide-up': 'slideUp 0.4s ease-out',
-        'slide-right': 'slideRight 0.3s ease-out',
         'pulse-soft': 'pulseSoft 2s ease-in-out infinite',
-        'count': 'count 0.6s ease-out',
       },
       keyframes: {
         fadeIn: {
@@ -82,10 +80,6 @@ export default {
         slideUp: {
           '0%': { opacity: '0', transform: 'translateY(12px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        slideRight: {
-          '0%': { opacity: '0', transform: 'translateX(-8px)' },
-          '100%': { opacity: '1', transform: 'translateX(0)' },
         },
         pulseSoft: {
           '0%, 100%': { opacity: '1' },
