@@ -54,54 +54,54 @@ interface Props {
 
 // ─── Football leg options ───
 const FOOTBALL_LEG_OPTIONS: { value: LegKind; label: string }[] = [
-  { value: 'over', label: 'Over' },
-  { value: 'under', label: 'Under' },
-  { value: 'homewin', label: 'Casa vence' },
-  { value: 'draw', label: 'Empate' },
-  { value: 'awaywin', label: 'Fora vence' },
-  { value: 'homeNoLose', label: 'Casa não perde (1X)' },
-  { value: 'awayNoLose', label: 'Fora não perde (X2)' },
-  { value: 'btts', label: 'Ambas marcam' },
-  { value: 'bttsNo', label: 'Ambas marcam: Não' },
-  { value: 'homeScores', label: 'Casa marca' },
-  { value: 'awayScores', label: 'Fora marca' },
-  { value: 'homeOver', label: 'Casa Over X gols' },
-  { value: 'homeUnder', label: 'Casa Under X gols' },
-  { value: 'awayOver', label: 'Fora Over X gols' },
-  { value: 'awayUnder', label: 'Fora Under X gols' },
-  { value: 'player', label: 'Jogador marca' },
-  { value: 'playerprop', label: 'Prop jogador (chutes/SOT/faltas)' },
-  { value: 'cornerTotal', label: 'Escanteios totais (O/U)' },
-  { value: 'cornerTeam', label: 'Escanteios por time (O/U)' },
-  { value: 'cornerSide', label: 'Escanteios 1X2' },
+  { value: 'over', label: 'OVER' },
+  { value: 'under', label: 'UNDER' },
+  { value: 'homewin', label: 'CASA VENCE' },
+  { value: 'draw', label: 'EMPATE' },
+  { value: 'awaywin', label: 'FORA VENCE' },
+  { value: 'homeNoLose', label: 'CASA NÃO PERDE (1X)' },
+  { value: 'awayNoLose', label: 'FORA NÃO PERDE (X2)' },
+  { value: 'btts', label: 'AMBAS MARCAM' },
+  { value: 'bttsNo', label: 'AMBAS MARCAM: NÃO' },
+  { value: 'homeScores', label: 'CASA MARCA' },
+  { value: 'awayScores', label: 'FORA MARCA' },
+  { value: 'homeOver', label: 'CASA OVER X GOLS' },
+  { value: 'homeUnder', label: 'CASA UNDER X GOLS' },
+  { value: 'awayOver', label: 'FORA OVER X GOLS' },
+  { value: 'awayUnder', label: 'FORA UNDER X GOLS' },
+  { value: 'player', label: 'JOGADOR MARCA' },
+  { value: 'playerprop', label: 'PROP JOGADOR (CHUTES/SOT/FALTAS)' },
+  { value: 'cornerTotal', label: 'ESCANTEIOS TOTAIS (O/U)' },
+  { value: 'cornerTeam', label: 'ESCANTEIOS POR TIME (O/U)' },
+  { value: 'cornerSide', label: 'ESCANTEIOS 1X2' },
 ];
 
 // ─── Tennis leg options ───
 const TENNIS_LEG_OPTIONS: { value: LegKind; label: string }[] = [
-  { value: 'matchWinner', label: 'Vencedor da partida' },
-  { value: 'totalGamesOver', label: 'Over jogos totais' },
-  { value: 'totalGamesUnder', label: 'Under jogos totais' },
-  { value: 'totalSetsOver', label: 'Over sets totais' },
-  { value: 'totalSetsUnder', label: 'Under sets totais' },
-  { value: 'setScore', label: 'Placar de sets exato' },
-  { value: 'firstSetWinner', label: 'Vencedor do 1º set' },
-  { value: 'tiebreakInMatch', label: 'Tiebreak na partida' },
+  { value: 'matchWinner', label: 'VENCEDOR DA PARTIDA' },
+  { value: 'totalGamesOver', label: 'OVER JOGOS TOTAIS' },
+  { value: 'totalGamesUnder', label: 'UNDER JOGOS TOTAIS' },
+  { value: 'totalSetsOver', label: 'OVER SETS TOTAIS' },
+  { value: 'totalSetsUnder', label: 'UNDER SETS TOTAIS' },
+  { value: 'setScore', label: 'PLACAR DE SETS EXATO' },
+  { value: 'firstSetWinner', label: 'VENCEDOR DO 1º SET' },
+  { value: 'tiebreakInMatch', label: 'TIEBREAK NA PARTIDA' },
 ];
 
 const BASKETBALL_LEG_OPTIONS: { value: LegKind; label: string }[] = [
-  { value: 'moneyline', label: 'Vencedor (moneyline)' },
-  { value: 'spreadCover', label: 'Cobre o spread' },
-  { value: 'totalOver', label: 'Over pontos totais' },
-  { value: 'totalUnder', label: 'Under pontos totais' },
-  { value: 'teamTotalOver', label: 'Over pontos do time' },
-  { value: 'teamTotalUnder', label: 'Under pontos do time' },
-  { value: 'marginRange', label: 'Margem de vitória (faixa)' },
+  { value: 'moneyline', label: 'VENCEDOR (MONEYLINE)' },
+  { value: 'spreadCover', label: 'COBRE O SPREAD' },
+  { value: 'totalOver', label: 'OVER PONTOS TOTAIS' },
+  { value: 'totalUnder', label: 'UNDER PONTOS TOTAIS' },
+  { value: 'teamTotalOver', label: 'OVER PONTOS DO TIME' },
+  { value: 'teamTotalUnder', label: 'UNDER PONTOS DO TIME' },
+  { value: 'marginRange', label: 'MARGEM DE VITÓRIA (FAIXA)' },
 ];
 
 const SPORT_OPTIONS: { value: SportId; label: string }[] = [
-  { value: 'football', label: 'Futebol' },
-  { value: 'tennis', label: 'Tênis' },
-  { value: 'basketball', label: 'Basquete' },
+  { value: 'football', label: 'FUTEBOL' },
+  { value: 'tennis', label: 'TÊNIS' },
+  { value: 'basketball', label: 'BASQUETE' },
 ];
 
 function parseLegs(saved: string): Leg[] {
@@ -203,6 +203,24 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
 
   return (
     <div className="space-y-5 animate-fade-in">
+      {/* Examples row — above everything */}
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">Exemplos:</span>
+        {sport === 'football' && (
+          <>
+            <button type="button" onClick={() => onLoadExample('poi-builder')} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">Over + Casa vence</button>
+            <button type="button" onClick={() => onLoadExample('poi-playerprop')} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">Prop jogador</button>
+          </>
+        )}
+        {sport === 'tennis' && (
+          <>
+            <button type="button" onClick={() => onLoadExample('poi-tennis')} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">Djokovic @1.33 + Over 22.5</button>
+            <button type="button" onClick={() => onLoadExample('poi-tennis-prop')} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">Vencedor + Over + 1º set</button>
+          </>
+        )}
+        <button type="button" onClick={onReset} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors ml-auto flex items-center gap-1">Limpar</button>
+      </div>
+
       {/* Sport selector */}
       <div className="panel">
         <div className="flex items-center gap-3 mb-3">
@@ -219,28 +237,9 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
         />
       </div>
 
-      <div className="panel border-warn/30">
-        <p className="text-xs text-text-secondary leading-relaxed">
-          {sport === 'tennis' ? (
-            <>Use para bet builders de <b>tênis</b>. O modelo Markov por ponto (ponto→game→set→partida) calibra a distribuição conjunta a partir das odds simples via Monte Carlo.</>
-          ) : sport === 'basketball' ? (
-            <>Use para bet builders de <b>basquete</b>. O modelo Normal Bivariada calibra as médias dos times a partir do total e spread, preservando a correlação de ritmo entre as pontuações.</>
-          ) : (
-            <>Use para bet builders do <b>mesmo jogo</b>, quando a correlação entre pernas importa. O modelo Poisson/Dixon-Coles calibra a distribuição de placar a partir das odds simples.</>
-          )}
-        </p>
-      </div>
-
       {/* ─── Football inputs ─── */}
       {sport === 'football' && (
         <>
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">Exemplos:</span>
-            <button type="button" onClick={() => onLoadExample('poi-builder')} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">Over + Casa vence</button>
-            <button type="button" onClick={() => onLoadExample('poi-playerprop')} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">Prop jogador</button>
-            <button type="button" onClick={onReset} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors ml-auto flex items-center gap-1">Limpar</button>
-          </div>
-
           <div className="panel panel-focus space-y-5">
             <div className="section-title">Odds simples do jogo</div>
             <div className="grid grid-cols-3 gap-3">
@@ -290,13 +289,6 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
       {/* ─── Tennis inputs ─── */}
       {sport === 'tennis' && (
         <>
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">Exemplos:</span>
-            <button type="button" onClick={() => onLoadExample('poi-tennis')} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">Djokovic @1.33 + Over 22.5</button>
-            <button type="button" onClick={() => onLoadExample('poi-tennis-prop')} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">Vencedor + Over + 1º set</button>
-            <button type="button" onClick={onReset} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors ml-auto flex items-center gap-1">Limpar</button>
-          </div>
-
           <div className="panel panel-focus space-y-5">
             <div className="section-title">Odds simples do jogo</div>
             <div className="grid grid-cols-2 gap-3">
@@ -314,8 +306,8 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                 value={values['poi-bestOf'] || '3'}
                 onChange={v => onChange('poi-bestOf', v)}
                 options={[
-                  { value: '3', label: 'Melhor de 3 sets' },
-                  { value: '5', label: 'Melhor de 5 sets' },
+                  { value: '3', label: 'MELHOR DE 3 SETS' },
+                  { value: '5', label: 'MELHOR DE 5 SETS' },
                 ]}
               />
             </div>
@@ -387,7 +379,7 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
 
       {/* ─── Legs (shared, but options depend on sport) ─── */}
       <div className="panel panel-focus space-y-5">
-        <div className="section-title">Pernas da combinada</div>
+        <div className="section-title">SELEÇÃO</div>
         <div className="space-y-3">
           {legs.map(leg => {
             const isP = leg.kind === 'player';
@@ -462,8 +454,8 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                       value={leg.side || 'home'}
                       onChange={v => updateLeg(leg.id, { side: v })}
                       options={[
-                        { value: 'home', label: 'mandante' },
-                        { value: 'away', label: 'visitante' },
+                        { value: 'home', label: 'MANDANTE' },
+                        { value: 'away', label: 'VISITANTE' },
                       ]}
                     />
                   )}
@@ -473,8 +465,8 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                       value={leg.side || 'A'}
                       onChange={v => updateLeg(leg.id, { side: v })}
                       options={[
-                        { value: 'A', label: 'Jogador A' },
-                        { value: 'B', label: 'Jogador B' },
+                        { value: 'A', label: 'JOGADOR A' },
+                        { value: 'B', label: 'JOGADOR B' },
                       ]}
                     />
                   )}
@@ -484,8 +476,8 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                       value={leg.side || 'A'}
                       onChange={v => updateLeg(leg.id, { side: v })}
                       options={[
-                        { value: 'A', label: 'Time A' },
-                        { value: 'B', label: 'Time B' },
+                        { value: 'A', label: 'TIME A' },
+                        { value: 'B', label: 'TIME B' },
                       ]}
                     />
                   )}
@@ -511,8 +503,8 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                       value={leg.cSide || 'over'}
                       onChange={v => updateLeg(leg.id, { cSide: v })}
                       options={[
-                        { value: 'over', label: 'Over' },
-                        { value: 'under', label: 'Under' },
+                        { value: 'over', label: 'OVER' },
+                        { value: 'under', label: 'UNDER' },
                       ]}
                     />
                   )}
@@ -522,8 +514,8 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                       value={leg.cDir || 'over'}
                       onChange={v => updateLeg(leg.id, { cDir: v })}
                       options={[
-                        { value: 'over', label: 'Over' },
-                        { value: 'under', label: 'Under' },
+                        { value: 'over', label: 'OVER' },
+                        { value: 'under', label: 'UNDER' },
                       ]}
                     />
                   )}
@@ -533,9 +525,9 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                       value={leg.c1x2 || 'home'}
                       onChange={v => updateLeg(leg.id, { c1x2: v })}
                       options={[
-                        { value: 'home', label: 'Casa' },
-                        { value: 'draw', label: 'Empate' },
-                        { value: 'away', label: 'Visitante' },
+                        { value: 'home', label: 'CASA' },
+                        { value: 'draw', label: 'EMPATE' },
+                        { value: 'away', label: 'VISITANTE' },
                       ]}
                     />
                   )}
@@ -566,8 +558,8 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                         value={leg.ppSide || 'home'}
                         onChange={v => updateLeg(leg.id, { ppSide: v })}
                         options={[
-                          { value: 'home', label: 'Mandante' },
-                          { value: 'away', label: 'Visitante' },
+                        { value: 'home', label: 'MANDANTE' },
+                        { value: 'away', label: 'VISITANTE' },
                         ]}
                       />
                       <label className="flex items-center gap-1.5 text-xs text-text-muted">
@@ -576,11 +568,11 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                           value={leg.ppLine || '0,5'}
                           onChange={v => updateLeg(leg.id, { ppLine: v })}
                           options={[
-                            { value: '0,5', label: 'Over 0,5' },
-                            { value: '1,5', label: 'Over 1,5' },
-                            { value: '2,5', label: 'Over 2,5' },
-                            { value: '3,5', label: 'Over 3,5' },
-                            { value: '4,5', label: 'Over 4,5' },
+                            { value: '0,5', label: 'OVER 0,5' },
+                            { value: '1,5', label: 'OVER 1,5' },
+                            { value: '2,5', label: 'OVER 2,5' },
+                            { value: '3,5', label: 'OVER 3,5' },
+                            { value: '4,5', label: 'OVER 4,5' },
                           ]}
                         />
                       </label>
@@ -604,20 +596,30 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
           })}
         </div>
         <button type="button" onClick={() => addLeg(sport === 'tennis' ? 'matchWinner' : sport === 'basketball' ? 'moneyline' : 'over')} className="btn-ghost text-xs flex items-center gap-1.5">
-          <Plus size={14} aria-hidden="true" /> Perna
+          <Plus size={14} aria-hidden="true" /> Adicionar seleção
         </button>
 
         <div className="divider" />
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs text-text-muted mb-1.5 block">Sua odd final</label>
+            <label className="text-xs text-text-muted mb-1.5 block">Sua odd do Bet Builder</label>
             <input type="text" inputMode="decimal" autoComplete="off" value={values['poi-your'] || ''} onChange={e => onChange('poi-your', e.target.value)} className="input-dark input-highlight" placeholder="3.15" />
           </div>
         </div>
       </div>
 
-      <button type="button" onClick={onCalculate} disabled={isLoading} className="btn-primary w-full mt-4 py-3 text-base">
+      <div className="px-4 py-3 rounded-lg border border-border/50 bg-surface text-[11px] text-text-muted leading-relaxed">
+        {sport === 'tennis' ? (
+          <>Use para bet builders de <b>tênis</b>. O modelo Markov por ponto (ponto→game→set→partida) calibra a distribuição conjunta a partir das odds simples via Monte Carlo.</>
+        ) : sport === 'basketball' ? (
+          <>Use para bet builders de <b>basquete</b>. O modelo Normal Bivariada calibra as médias dos times a partir do total e spread, preservando a correlação de ritmo entre as pontuações.</>
+        ) : (
+          <>Use para bet builders do <b>mesmo jogo</b>, quando a correlação entre pernas importa. O modelo Poisson/Dixon-Coles calibra a distribuição de placar a partir das odds simples.</>
+        )}
+      </div>
+
+      <button type="button" onClick={onCalculate} disabled={isLoading} className="btn-primary w-full py-3 text-base">
         {isLoading ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Calculando...</> : 'Calcular'}
       </button>
     </div>
