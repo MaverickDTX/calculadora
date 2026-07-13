@@ -54,54 +54,54 @@ interface Props {
 
 // ─── Football leg options ───
 const FOOTBALL_LEG_OPTIONS: { value: LegKind; label: string }[] = [
-  { value: 'over', label: 'OVER' },
-  { value: 'under', label: 'UNDER' },
-  { value: 'homewin', label: 'CASA VENCE' },
-  { value: 'draw', label: 'EMPATE' },
-  { value: 'awaywin', label: 'FORA VENCE' },
-  { value: 'homeNoLose', label: 'CASA NÃO PERDE (1X)' },
-  { value: 'awayNoLose', label: 'FORA NÃO PERDE (X2)' },
-  { value: 'btts', label: 'AMBAS MARCAM' },
-  { value: 'bttsNo', label: 'AMBAS MARCAM: NÃO' },
-  { value: 'homeScores', label: 'CASA MARCA' },
-  { value: 'awayScores', label: 'FORA MARCA' },
-  { value: 'homeOver', label: 'CASA OVER X GOLS' },
-  { value: 'homeUnder', label: 'CASA UNDER X GOLS' },
-  { value: 'awayOver', label: 'FORA OVER X GOLS' },
-  { value: 'awayUnder', label: 'FORA UNDER X GOLS' },
-  { value: 'player', label: 'JOGADOR MARCA' },
-  { value: 'playerprop', label: 'PROP JOGADOR (CHUTES/SOT/FALTAS)' },
-  { value: 'cornerTotal', label: 'ESCANTEIOS TOTAIS (O/U)' },
-  { value: 'cornerTeam', label: 'ESCANTEIOS POR TIME (O/U)' },
-  { value: 'cornerSide', label: 'ESCANTEIOS 1X2' },
+  { value: 'over', label: 'Over' },
+  { value: 'under', label: 'Under' },
+  { value: 'homewin', label: 'Casa vence' },
+  { value: 'draw', label: 'Empate' },
+  { value: 'awaywin', label: 'Fora vence' },
+  { value: 'homeNoLose', label: 'Casa não perde (1X)' },
+  { value: 'awayNoLose', label: 'Fora não perde (X2)' },
+  { value: 'btts', label: 'Ambas marcam' },
+  { value: 'bttsNo', label: 'Ambas marcam: Não' },
+  { value: 'homeScores', label: 'Casa marca' },
+  { value: 'awayScores', label: 'Fora marca' },
+  { value: 'homeOver', label: 'Casa Over X gols' },
+  { value: 'homeUnder', label: 'Casa Under X gols' },
+  { value: 'awayOver', label: 'Fora Over X gols' },
+  { value: 'awayUnder', label: 'Fora Under X gols' },
+  { value: 'player', label: 'Jogador marca' },
+  { value: 'playerprop', label: 'Prop jogador (chutes/SOT/faltas)' },
+  { value: 'cornerTotal', label: 'Escanteios totais (O/U)' },
+  { value: 'cornerTeam', label: 'Escanteios por time (O/U)' },
+  { value: 'cornerSide', label: 'Escanteios 1X2' },
 ];
 
 // ─── Tennis leg options ───
 const TENNIS_LEG_OPTIONS: { value: LegKind; label: string }[] = [
-  { value: 'matchWinner', label: 'VENCEDOR DA PARTIDA' },
-  { value: 'totalGamesOver', label: 'OVER JOGOS TOTAIS' },
-  { value: 'totalGamesUnder', label: 'UNDER JOGOS TOTAIS' },
-  { value: 'totalSetsOver', label: 'OVER SETS TOTAIS' },
-  { value: 'totalSetsUnder', label: 'UNDER SETS TOTAIS' },
-  { value: 'setScore', label: 'PLACAR DE SETS EXATO' },
-  { value: 'firstSetWinner', label: 'VENCEDOR DO 1º SET' },
-  { value: 'tiebreakInMatch', label: 'TIEBREAK NA PARTIDA' },
+  { value: 'matchWinner', label: 'Vencedor da partida' },
+  { value: 'totalGamesOver', label: 'Over jogos totais' },
+  { value: 'totalGamesUnder', label: 'Under jogos totais' },
+  { value: 'totalSetsOver', label: 'Over sets totais' },
+  { value: 'totalSetsUnder', label: 'Under sets totais' },
+  { value: 'setScore', label: 'Placar de sets exato' },
+  { value: 'firstSetWinner', label: 'Vencedor do 1º set' },
+  { value: 'tiebreakInMatch', label: 'Tiebreak na partida' },
 ];
 
 const BASKETBALL_LEG_OPTIONS: { value: LegKind; label: string }[] = [
-  { value: 'moneyline', label: 'VENCEDOR (MONEYLINE)' },
-  { value: 'spreadCover', label: 'COBRE O SPREAD' },
-  { value: 'totalOver', label: 'OVER PONTOS TOTAIS' },
-  { value: 'totalUnder', label: 'UNDER PONTOS TOTAIS' },
-  { value: 'teamTotalOver', label: 'OVER PONTOS DO TIME' },
-  { value: 'teamTotalUnder', label: 'UNDER PONTOS DO TIME' },
-  { value: 'marginRange', label: 'MARGEM DE VITÓRIA (FAIXA)' },
+  { value: 'moneyline', label: 'Vencedor (moneyline)' },
+  { value: 'spreadCover', label: 'Cobre o spread' },
+  { value: 'totalOver', label: 'Over pontos totais' },
+  { value: 'totalUnder', label: 'Under pontos totais' },
+  { value: 'teamTotalOver', label: 'Over pontos do time' },
+  { value: 'teamTotalUnder', label: 'Under pontos do time' },
+  { value: 'marginRange', label: 'Margem de vitória (faixa)' },
 ];
 
 const SPORT_OPTIONS: { value: SportId; label: string }[] = [
-  { value: 'football', label: 'FUTEBOL' },
-  { value: 'tennis', label: 'TÊNIS' },
-  { value: 'basketball', label: 'BASQUETE' },
+  { value: 'football', label: 'Futebol' },
+  { value: 'tennis', label: 'Tênis' },
+  { value: 'basketball', label: 'Basquete' },
 ];
 
 function parseLegs(saved: string): Leg[] {
@@ -243,18 +243,18 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
           <div className="panel panel-focus space-y-5">
             <div className="section-title">Odds simples do jogo</div>
             <div className="grid grid-cols-3 gap-3">
-              <div><label className="text-xs text-text-muted mb-1.5 block">CASA (1)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-h'] || ''} onChange={e => onChange('poi-h', e.target.value)} className="input-dark" placeholder="1.80" /></div>
-              <div><label className="text-xs text-text-muted mb-1.5 block">EMPATE (X)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-d'] || ''} onChange={e => onChange('poi-d', e.target.value)} className="input-dark" placeholder="3.60" /></div>
-              <div><label className="text-xs text-text-muted mb-1.5 block">FORA (2)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-a'] || ''} onChange={e => onChange('poi-a', e.target.value)} className="input-dark" placeholder="4.50" /></div>
+              <div><label className="text-[11px] text-text-muted mb-1.5 block">CASA (1)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-h'] || ''} onChange={e => onChange('poi-h', e.target.value)} className="input-dark" placeholder="1.80" /></div>
+              <div><label className="text-[11px] text-text-muted mb-1.5 block">EMPATE (X)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-d'] || ''} onChange={e => onChange('poi-d', e.target.value)} className="input-dark" placeholder="3.60" /></div>
+              <div><label className="text-[11px] text-text-muted mb-1.5 block">FORA (2)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-a'] || ''} onChange={e => onChange('poi-a', e.target.value)} className="input-dark" placeholder="4.50" /></div>
             </div>
             <div className="grid grid-cols-3 gap-3">
-              <div><label className="text-xs text-text-muted mb-1.5 block">LINHA O/U GOLS</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-ouline'] || ''} onChange={e => onChange('poi-ouline', e.target.value)} className="input-dark" placeholder="2.5" /></div>
-              <div><label className="text-xs text-text-muted mb-1.5 block">ODD OVER</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-over'] || ''} onChange={e => onChange('poi-over', e.target.value)} className="input-dark" placeholder="1.95" /></div>
-              <div><label className="text-xs text-text-muted mb-1.5 block">ODD UNDER</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-under'] || ''} onChange={e => onChange('poi-under', e.target.value)} className="input-dark" placeholder="1.95" /></div>
+              <div><label className="text-[11px] text-text-muted mb-1.5 block">LINHA O/U GOLS</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-ouline'] || ''} onChange={e => onChange('poi-ouline', e.target.value)} className="input-dark" placeholder="2.5" /></div>
+              <div><label className="text-[11px] text-text-muted mb-1.5 block">ODD OVER</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-over'] || ''} onChange={e => onChange('poi-over', e.target.value)} className="input-dark" placeholder="1.95" /></div>
+              <div><label className="text-[11px] text-text-muted mb-1.5 block">ODD UNDER</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-under'] || ''} onChange={e => onChange('poi-under', e.target.value)} className="input-dark" placeholder="1.95" /></div>
             </div>
 
             <div>
-              <label className="text-xs text-text-muted mb-1.5 block">CORREÇÃO DIXON-COLES ρ<HelpTip text="Correção de dependência entre poucos gols (Dixon-Coles). Valores típicos entre -0.15 e 0; ~-0.05 é comum. 0 = Poisson pura." /></label>
+              <label className="text-[11px] text-text-muted mb-1.5 block">CORREÇÃO DIXON-COLES ρ<HelpTip text="Correção de dependência entre poucos gols (Dixon-Coles). Valores típicos entre -0.15 e 0; ~-0.05 é comum. 0 = Poisson pura." /></label>
               <input type="text" inputMode="text" autoComplete="off" value={values['poi-rho'] || ''} onChange={e => onChange('poi-rho', e.target.value)} className="input-dark" placeholder="-0.05" />
             </div>
 
@@ -267,14 +267,14 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
               {cornerOpen && (
                 <div className="mt-3 space-y-3 animate-fade-in">
                   <div className="grid grid-cols-3 gap-3">
-                    <div><label className="text-xs text-text-muted mb-1.5 block">LINHA O/U CORNERS</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-line'] || ''} onChange={e => onChange('poi-c-line', e.target.value)} className="input-dark" placeholder="9.5" /></div>
-                    <div><label className="text-xs text-text-muted mb-1.5 block">ODD OVER CORNERS</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-over'] || ''} onChange={e => onChange('poi-c-over', e.target.value)} className="input-dark" placeholder="1.90" /></div>
-                    <div><label className="text-xs text-text-muted mb-1.5 block">ODD UNDER CORNERS</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-under'] || ''} onChange={e => onChange('poi-c-under', e.target.value)} className="input-dark" placeholder="1.90" /></div>
+                    <div><label className="text-[11px] text-text-muted mb-1.5 block">LINHA O/U CORNERS</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-line'] || ''} onChange={e => onChange('poi-c-line', e.target.value)} className="input-dark" placeholder="9.5" /></div>
+                    <div><label className="text-[11px] text-text-muted mb-1.5 block">ODD OVER CORNERS</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-over'] || ''} onChange={e => onChange('poi-c-over', e.target.value)} className="input-dark" placeholder="1.90" /></div>
+                    <div><label className="text-[11px] text-text-muted mb-1.5 block">ODD UNDER CORNERS</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-under'] || ''} onChange={e => onChange('poi-c-under', e.target.value)} className="input-dark" placeholder="1.90" /></div>
                   </div>
                   <div className="grid grid-cols-3 gap-3">
-                    <div><label className="text-xs text-text-muted mb-1.5 block">CORNER 1X2 — CASA (1) <span className="text-text-muted/70">OPCIONAL</span></label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-1'] || ''} onChange={e => onChange('poi-c-1', e.target.value)} className="input-dark" placeholder="opt" /></div>
-                    <div><label className="text-xs text-text-muted mb-1.5 block">EMPATE CORNERS (X)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-x'] || ''} onChange={e => onChange('poi-c-x', e.target.value)} className="input-dark" placeholder="opt" /></div>
-                    <div><label className="text-xs text-text-muted mb-1.5 block">VISITANTE (2)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-2'] || ''} onChange={e => onChange('poi-c-2', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                    <div><label className="text-[11px] text-text-muted mb-1.5 block">CORNER 1X2 — CASA (1) <span className="text-text-muted/70">OPCIONAL</span></label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-1'] || ''} onChange={e => onChange('poi-c-1', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                    <div><label className="text-[11px] text-text-muted mb-1.5 block">EMPATE CORNERS (X)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-x'] || ''} onChange={e => onChange('poi-c-x', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                    <div><label className="text-[11px] text-text-muted mb-1.5 block">VISITANTE (2)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-c-2'] || ''} onChange={e => onChange('poi-c-2', e.target.value)} className="input-dark" placeholder="opt" /></div>
                   </div>
                   <p className="text-xs text-text-muted leading-relaxed">
                     Sem o 1X2 de escanteios, o total é dividido entre os times pela proporção de domínio do jogo (split de gols). Com o 1X2, o split de escanteios é calibrado diretamente. Escanteios costumam ser levemente <b>sobredispersos</b> vs. Poisson — a cauda alta pode ser subestimada (ressalva análoga à de SOT/props).
@@ -292,13 +292,13 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
           <div className="panel panel-focus space-y-5">
             <div className="section-title">Odds simples do jogo</div>
             <div className="grid grid-cols-2 gap-3">
-              <div><label className="text-xs text-text-muted mb-1.5 block">JOGADOR A — ML</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-mlA'] || ''} onChange={e => onChange('poi-mlA', e.target.value)} className="input-dark" placeholder="1.80" /></div>
-              <div><label className="text-xs text-text-muted mb-1.5 block">JOGADOR B — ML</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-mlB'] || ''} onChange={e => onChange('poi-mlB', e.target.value)} className="input-dark" placeholder="2.10" /></div>
+              <div><label className="text-[11px] text-text-muted mb-1.5 block">JOGADOR A — ML</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-mlA'] || ''} onChange={e => onChange('poi-mlA', e.target.value)} className="input-dark" placeholder="1.80" /></div>
+              <div><label className="text-[11px] text-text-muted mb-1.5 block">JOGADOR B — ML</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-mlB'] || ''} onChange={e => onChange('poi-mlB', e.target.value)} className="input-dark" placeholder="2.10" /></div>
             </div>
             <div className="grid grid-cols-3 gap-3">
-              <div><label className="text-xs text-text-muted mb-1.5 block">LINHA O/U JOGOS</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-gamesLine'] || ''} onChange={e => onChange('poi-gamesLine', e.target.value)} className="input-dark" placeholder="22.5" /></div>
-              <div><label className="text-xs text-text-muted mb-1.5 block">ODD OVER</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-gamesOver'] || ''} onChange={e => onChange('poi-gamesOver', e.target.value)} className="input-dark" placeholder="1.90" /></div>
-              <div><label className="text-xs text-text-muted mb-1.5 block">ODD UNDER</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-gamesUnder'] || ''} onChange={e => onChange('poi-gamesUnder', e.target.value)} className="input-dark" placeholder="1.90" /></div>
+              <div><label className="text-[11px] text-text-muted mb-1.5 block">LINHA O/U JOGOS</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-gamesLine'] || ''} onChange={e => onChange('poi-gamesLine', e.target.value)} className="input-dark" placeholder="22.5" /></div>
+              <div><label className="text-[11px] text-text-muted mb-1.5 block">ODD OVER</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-gamesOver'] || ''} onChange={e => onChange('poi-gamesOver', e.target.value)} className="input-dark" placeholder="1.90" /></div>
+              <div><label className="text-[11px] text-text-muted mb-1.5 block">ODD UNDER</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-gamesUnder'] || ''} onChange={e => onChange('poi-gamesUnder', e.target.value)} className="input-dark" placeholder="1.90" /></div>
             </div>
             <div className="flex items-center gap-3">
               <label className="text-xs text-text-muted">Formato</label>
@@ -306,8 +306,8 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                 value={values['poi-bestOf'] || '3'}
                 onChange={v => onChange('poi-bestOf', v)}
                 options={[
-                  { value: '3', label: 'MELHOR DE 3 SETS' },
-                  { value: '5', label: 'MELHOR DE 5 SETS' },
+                  { value: '3', label: 'Melhor de 3 sets' },
+                  { value: '5', label: 'Melhor de 5 sets' },
                 ]}
               />
             </div>
@@ -321,8 +321,8 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
               {tennisExtra && (
                 <div className="mt-3 space-y-3 animate-fade-in">
                   <div className="grid grid-cols-2 gap-3">
-                    <div><label className="text-xs text-text-muted mb-1.5 block">A VENCE 1º SET</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-firstSetA'] || ''} onChange={e => onChange('poi-firstSetA', e.target.value)} className="input-dark" placeholder="opt" /></div>
-                    <div><label className="text-xs text-text-muted mb-1.5 block">B VENCE 1º SET</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-firstSetB'] || ''} onChange={e => onChange('poi-firstSetB', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                    <div><label className="text-[11px] text-text-muted mb-1.5 block">A VENCE 1º SET</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-firstSetA'] || ''} onChange={e => onChange('poi-firstSetA', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                    <div><label className="text-[11px] text-text-muted mb-1.5 block">B VENCE 1º SET</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-firstSetB'] || ''} onChange={e => onChange('poi-firstSetB', e.target.value)} className="input-dark" placeholder="opt" /></div>
                   </div>
                   <p className="text-xs text-text-muted leading-relaxed">
                     Quando preenchidas, as odds do 1º set fornecem um ponto extra de calibração para o modelo Markov, melhorando a estimativa de `pA_serve` e `pB_serve`.
@@ -339,14 +339,14 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
         <div className="panel panel-focus space-y-5">
           <div className="section-title">Odds simples do jogo</div>
           <div className="grid grid-cols-3 gap-3">
-            <div><label className="text-xs text-text-muted mb-1.5 block">LINHA TOTAL</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-totalLine'] || ''} onChange={e => onChange('poi-totalLine', e.target.value)} className="input-dark" placeholder="224.5" /></div>
-            <div><label className="text-xs text-text-muted mb-1.5 block">ODD OVER</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-totalOver'] || ''} onChange={e => onChange('poi-totalOver', e.target.value)} className="input-dark" placeholder="1.91" /></div>
-            <div><label className="text-xs text-text-muted mb-1.5 block">ODD UNDER</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-totalUnder'] || ''} onChange={e => onChange('poi-totalUnder', e.target.value)} className="input-dark" placeholder="1.91" /></div>
+            <div><label className="text-[11px] text-text-muted mb-1.5 block">LINHA TOTAL</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-totalLine'] || ''} onChange={e => onChange('poi-totalLine', e.target.value)} className="input-dark" placeholder="224.5" /></div>
+            <div><label className="text-[11px] text-text-muted mb-1.5 block">ODD OVER</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-totalOver'] || ''} onChange={e => onChange('poi-totalOver', e.target.value)} className="input-dark" placeholder="1.91" /></div>
+            <div><label className="text-[11px] text-text-muted mb-1.5 block">ODD UNDER</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-totalUnder'] || ''} onChange={e => onChange('poi-totalUnder', e.target.value)} className="input-dark" placeholder="1.91" /></div>
           </div>
           <div className="grid grid-cols-3 gap-3">
-            <div><label className="text-xs text-text-muted mb-1.5 block">SPREAD A</label><input type="text" inputMode="text" autoComplete="off" value={values['poi-spread'] || ''} onChange={e => onChange('poi-spread', e.target.value)} className="input-dark" placeholder="-5.5" /></div>
-            <div><label className="text-xs text-text-muted mb-1.5 block">ODD SPREAD A</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-spreadA'] || ''} onChange={e => onChange('poi-spreadA', e.target.value)} className="input-dark" placeholder="1.91" /></div>
-            <div><label className="text-xs text-text-muted mb-1.5 block">ODD SPREAD B</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-spreadB'] || ''} onChange={e => onChange('poi-spreadB', e.target.value)} className="input-dark" placeholder="1.91" /></div>
+            <div><label className="text-[11px] text-text-muted mb-1.5 block">SPREAD A</label><input type="text" inputMode="text" autoComplete="off" value={values['poi-spread'] || ''} onChange={e => onChange('poi-spread', e.target.value)} className="input-dark" placeholder="-5.5" /></div>
+            <div><label className="text-[11px] text-text-muted mb-1.5 block">ODD SPREAD A</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-spreadA'] || ''} onChange={e => onChange('poi-spreadA', e.target.value)} className="input-dark" placeholder="1.91" /></div>
+            <div><label className="text-[11px] text-text-muted mb-1.5 block">ODD SPREAD B</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-spreadB'] || ''} onChange={e => onChange('poi-spreadB', e.target.value)} className="input-dark" placeholder="1.91" /></div>
           </div>
           <div className="pt-3 border-t border-border">
             <button type="button" onClick={() => setBasketExtra(!basketExtra)} className="flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">
@@ -357,19 +357,19 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
             {basketExtra && (
               <div className="mt-3 space-y-3 animate-fade-in">
                 <div className="grid grid-cols-3 gap-3">
-                  <div><label className="text-xs text-text-muted mb-1.5 block">TOTAL TIME A</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-teamTotalA'] || ''} onChange={e => onChange('poi-teamTotalA', e.target.value)} className="input-dark" placeholder="112.5" /></div>
-                  <div><label className="text-xs text-text-muted mb-1.5 block">OVER A</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-teamTotalAOver'] || ''} onChange={e => onChange('poi-teamTotalAOver', e.target.value)} className="input-dark" placeholder="opt" /></div>
-                  <div><label className="text-xs text-text-muted mb-1.5 block">UNDER A</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-teamTotalAUnder'] || ''} onChange={e => onChange('poi-teamTotalAUnder', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                  <div><label className="text-[11px] text-text-muted mb-1.5 block">TOTAL TIME A</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-teamTotalA'] || ''} onChange={e => onChange('poi-teamTotalA', e.target.value)} className="input-dark" placeholder="112.5" /></div>
+                  <div><label className="text-[11px] text-text-muted mb-1.5 block">OVER A</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-teamTotalAOver'] || ''} onChange={e => onChange('poi-teamTotalAOver', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                  <div><label className="text-[11px] text-text-muted mb-1.5 block">UNDER A</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-teamTotalAUnder'] || ''} onChange={e => onChange('poi-teamTotalAUnder', e.target.value)} className="input-dark" placeholder="opt" /></div>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
-                  <div><label className="text-xs text-text-muted mb-1.5 block">TOTAL TIME B</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-teamTotalB'] || ''} onChange={e => onChange('poi-teamTotalB', e.target.value)} className="input-dark" placeholder="111.5" /></div>
-                  <div><label className="text-xs text-text-muted mb-1.5 block">OVER B</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-teamTotalBOver'] || ''} onChange={e => onChange('poi-teamTotalBOver', e.target.value)} className="input-dark" placeholder="opt" /></div>
-                  <div><label className="text-xs text-text-muted mb-1.5 block">UNDER B</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-teamTotalBUnder'] || ''} onChange={e => onChange('poi-teamTotalBUnder', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                  <div><label className="text-[11px] text-text-muted mb-1.5 block">TOTAL TIME B</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-teamTotalB'] || ''} onChange={e => onChange('poi-teamTotalB', e.target.value)} className="input-dark" placeholder="111.5" /></div>
+                  <div><label className="text-[11px] text-text-muted mb-1.5 block">OVER B</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-teamTotalBOver'] || ''} onChange={e => onChange('poi-teamTotalBOver', e.target.value)} className="input-dark" placeholder="opt" /></div>
+                  <div><label className="text-[11px] text-text-muted mb-1.5 block">UNDER B</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-teamTotalBUnder'] || ''} onChange={e => onChange('poi-teamTotalBUnder', e.target.value)} className="input-dark" placeholder="opt" /></div>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
-                  <div><label className="text-xs text-text-muted mb-1.5 block">σ A</label><input type="text" inputMode="text" autoComplete="off" value={values['poi-sigmaA'] || ''} onChange={e => onChange('poi-sigmaA', e.target.value)} className="input-dark" placeholder="12" /></div>
-                  <div><label className="text-xs text-text-muted mb-1.5 block">σ B</label><input type="text" inputMode="text" autoComplete="off" value={values['poi-sigmaB'] || ''} onChange={e => onChange('poi-sigmaB', e.target.value)} className="input-dark" placeholder="12" /></div>
-                  <div><label className="text-xs text-text-muted mb-1.5 block">ρ</label><input type="text" inputMode="text" autoComplete="off" value={values['poi-rhoBB'] || ''} onChange={e => onChange('poi-rhoBB', e.target.value)} className="input-dark" placeholder="0.25" /></div>
+                  <div><label className="text-[11px] text-text-muted mb-1.5 block">σ A</label><input type="text" inputMode="text" autoComplete="off" value={values['poi-sigmaA'] || ''} onChange={e => onChange('poi-sigmaA', e.target.value)} className="input-dark" placeholder="12" /></div>
+                  <div><label className="text-[11px] text-text-muted mb-1.5 block">σ B</label><input type="text" inputMode="text" autoComplete="off" value={values['poi-sigmaB'] || ''} onChange={e => onChange('poi-sigmaB', e.target.value)} className="input-dark" placeholder="12" /></div>
+                  <div><label className="text-[11px] text-text-muted mb-1.5 block">ρ</label><input type="text" inputMode="text" autoComplete="off" value={values['poi-rhoBB'] || ''} onChange={e => onChange('poi-rhoBB', e.target.value)} className="input-dark" placeholder="0.25" /></div>
                 </div>
               </div>
             )}
@@ -454,8 +454,8 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                       value={leg.side || 'home'}
                       onChange={v => updateLeg(leg.id, { side: v })}
                       options={[
-                        { value: 'home', label: 'MANDANTE' },
-                        { value: 'away', label: 'VISITANTE' },
+                        { value: 'home', label: 'Mandante' },
+                        { value: 'away', label: 'Visitante' },
                       ]}
                     />
                   )}
@@ -465,8 +465,8 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                       value={leg.side || 'A'}
                       onChange={v => updateLeg(leg.id, { side: v })}
                       options={[
-                        { value: 'A', label: 'JOGADOR A' },
-                        { value: 'B', label: 'JOGADOR B' },
+                        { value: 'A', label: 'Jogador A' },
+                        { value: 'B', label: 'Jogador B' },
                       ]}
                     />
                   )}
@@ -476,8 +476,8 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                       value={leg.side || 'A'}
                       onChange={v => updateLeg(leg.id, { side: v })}
                       options={[
-                        { value: 'A', label: 'TIME A' },
-                        { value: 'B', label: 'TIME B' },
+                        { value: 'A', label: 'Time A' },
+                        { value: 'B', label: 'Time B' },
                       ]}
                     />
                   )}
@@ -503,8 +503,8 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                       value={leg.cSide || 'over'}
                       onChange={v => updateLeg(leg.id, { cSide: v })}
                       options={[
-                        { value: 'over', label: 'OVER' },
-                        { value: 'under', label: 'UNDER' },
+                        { value: 'over', label: 'Over' },
+                        { value: 'under', label: 'Under' },
                       ]}
                     />
                   )}
@@ -514,8 +514,8 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                       value={leg.cDir || 'over'}
                       onChange={v => updateLeg(leg.id, { cDir: v })}
                       options={[
-                        { value: 'over', label: 'OVER' },
-                        { value: 'under', label: 'UNDER' },
+                        { value: 'over', label: 'Over' },
+                        { value: 'under', label: 'Under' },
                       ]}
                     />
                   )}
@@ -525,9 +525,9 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                       value={leg.c1x2 || 'home'}
                       onChange={v => updateLeg(leg.id, { c1x2: v })}
                       options={[
-                        { value: 'home', label: 'CASA' },
-                        { value: 'draw', label: 'EMPATE' },
-                        { value: 'away', label: 'VISITANTE' },
+                        { value: 'home', label: 'Casa' },
+                        { value: 'draw', label: 'Empate' },
+                        { value: 'away', label: 'Visitante' },
                       ]}
                     />
                   )}
@@ -558,8 +558,8 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                         value={leg.ppSide || 'home'}
                         onChange={v => updateLeg(leg.id, { ppSide: v })}
                         options={[
-                        { value: 'home', label: 'MANDANTE' },
-                        { value: 'away', label: 'VISITANTE' },
+                        { value: 'home', label: 'Mandante' },
+                        { value: 'away', label: 'Visitante' },
                         ]}
                       />
                       <label className="flex items-center gap-1.5 text-xs text-text-muted">
@@ -568,11 +568,11 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                           value={leg.ppLine || '0,5'}
                           onChange={v => updateLeg(leg.id, { ppLine: v })}
                           options={[
-                            { value: '0,5', label: 'OVER 0,5' },
-                            { value: '1,5', label: 'OVER 1,5' },
-                            { value: '2,5', label: 'OVER 2,5' },
-                            { value: '3,5', label: 'OVER 3,5' },
-                            { value: '4,5', label: 'OVER 4,5' },
+                            { value: '0,5', label: 'Over 0,5' },
+                            { value: '1,5', label: 'Over 1,5' },
+                            { value: '2,5', label: 'Over 2,5' },
+                            { value: '3,5', label: 'Over 3,5' },
+                            { value: '4,5', label: 'Over 4,5' },
                           ]}
                         />
                       </label>
@@ -603,7 +603,7 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs text-text-muted mb-1.5 block">Sua odd do Bet Builder</label>
+            <label className="text-[11px] text-text-muted mb-1.5 block">Sua odd do Bet Builder</label>
             <input type="text" inputMode="decimal" autoComplete="off" value={values['poi-your'] || ''} onChange={e => onChange('poi-your', e.target.value)} className="input-dark input-highlight" placeholder="3.15" />
           </div>
         </div>
