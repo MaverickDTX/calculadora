@@ -225,7 +225,7 @@ export function Select({
           'rounded-xl border',
           'bg-[#0B0F17]/60 backdrop-blur-xl',
           'text-text-primary placeholder:text-text-muted',
-          'font-mono text-sm',
+          'font-sans text-sm',
           'transition-colors',
           'focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent',
           disabled && 'opacity-50 cursor-not-allowed',

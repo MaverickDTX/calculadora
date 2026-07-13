@@ -31,7 +31,7 @@ export function Toast({ message, actionLabel, onAction, onDismiss, duration = 50
     >
       <div
         className="flex items-center gap-3 px-5 py-3 rounded-xl border border-border text-text-primary text-sm shadow-float animate-slide-up pointer-events-auto"
-        style={{ background: 'rgba(31, 41, 55, 0.96)', backdropFilter: 'blur(20px) saturate(140%)' }}
+        style={{ background: 'var(--color-surface-elevated)' }}
       >
         <span>{message}</span>
         {actionLabel && onAction && (

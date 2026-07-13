@@ -1,5 +1,5 @@
 import { useState, useRef, memo } from 'react';
-import { Plus, Trash2, ChevronDown, RotateCcw, Lightbulb, Loader2 } from 'lucide-react';
+import { Plus, Trash2, ChevronDown, Loader2 } from 'lucide-react';
 import { HelpTip } from '../HelpTip';
 import { Select } from '../Select';
 
@@ -234,16 +234,11 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
       {/* ─── Football inputs ─── */}
       {sport === 'football' && (
         <>
-          <div className="panel">
-            <div className="flex items-center gap-2 mb-3">
-              <Lightbulb size={14} className="text-warn" aria-hidden="true" />
-              <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Exemplos rápidos</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <button type="button" onClick={() => onLoadExample('poi-builder')} className="btn-ghost text-xs">Over + Casa vence</button>
-              <button type="button" onClick={() => onLoadExample('poi-playerprop')} className="btn-ghost text-xs">Prop jogador</button>
-              <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} aria-hidden="true" /> Reset</button>
-            </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">Exemplos:</span>
+            <button type="button" onClick={() => onLoadExample('poi-builder')} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">Over + Casa vence</button>
+            <button type="button" onClick={() => onLoadExample('poi-playerprop')} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">Prop jogador</button>
+            <button type="button" onClick={onReset} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors ml-auto flex items-center gap-1">Limpar</button>
           </div>
 
           <div className="panel panel-focus space-y-5">
@@ -295,16 +290,11 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
       {/* ─── Tennis inputs ─── */}
       {sport === 'tennis' && (
         <>
-          <div className="panel">
-            <div className="flex items-center gap-2 mb-3">
-              <Lightbulb size={14} className="text-warn" aria-hidden="true" />
-              <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Exemplos rápidos</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <button type="button" onClick={() => onLoadExample('poi-tennis')} className="btn-ghost text-xs">Djokovic @1.33 + Over 22.5</button>
-              <button type="button" onClick={() => onLoadExample('poi-tennis-prop')} className="btn-ghost text-xs">Vencedor + Over + 1º set</button>
-              <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} aria-hidden="true" /> Reset</button>
-            </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">Exemplos:</span>
+            <button type="button" onClick={() => onLoadExample('poi-tennis')} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">Djokovic @1.33 + Over 22.5</button>
+            <button type="button" onClick={() => onLoadExample('poi-tennis-prop')} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">Vencedor + Over + 1º set</button>
+            <button type="button" onClick={onReset} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors ml-auto flex items-center gap-1">Limpar</button>
           </div>
 
           <div className="panel panel-focus space-y-5">

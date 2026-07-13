@@ -35,16 +35,14 @@ export function ResultsDrawer({ result, config, isLoading, onClose }: Props) {
       <div {...a11yProps}
         className="fixed bottom-0 left-0 right-0 z-50 h-[60vh] flex flex-col rounded-t-2xl border border-border animate-slide-up md:relative md:inset-auto md:z-auto md:h-auto md:w-[400px] md:shrink-0 md:border-0 md:border-l md:border-border md:rounded-none"
         style={{
-          background: 'rgba(11, 15, 23, 0.75)',
-          backdropFilter: 'blur(24px) saturate(150%)',
-          WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+          background: 'var(--color-surface-elevated)',
         }}
       >
         <div aria-hidden="true" className="md:hidden pt-2 pb-1 flex justify-center">
           <div className="w-10 h-1 rounded-full bg-[#4B5563]" />
         </div>
         <div className="px-5 py-4 border-b border-border flex items-center justify-between shrink-0"
-          style={{ background: 'rgba(11, 15, 23, 0.4)' }}
+          style={{ background: 'var(--color-surface-hover)' }}
         >
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-accent animate-pulse-soft" />

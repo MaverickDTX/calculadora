@@ -100,7 +100,7 @@ export function ResultContent({ B, config }: { B: BetResult; config: Config }) {
 
       <CollapsibleSection title="Decomposição">
         <div className="font-mono text-sm text-text-secondary rounded-lg p-3 border border-border"
-          style={{ background: 'rgba(11, 15, 23, 0.5)' }}
+          style={{ background: 'var(--color-surface)' }}
         >
           {B.decomp}
           {B.boosted && <span className="text-accent ml-2">→ boost {fnum(B.yourEff, 3)}</span>}

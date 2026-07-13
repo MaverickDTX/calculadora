@@ -2,17 +2,17 @@
 
 @theme {
   --color-surface: #0b0d13;
-  --color-surface-elevated: #141821;
-  --color-surface-hover: #1c2230;
-  --color-surface-active: #2b3344;
+  --color-surface-elevated: #111318;
+  --color-surface-hover: #161b26;
+  --color-surface-active: #232a38;
 
-  --color-border: #232a38;
+  --color-border: #1e2330;
   --color-border-strong: #364052;
   --color-border-focus: #34d399;
 
   --color-text-primary: #F9FAFB;
   --color-text-secondary: #9CA3AF;
-  --color-text-muted: #8B93A1;
+  --color-text-muted: #5a6478;
 
   /* Verde Kelly: accent (roxo antigo) vira verde. Mantido o nome --color-accent
      para não quebrar o contrato de API que as Tasks 8-11 consomem. #10b981 é

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, RotateCcw, Lightbulb } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
+import { HelpTip } from '../HelpTip';
 import { MARGIN_PRESETS } from '../../lib/presets';
 import { Select } from '../Select';
 import { NumberInput } from '../NumberInput';
@@ -65,15 +66,10 @@ export function ProxyTab({ values, onChange, onLoadExample, onReset, onCalculate
 
   return (
     <div className="space-y-5 animate-fade-in">
-      <div className="panel">
-        <div className="flex items-center gap-2 mb-3">
-          <Lightbulb size={14} className="text-warn" aria-hidden="true" />
-          <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Exemplos rápidos</span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={() => onLoadExample('proxy-single')} className="btn-ghost text-xs">Referência única</button>
-          <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} aria-hidden="true" /> Reset</button>
-        </div>
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">Exemplos:</span>
+        <button type="button" onClick={() => onLoadExample('proxy-single')} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">Referência única</button>
+        <button type="button" onClick={onReset} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors ml-auto flex items-center gap-1">Limpar</button>
       </div>
 
       <div className="panel panel-focus space-y-5">
@@ -122,11 +118,11 @@ export function ProxyTab({ values, onChange, onLoadExample, onReset, onCalculate
             <div className="section-title">Referência</div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-text-muted mb-1.5 block">Odd de referência</label>
+                <label className="text-xs text-text-muted mb-1.5 block flex items-center gap-1">Odd de referência<HelpTip text="Odds de mercado eficiente usada como proxy" /></label>
                 <NumberInput value={values['proxy-ref'] || ''} onChange={v => onChange('proxy-ref', v)} placeholder="1.70" min={1.01} />
               </div>
               <div>
-                <label className="text-xs text-text-muted mb-1.5 block">Margem presumida (%)</label>
+                <label className="text-xs text-text-muted mb-1.5 block flex items-center gap-1">Margem presumida (%)<HelpTip text="Margem estimada do mercado de referência" /></label>
                 <NumberInput value={values['proxy-margin'] || ''} onChange={v => onChange('proxy-margin', v)} placeholder="5.0" min={0} max={30} />
               </div>
             </div>
@@ -154,7 +150,7 @@ export function ProxyTab({ values, onChange, onLoadExample, onReset, onCalculate
             <button type="button" onClick={addCons} className="btn-ghost text-xs flex items-center gap-1.5"><Plus size={14} aria-hidden="true" /> Casa</button>
             <div className="grid grid-cols-2 gap-3 mt-3">
               <div>
-                <label className="text-xs text-text-muted mb-1.5 block">Margem presumida (%)</label>
+                <label className="text-xs text-text-muted mb-1.5 block flex items-center gap-1">Margem presumida (%)<HelpTip text="Margem estimada do mercado de referência" /></label>
                 <NumberInput value={values['proxy-cons-margin'] || ''} onChange={v => onChange('proxy-cons-margin', v)} placeholder="5.0" min={0} max={30} />
               </div>
               <div>

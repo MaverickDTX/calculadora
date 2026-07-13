@@ -21,18 +21,16 @@ const TABS: { id: TabId; label: string; short: string; icon: React.ElementType }
   { id: 'asia', label: 'Asiáticos', short: 'Asiát.', icon: TrendingUp },
 ];
 
-const glassBg: React.CSSProperties = {
-  background: 'rgba(11, 15, 23, 0.7)',
-  backdropFilter: 'blur(24px) saturate(150%)',
-  WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+const solidBg: React.CSSProperties = {
+  background: 'var(--color-surface)',
 };
 
 export function Sidebar({ activeTab, onChange, onConfig }: Props) {
   return (
     <>
       {/* Desktop sidebar — hidden on mobile */}
-      <aside className="hidden md:flex w-60 border-r border-border flex-col shrink-0" style={glassBg}>
-        <div className="px-4 py-5 border-b border-border" style={{ background: 'rgba(11, 15, 23, 0.4)' }}>
+      <aside className="hidden md:flex w-60 border-r border-border flex-col shrink-0" style={solidBg}>
+        <div className="px-4 py-5 border-b border-border" style={{ background: 'var(--color-surface-hover)' }}>
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center shadow-glow">
               <Calculator size={18} className="text-white" aria-hidden="true" />
@@ -75,7 +73,7 @@ export function Sidebar({ activeTab, onChange, onConfig }: Props) {
         role="tablist"
         aria-label="Mercados"
         className="md:hidden fixed bottom-0 left-0 right-0 z-40 h-16 border-t border-border flex items-stretch"
-        style={{ background: 'rgba(11, 15, 23, 0.95)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
+        style={{ background: 'var(--color-surface-elevated)' }}
       >
         {TABS.map(t => (
           <button

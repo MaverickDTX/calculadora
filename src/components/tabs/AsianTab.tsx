@@ -1,4 +1,4 @@
-import { RotateCcw, Lightbulb, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { HelpTip } from '../HelpTip';
 import { Select } from '../Select';
 import { NumberInput } from '../NumberInput';
@@ -23,15 +23,10 @@ export function AsianTab({ values, onChange, onLoadExample, onReset, onCalculate
         </p>
       </div>
 
-      <div className="panel">
-        <div className="flex items-center gap-2 mb-3">
-          <Lightbulb size={14} className="text-warn" aria-hidden="true" />
-          <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Exemplos rápidos</span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={() => onLoadExample('asia-total')} className="btn-ghost text-xs">Total asiático</button>
-          <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} aria-hidden="true" /> Reset</button>
-        </div>
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">Exemplos:</span>
+        <button type="button" onClick={() => onLoadExample('asia-total')} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">Total asiático</button>
+        <button type="button" onClick={onReset} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors ml-auto flex items-center gap-1">Limpar</button>
       </div>
 
       <div className="panel panel-focus space-y-5">
@@ -81,7 +76,7 @@ export function AsianTab({ values, onChange, onLoadExample, onReset, onCalculate
                 ]} />
               </div>
               <div>
-                <label className="text-xs text-text-muted mb-1.5 block">Linha asiática alvo</label>
+                <label className="text-xs text-text-muted mb-1.5 block flex items-center gap-1">Linha asiática alvo<HelpTip text="Linha da aposta que você quer avaliar (pode ser quarter-line)" /></label>
                 <NumberInput value={values['asia-line'] || ''} onChange={v => onChange('asia-line', v)} placeholder="2.25" min={0} />
               </div>
             </div>
