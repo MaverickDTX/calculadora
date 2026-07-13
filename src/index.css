@@ -1,6 +1,75 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-surface: #0B0F17;
+  --color-surface-elevated: #111827;
+  --color-surface-hover: #1F2937;
+  --color-surface-active: #4B5563;
+
+  --color-border: #1F2937;
+  --color-border-strong: #4B5563;
+  --color-border-focus: #7777EE;
+
+  --color-text-primary: #F9FAFB;
+  --color-text-secondary: #9CA3AF;
+  --color-text-muted: #8B93A1;
+
+  --color-accent: #7777EE;
+  --color-accent-hover: #818CF8;
+  --color-accent-soft: rgba(99,102,241,0.15);
+  --color-accent-glow: rgba(99,102,241,0.4);
+
+  --color-value: #10B981;
+  --color-value-soft: rgba(16,185,129,0.12);
+  --color-value-glow: rgba(16,185,129,0.3);
+
+  --color-warn: #F59E0B;
+  --color-warn-soft: rgba(245,158,11,0.12);
+
+  --color-danger: #EF4444;
+  --color-danger-soft: rgba(239,68,68,0.12);
+
+  --color-info: #38BDF8;
+  --color-info-soft: rgba(56,189,248,0.12);
+
+  --color-kelly: #A78BFA;
+  --color-kelly-soft: rgba(139,92,246,0.12);
+
+  --font-mono: 'Chivo Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-display: Inter, system-ui, sans-serif;
+
+  --radius-2xl: 16px;
+  --radius-xl: 12px;
+  --radius-lg: 10px;
+  --radius-md: 8px;
+
+  --shadow-glow: 0 0 20px rgba(99,102,241,0.15);
+  --shadow-glow-green: 0 0 20px rgba(16,185,129,0.15);
+  --shadow-glow-warn: 0 0 20px rgba(245,158,11,0.15);
+  --shadow-glow-danger: 0 0 20px rgba(239,68,68,0.15);
+  --shadow-panel: 0 4px 24px rgba(0,0,0,0.4);
+  --shadow-float: 0 8px 32px rgba(0,0,0,0.5);
+
+  --animate-fade-in: fadeIn 0.3s ease-out;
+  --animate-slide-up: slideUp 0.4s ease-out;
+  --animate-pulse-soft: pulseSoft 2s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slideUp {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseSoft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
 
 @layer base {
   html {
