@@ -12,11 +12,11 @@ interface Props {
 
 export function NResultsTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
   const raw = values['nres-others'] || '';
-  const others = raw ? raw.split(',').map(s => s.trim()).filter(Boolean) : [''];
+  const others = raw ? raw.split(',').map(s => s.trim()) : [''];
 
   const updateOthers = (newOthers: string[]) => {
     newOthers = newOthers.map(s => s.replace(/,/g, '.'));
-    onChange('nres-others', newOthers.filter(s => s.trim()).join(','));
+    onChange('nres-others', newOthers.join(','));
   };
 
   const addOther = () => updateOthers([...others, '']);
