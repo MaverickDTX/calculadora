@@ -174,9 +174,9 @@
   }
   }
   .panel-focus {
-    border-color: rgba(16, 185, 129, 0.45);
+    border-color: rgba(255,255,255,0.14);
     background: var(--color-surface-elevated);
-    box-shadow: 0 0 0 1px rgba(16,185,129,0.15), 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
   }
   .input-dark {
     height: auto;
@@ -219,7 +219,7 @@
   }
   .input-highlight:focus {
   border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16,185,129,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.15), inset 0 1px 0 rgba(255,255,255,0.05);
   }
   .btn-primary {
     border-radius: 10px;
@@ -368,8 +368,8 @@
     border: 1px solid rgba(16,185,129,0.2);
   }
   .quality-good {
-    border-color: rgba(16,185,129,0.3);
-    background: rgba(16,185,129,0.06);
+    border-color: rgba(255,255,255,0.14);
+    background: rgba(255,255,255,0.04);
   }
   .quality-mid {
     border-color: rgba(245,158,11,0.3);
@@ -384,8 +384,8 @@
     background: #0B0F17;
   }
   .stake-display {
-    background: linear-gradient(135deg, #141821 0%, #16352a 50%, #141821 100%);
-    border: 1px solid rgba(16, 185, 129, 0.25);
+    background: linear-gradient(135deg, #141821 0%, #1a2230 50%, #141821 100%);
+    border: 1px solid rgba(255,255,255,0.14);
     border-radius: 16px;
     padding: 20px 24px;
     position: relative;
@@ -399,7 +399,7 @@
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.8), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
   }
   .divider {
     height: 1px;
