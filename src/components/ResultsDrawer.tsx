@@ -33,7 +33,7 @@ export function ResultsDrawer({ result, config, isLoading, onClose }: Props) {
         />
       )}
       <div {...a11yProps}
-        className="fixed bottom-0 left-0 right-0 z-50 h-[60vh] flex flex-col rounded-t-2xl border border-border animate-slide-up md:relative md:inset-auto md:z-auto md:h-auto md:w-[400px] md:shrink-0 md:border-0 md:border-l md:border-border md:rounded-none"
+        className="fixed bottom-0 left-0 right-0 z-50 h-[60vh] flex flex-col rounded-t-lg border border-border animate-slide-up md:relative md:inset-auto md:z-auto md:h-auto md:w-[400px] md:shrink-0 md:border-0 md:border-l md:border-border md:rounded-none"
         style={{
           background: 'var(--color-surface-elevated)',
         }}

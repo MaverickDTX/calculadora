@@ -66,7 +66,7 @@ export function ComboTab({ values, onChange, onLoadExample, onReset, onCalculate
   const hasTail = legs.some(l => { const o = numDec(l.odds[l.sideIdx]); return o > 0 && (o < 1.20 || o > 10); });
 
   return (
-    <div className="space-y-5 animate-fade-in">
+    <div className="space-y-3 animate-fade-in">
       {/* Examples row */}
       <div className="flex items-center gap-2">
         <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">Exemplos:</span>
@@ -75,7 +75,7 @@ export function ComboTab({ values, onChange, onLoadExample, onReset, onCalculate
       </div>
 
       {/* Pernas card */}
-      <div className="panel panel-focus space-y-4">
+      <div className="panel panel-focus space-y-3">
         <div className="section-title">PERNAS ({legs.length})</div>
 
         <div className="space-y-3">
@@ -128,7 +128,7 @@ export function ComboTab({ values, onChange, onLoadExample, onReset, onCalculate
       </div>
 
       {/* Aposta combinada */}
-      <div className="panel panel-focus space-y-4">
+      <div className="panel panel-focus space-y-3">
         <div className="section-title">APOSTA COMBINADA</div>
         <div className="grid grid-cols-2 gap-3">
           <div>

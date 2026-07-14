@@ -220,12 +220,12 @@ export function Select({
         aria-invalid={error}
         aria-required={!!label}
         className={[
-          'relative w-full h-11 px-4 text-left',
+          'relative w-full h-auto py-[7px] px-2.5 text-left',
           'flex items-center',
           'rounded-xl border',
           'bg-[#0B0F17]/60 backdrop-blur-xl',
           'text-text-primary placeholder:text-text-muted',
-          'font-sans text-sm',
+          'font-sans text-[13px]',
           'transition-colors',
           'focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent',
           disabled && 'opacity-50 cursor-not-allowed',

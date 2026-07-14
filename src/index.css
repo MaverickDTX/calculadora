@@ -165,13 +165,13 @@
     background: var(--color-surface-elevated);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 14px;
-    padding: 20px;
+    padding: 16px;
     transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     box-shadow: 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.04);
-  }
   .panel:hover {
-    border-color: rgba(255, 255, 255, 0.14);
-    background: var(--color-surface-hover);
+    border-color: rgba(255, 255, 255, 0.12);
+    /* removed background to avoid gray hover effect */
+  }
   }
   .panel-focus {
     border-color: rgba(16, 185, 129, 0.45);
@@ -179,13 +179,13 @@
     box-shadow: 0 0 0 1px rgba(16,185,129,0.15), 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
   }
   .input-dark {
-    height: 44px;
+    height: auto;
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     background: var(--color-surface);
     color: #F9FAFB;
-    font-size: 14px;
-    padding: 10px 14px;
+    font-size: 13px;
+    padding: 7px 10px;
     font-family: 'JetBrains Mono', monospace;
     transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
     touch-action: manipulation;
@@ -211,13 +211,15 @@
     box-shadow: 0 0 0 3px rgba(16,185,129,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
   }
   .input-highlight {
-    border-color: rgba(16, 185, 129, 0.5);
-    background: rgba(16, 185, 129, 0.08);
-    color: #F9FAFB;
-    font-weight: 600;
+  /* Borda neutra por padrão, verde apenas no foco */
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  color: #F9FAFB;
+  font-weight: 600;
   }
   .input-highlight:focus {
-    box-shadow: 0 0 0 4px rgba(16,185,129,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
   }
   .btn-primary {
     border-radius: 10px;
@@ -314,7 +316,7 @@
   }
   .metric-card:hover {
     border-color: rgba(255, 255, 255, 0.12);
-    background: var(--color-surface-hover);
+    /* removed background to avoid gray hover effect */
   }
   .metric-value {
     font-family: 'JetBrains Mono', monospace;
@@ -421,7 +423,7 @@
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: #8B93A1;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
   .tooltip {
     position: relative;

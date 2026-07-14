@@ -48,14 +48,14 @@ export function AubTab({ values, onChange, onLoadExample, onReset, onCalculate }
   };
 
   return (
-    <div className="space-y-5 animate-fade-in">
+    <div className="space-y-3 animate-fade-in">
       <div className="flex items-center gap-2">
         <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">Exemplos:</span>
         <button type="button" onClick={() => onLoadExample('aub-basic')} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">Duas seleções</button>
         <button type="button" onClick={onReset} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors ml-auto flex items-center gap-1">Limpar</button>
       </div>
 
-      <div className="panel panel-focus space-y-5">
+      <div className="panel panel-focus space-y-3">
         <div className="section-title">Mercado — A ou B</div>
         <p className="text-xs text-text-muted leading-relaxed">
           Calcula a probabilidade de pelo menos uma seleção ocorrer. Para jogadores do mesmo jogo, reduza o stake por correlação.

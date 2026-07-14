@@ -202,7 +202,7 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
   };
 
   return (
-    <div className="space-y-5 animate-fade-in">
+    <div className="space-y-3 animate-fade-in">
       {/* Examples row — above everything */}
       <div className="flex items-center gap-2">
         <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">Exemplos:</span>
@@ -240,7 +240,7 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
       {/* ─── Football inputs ─── */}
       {sport === 'football' && (
         <>
-          <div className="panel panel-focus space-y-5">
+          <div className="panel panel-focus space-y-3">
             <div className="section-title">Odds simples do jogo</div>
             <div className="grid grid-cols-3 gap-3">
               <div><label className="text-[11px] text-text-muted mb-1.5 block">CASA (1)</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-h'] || ''} onChange={e => onChange('poi-h', e.target.value)} className="input-dark" placeholder="1.80" /></div>
@@ -289,7 +289,7 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
       {/* ─── Tennis inputs ─── */}
       {sport === 'tennis' && (
         <>
-          <div className="panel panel-focus space-y-5">
+          <div className="panel panel-focus space-y-3">
             <div className="section-title">Odds simples do jogo</div>
             <div className="grid grid-cols-2 gap-3">
               <div><label className="text-[11px] text-text-muted mb-1.5 block">JOGADOR A — ML</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-mlA'] || ''} onChange={e => onChange('poi-mlA', e.target.value)} className="input-dark" placeholder="1.80" /></div>
@@ -336,7 +336,7 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
 
       {/* ─── Basketball inputs ─── */}
       {sport === 'basketball' && (
-        <div className="panel panel-focus space-y-5">
+        <div className="panel panel-focus space-y-3">
           <div className="section-title">Odds simples do jogo</div>
           <div className="grid grid-cols-3 gap-3">
             <div><label className="text-[11px] text-text-muted mb-1.5 block">LINHA TOTAL</label><input type="text" inputMode="decimal" autoComplete="off" value={values['poi-totalLine'] || ''} onChange={e => onChange('poi-totalLine', e.target.value)} className="input-dark" placeholder="224.5" /></div>
@@ -378,7 +378,7 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
       )}
 
       {/* ─── Legs (shared, but options depend on sport) ─── */}
-      <div className="panel panel-focus space-y-5">
+      <div className="panel panel-focus space-y-3">
         <div className="section-title">SELEÇÃO</div>
         <div className="space-y-3">
           {legs.map(leg => {

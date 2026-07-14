@@ -38,7 +38,7 @@ export function NResultsTab({ values, onChange, onLoadExample, onReset, onCalcul
   ];
 
   return (
-    <div className="space-y-5 animate-fade-in">
+    <div className="space-y-3 animate-fade-in">
       <div className="flex items-center gap-2">
         <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">Exemplos:</span>
         {presets.map(p => (

@@ -22,7 +22,7 @@ export function ResultsModal({ result, config, isLoading, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center md:pl-60 bg-black/50 backdrop-blur-md animate-fade-in" style={{ overscrollBehavior: 'contain' }} onClick={onClose}>
       <div {...dialogProps}
-        className="border border-border rounded-2xl shadow-float w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col animate-slide-up"
+        className="border border-border rounded-lg shadow-float w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col animate-slide-up"
         style={{ background: 'var(--color-surface-elevated)' }}
         onClick={e => e.stopPropagation()}
       >

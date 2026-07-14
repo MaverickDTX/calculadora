@@ -16,7 +16,7 @@ export function AsianTab({ values, onChange, onLoadExample, onReset, onCalculate
   const mode = values['asia-mode'] || 'total';
 
   return (
-    <div className="space-y-5 animate-fade-in">
+    <div className="space-y-3 animate-fade-in">
       <div className="panel border-warn/30">
         <p className="text-xs text-text-secondary leading-relaxed">
           Use para linhas com <b>push, meia vitória ou meia derrota</b>: Over 2.25, Under 2.75, DNB e handicaps asiáticos. O cálculo usa retornos por estado — EV e Kelly são resolvidos por crescimento logarítmico.
@@ -29,7 +29,7 @@ export function AsianTab({ values, onChange, onLoadExample, onReset, onCalculate
         <button type="button" onClick={onReset} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors ml-auto flex items-center gap-1">Limpar</button>
       </div>
 
-      <div className="panel panel-focus space-y-5">
+      <div className="panel panel-focus space-y-3">
         <div className="section-title">Modo de cálculo</div>
         <div className="grid grid-cols-2 gap-3">
           <div>

@@ -65,14 +65,14 @@ export function ProxyTab({ values, onChange, onLoadExample, onReset, onCalculate
   };
 
   return (
-    <div className="space-y-5 animate-fade-in">
+    <div className="space-y-3 animate-fade-in">
       <div className="flex items-center gap-2">
         <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">Exemplos:</span>
         <button type="button" onClick={() => onLoadExample('proxy-single')} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">Referência única</button>
         <button type="button" onClick={onReset} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors ml-auto flex items-center gap-1">Limpar</button>
       </div>
 
-      <div className="panel panel-focus space-y-5">
+      <div className="panel panel-focus space-y-3">
         <div className="section-title">Modo</div>
         <div className="grid grid-cols-2 gap-3">
           <div>
