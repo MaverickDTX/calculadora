@@ -1,21 +1,17 @@
 # Handoff — Régua de Kelly (Kelly Stake Pro)
 
-> Última atualização: 2026-07-12 (4ª sessão) · Versão em produção: **v0.7**
-> ✅ **typecheck e build limpos** — `tsc --noEmit -p tsconfig.app.json` sem erros; `vite build` gera artefatos (JS ~335 kB / 101 kB gzip). `typecheck-errors-v0.5.txt` está **obsoleto** (apagar).
+> Última atualização: 2026-07-14 · Versão em produção: **v0.13**
+> ✅ **typecheck e build limpos** — `tsc --noEmit -p tsconfig.app.json` sem erros; `vite build` gera artefatos (JS ~354 kB / 106 kB gzip). `typecheck-errors-v0.5.txt` está **obsoleto** (apagar).
 > Memória detalhada do projeto: `memory/project_kelly.md` (índice em `memory/MEMORY.md`)
 > Handoff do coletor de dados: `HANDOFF-coletor-shots-time.md` (fora do git, em `C:\Projetos\calculadora\`)
 
 ## TL;DR
-Sessão fechada com **v0.7 em produção**. Tudo commitado e pushado — `main` em
-sincronia com `origin/main`. Entregues nesta sessão: correção do parsing de pernas de tênis
-(`setScoreA`/`setScoreB` nos índices corretos), `React.memo` no `BetBuilderTab` para
-eliminar input lag na "odd final", exemplos rápidos de tênis na aba Bet Builder
-(Djokovic/Alcaraz + Over 22.5, e Vencedor + Over + 1º set).
+Sessão fechada com **v0.13 em produção** (deploy Vercel ativo). O branch `feature/ui-redesign` foi mergeado em `main` (`--no-ff`, commit `ab4744b`) e o push em `main` disparou o auto-deploy. Entregues neste ciclo (v0.8→v0.13): redesign completo de UI (design system verde Kelly), refatoração da lógica de cálculo para `src/lib/calc.ts`, e ajustes de foco/bordas de card. **O backlog de código está esgotado** para ação (ver Pendências).
 
 ## Ambiente
 - **Repo:** `MaverickDTX/calculadora`
 - **Deploy:** `calculadora-gray-one.vercel.app` (auto-deploy a cada push em `main`, ~1 min)
-- **App React:** `C:\Projetos\calculadora\project\` (raiz do repo). React 18 + TS + Vite + Tailwind + Supabase.
+- **App React:** `C:\Projetos\calculadora\project\` (raiz do repo). React 18 + TS + Vite + **Tailwind v4** (CSS-based, sem `tailwind.config.js` / `postcss.config.js`). Sem Supabase (integração removida em `f33ed72`).
 - **Scripts de análise (Python):** `C:\Projetos\calculadora\` (raiz, **fora do git** — não versionados). Ex.: `estimar_beta_xg.py`.
 - **Referência legada:** `regua-kelly-v14.html` (paridade de cálculo).
 - Identidade git: MaverickDTX / matteblz@gmail.com
@@ -23,80 +19,67 @@ eliminar input lag na "odd final", exemplos rápidos de tênis na aba Bet Builde
 ## Convenções do projeto (seguir)
 1. **Versionamento** (`memory/feedback_versionamento.md`): fonte única em
    `src/version.ts` → `APP_VERSION`, formato `0.x`. **Um bump por sessão/entrega**
-   (não por commit). Próxima entrega = **0.8**.
+   (não por commit). Próxima entrega = **0.14**.
 2. **Decimal = ponto** (formato das casas): a entrada força vírgula→ponto em todo
    campo de odd/linha (central em `handleInputChange` do `App.tsx`, exceto
    `RAW_LIST_FIELDS`). Manter esse padrão em campos novos.
 3. **Fluxo:** `npm run typecheck` + `npm run build` limpos e **verificar no preview**
    (dev server) antes de commitar.
-4. Apagar `vite.config.ts.timestamp-*.mjs` antes de commitar (já no `.gitignore`).
+4. **Cores de foco/card (decidido em v0.13):** borda e anel de foco dos inputs/Select
+   ficam **verde**; a **borda externa dos cards** (`.panel-focus`, `.stake-display`,
+   `.quality-good`) fica **cinza** (sem verde persistente fora do foco). Dropdown de
+   seleção usa **barra verde à esquerda** (não check) para não deslocar o texto.
+5. Apagar `vite.config.ts.timestamp-*.mjs` antes de commitar (já no `.gitignore`).
 
-## O que foi feito (commits desta sessão, todos pushados)
-| Hash | Entrega |
-|---|---|
-| `d301840` | **chore:** bump version to 0.6 |
-| `f0dfd8f` | **fix(tennis):** corrige parsing `setScoreA`/`setScoreB` (índices 17/18) + memo `BetBuilderTab` |
-| `56905fc` | **fix(tennis):** corrige parsing `setScoreA`/`setScoreB` + memo `BetBuilderTab` + exemplos tênis |
-| `75549de` | **fix(tennis):** adiciona botões "Exemplos rápidos" na aba Bet Builder (tênis) |
-| (implícito) | **v0.7:** version bump + typecheck/build limpos |
+## O que foi feito (v0.8 → v0.13, todos em `feature/ui-redesign`, mergeado em `main` em `ab4744b`)
 
-## Pendências (numeração de `project_kelly.md`)
+### Redesign de UI (v0.12/v0.13)
+- Design system "verde Kelly": paleta, glassmorphism residual, badges, tooltips, fonte do Select.
+- Labels uppercase em campos; layout reestruturado das abas (BetBuilder, Combo, Asian, AUB, Props, Proxy, N Results).
+- Loading states com skeleton nas abas pesadas.
+- **Foco:** borda verde no foco do input/Select (Select usa `focus:!border-accent` para vencer o `hover` de mesma especificidade); anel de foco verde.
+- **Dropdown (`Select.tsx`, compartilhado):** indicador de seleção = barra verde de 2px à esquerda (substituiu o `<Check>` verde que deslocava o texto; slot reservado em todas as linhas).
+- **Cards:** borda externa de `.panel-focus`, `.stake-display` e `.quality-good` em cinza esmaecido (sem verde persistente fora do foco).
 
-### Abertas — acionáveis
-- **#11 Novas pernas Bet Builder (resto)** — "Ambas marcam: Não" feito. **Pipeline de
-  dados construído** (script Python `coletar_shots_time_sofasport.py`, fora do git):
-  coleta shots/SOT + cartões por time via SofaScore RapidAPI (provider atual:
-  **sportapi7 / RapidSportAPI**). Cache persistido: **só** `sofasport_cache.json`
-  (376 eventos com stats) — metadados de time/evento vivem em memória e a Fase 1
-  reprocessa os 156 times a cada execução. Coleta completa **travada na quota free**
-  (500 req/mês; custo total estimado ~1.900–2.400 req → uma chave free não basta —
-  detalhes e opções em `HANDOFF-coletor-shots-time.md`, auditado 2026-07-12).
-  **Decisão de calibração ainda pendente** (escada de odds / linha O-U / base rate).
-- **#13 Mercado de cartões** (O/U partida/time + 1X2) — dados de cartão já incluídos
-  no pipeline acima (`yellowCards` confirmado, `redCards` condicional). Mesma decisão
-  de calibração pendente.
-- **#10 Colapso de linha** ao limpar campo do meio (A ou B / N Resultados) — baixa prio.
-- **#2 Resumo do ajuste λ/erro** (paridade v14) — opcional, baixo valor.
+### Refatoração de cálculo (v0.8+)
+- `src/hooks/useCalculator.ts` virou um **hook fino** (dispatch por `activeTab` + modo reactive/lazy com skeleton) que importa de `src/lib/calc.ts`.
+- `src/lib/calc.ts` contém as funções puras por aba: `calcNres`, `calcProps`, `calcProxy`, `calcAub`, `calcCombo`, `calcPoi`, `calcAsia`.
 
-### Condicionais (só com gatilho)
-- **#5 Binomial Negativa** p/ cauda SOT (se o padrão migrar p/ Over 3,5/4,5).
-- **Re-arquitetar coupling p/ xG latente** (usar β-xG≈0,85 em vez do β-gols 0,54).
+### Correções
+- Recuperação de index git corrompido (`.git/index.corrupt` → `git reset` restaurou o index a partir de `HEAD`).
 
-### Engavetadas — decisão registrada (2026-07-09)
-- **#14 Leitor de prints (bot Telegram e/ou no app)** — SEGURADO por decisão do usuário.
-  Contexto: pedido original era bot Telegram com leitor de prints à la Bankroll Pro
-  (backend Vercel no mesmo repo, escopo Proxy + N Resultados). Na análise, o risco
-  central é que aqui o print alimenta **decisão de stake** (erro de OCR = aposta mal
-  dimensionada; a própria análise de sensibilidade mostra que ±1 tick muda o EV),
-  diferente do Bankroll Pro onde o print só registra. Alternativa recomendada quando
-  reabrir: **leitor de prints dentro do app** (extração Gemini preenche o formulário,
-  usuário revisa antes de calcular) — 80% do valor, sem infra nova; bot depois,
-  herdando o módulo de extração já validado. Ordens de execução completas do bot já
-  redigidas em `C:\Projetos\calculadora\ORDENS-bot-telegram-kelly.md` (inclui a
-  refatoração `useCalculator.ts` → `src/lib/calc.ts`, que tem valor por si só e pode
-  ser antecipada em qualquer sessão).
+## Pendências (numeradas de `project_kelly.md`)
 
-### Feitas
-#1, #3, #4 (Supabase confirmado), #6, #7, #8 (já estava OK),
-#9, #11 (bttsNo), #12 (ponto decimal global).
-**#11/#13 — pipeline de dados construído** (coletor SofaScore Python):
-  `coletar_shots_time_sofasport.py` com extração de shots/SOT/cartões,
-  resolução automática de ligas, cache incremental. Falta só rodar a
-  coleta completa (quota API) e a decisão de calibração.
+### Abertas — BLOQUEADAS
+- **#11 / #13 Pipeline de dados SOT/cartões** — coletor Python construído
+  (`coletar_shots_time_sofasport.py`, fora do git): coleta shots/SOT + cartões via
+  APIs de eventos. **Estagnado: cota de TODAS as APIs de odds/eventos estourou**
+  (sem chave paga disponível). Falta: resolver quota (provider pago ou cache local
+  estendido) **e** a decisão de calibração (base rate por liga/time, escada de odds).
+  Sem previsão — não iniciar trabalho de código enquanto a quota não voltar.
 
-## Próximo passo recomendado (v0.7+ — tênis / basquete)
+### Fechadas / descartadas
+- **Refatoração `useCalculator.ts` → `src/lib/calc.ts`** — ✅ **FEITO** no redesign
+  (v0.8+). A entrada "antecipável" do HANDOFF v0.7 estava desatualizada.
+- **#2 Resumo do ajuste λ/erro (paridade v14)** — ✅ **FEITO**: seção
+  "Fluxo do ajuste" em `ResultView.tsx` resume fração/confiança/sensibilidade/
+  divergência/pré-travas/piso/teto/edge mínimo. (O cálculo em si já tinha paridade
+  com `regua-kelly-v14.html`; o resumo visual é o entregue.)
+- **#10 Colapso de linha ao limpar campo do meio (A ou B / N Resultados)** — ⛔
+  **decisão de NÃO implementar** (2026-07-14). Diagnosticado: AubTab separa A/B num
+  `grid-cols-2` e seleções 3ª+ num bloco empilhado; NResultsTab usa `key={i}` em
+  linhas de campo vírgula-join. Sem valor suficiente para justificar a refatoração.
+- **#5 Binomial Negativa (cauda SOT)** — 🗑️ **descartado** (2026-07-14).
+- **#14 Leitor de prints (bot Telegram / no app)** — 🗑️ **engavetado** por decisão
+  do usuário. Reabrir só com gatilho; a refatoração `useCalculator.ts → calc.ts`
+  (já feita) era o ganho reutilizável antecipável.
 
-1. **Validar tênis em produção**: testar exemplos rápidos no app
-   (`https://calculadora-gray-one.vercel.app` → aba **Bet Builder** → Esporte: **Tênis** →
-   "Djokovic @1.33 / Alcaraz @3.50 + Over 22.5") para confirmar que o cálculo
-   funciona end-to-end.
-
-2. **Basquete (Fase 2)**: modelo Normal Bivariada + Monte Carlo em
-   `src/lib/sgp/basketball.ts` — usar `SGP_REGISTRY` pattern igual a futebol/tênis.
-
-3. Se houver demanda: **pipeline de dados cartões/SOT** — resolver quota API
-   (provider pago ou cache local estendido) + decisão de calibração (base rate por
-   liga/time, escada de odds).
+## Próximo passo recomendado
+1. **Nenhum item de código acionável restante.** Backlog esgotado: tudo ou foi feito
+   no redesign, ou está travado (API) ou descartado/engavetado.
+2. Se a cota de API voltar no futuro, retomar **#11/#13** (coleta completa + calibração).
+3. (Opcional / limpeza) Resolver o arquivo não rastreado `scripts/test-manual-task2.mjs`
+   — versionar ou remover (está fora do último commit de redesign).
 
 ## Diagnóstico: jointProb=0 no tênis (reanálise 3ª sessão — a causa-raiz anterior estava errada)
 
@@ -136,54 +119,17 @@ número sem valor decisório, a custo de 5× simulações por recálculo no brow
    comunica ao usuário que a combinação é improvável demais para o modelo medir,
    em vez de fingir precisão que não existe.
 
-## Correções desta sessão (4ª)
-
-### 1. Parsing de pernas de tênis (`src/hooks/useCalculator.ts:470-471`)
-O `setScoreA`/`setScoreB` estavam sendo lidos dos índices 3 e 4 do split `|`, mas a
-serialização no `BetBuilderTab` coloca esses campos nos índices 17 e 18. Corrigido
-para ler dos índices corretos.
-
-### 2. Input lag na "Sua odd final" (`src/components/tabs/BetBuilderTab.tsx`)
-O componente era grande e re-renderizava a cada keystroke via `handleInputChange` do
-`App.tsx`. Envolvido em `React.memo` — agora o input responde instantaneamente.
-
-### 3. Exemplos rápidos de tênis (`src/App.tsx`)
-Adicionados ao `EXAMPLE_MAP` e `EXAMPLE_TAB`:
-- `poi-tennis`: Djokovic @1.33 / Alcaraz @3.50, O/U 22.5 jogos @1.85/1.95, pernas
-  `matchWinner` (A) + `totalGamesOver` 22.5
-- `poi-tennis-prop`: mesmo jogo + `firstSetWinner` (A) — 3 pernas
-
-### 4. Botões "Exemplos rápidos" para tênis (`src/components/tabs/BetBuilderTab.tsx`)
-Bloco condicional `sport === 'tennis'` com os dois botões acima, espelhando o
-padrão do futebol.
-
-## Handoff v0.7 — SGP multi-esporte (arquivos novos/modificados desta sessão)
-**Modificados:**
-- `src/hooks/useCalculator.ts` — correção índices `setScoreA`/`setScoreB` (linhas 470-471)
-- `src/components/tabs/BetBuilderTab.tsx` — `React.memo` + botões exemplos tênis
-- `src/App.tsx` — `EXAMPLE_MAP` + `EXAMPLE_TAB` com `poi-tennis` e `poi-tennis-prop`
-- `src/version.ts` — `0.6` → `0.7`
-
-**Novos (v0.5, já commitados):**
-- `src/lib/sgp/types.ts` — interfaces `SportModel`, `Outcome`, `Leg`, `SportInputs`, `ModelParams`
-- `src/lib/sgp/football.ts` — modelo futebol extraído de `calcPoi` (interface `SportModel`)
-- `src/lib/sgp/tennis.ts` — modelo tênis: Markov ponto→game→set→partida + MC + calibração
-- `src/lib/sgp/monte-carlo.ts` — utilidades: `makeRng`, `gauss`, `jointProbMC`, `naiveProbMC`
-- `src/lib/sgp/index.ts` — registry `SGP_REGISTRY`
-
 ## Arquivos-chave (atualizado)
-- `src/lib/sgp/types.ts` — interfaces do sistema SGP multi-esporte
-- `src/lib/sgp/tennis.ts` — modelo Markov tênis (pernas: matchWinner, totalGamesOver/Under, totalSetsOver/Under, setScore, firstSetWinner, tiebreakInMatch)
-- `src/lib/sgp/football.ts` — modelo futebol (Poisson/Dixon-Coles, 20 pernas)
-- `src/hooks/useCalculator.ts` — `calcPoi` (dispatcher) + `calcTennis` + `calcCombo` + etc
-- `src/components/tabs/BetBuilderTab.tsx` — UI seletor esporte + pernas dinâmicas + `React.memo`
-- `src/App.tsx` — `handleInputChange` (força ponto), `loadExample`, `resetTab`,
-  `EXAMPLE_MAP`, `RAW_LIST_FIELDS`. `DEFAULT_INPUTS` contém só selects/flags (sem odds).
-- `src/version.ts` — `APP_VERSION` (**0.7**).
-- `src/hooks/useConfig.ts` — `DEFAULTS` (cap=0.05, floor=0.0025, edgemin=0.005);
-  `migratePercent` converte localStorage legado (valores >1 → ÷100).
-- `src/components/ConfigModal.tsx` — `fmtPct`/`parsePct` convertem cap/floor/edgemin
-  entre decimal (armazenado) e pontos percentuais (exibido).
+- `src/version.ts` — `APP_VERSION` (**0.13**).
+- `src/lib/calc.ts` — funções puras de cálculo por aba (`calcNres`/`calcProps`/`calcProxy`/`calcAub`/`calcCombo`/`calcPoi`/`calcAsia`); o dispatcher vive em `useCalculator.ts`.
+- `src/hooks/useCalculator.ts` — hook fino: dispatch por `activeTab` (reactive para abas leves, lazy+setTimeout(0) para abas pesadas com skeleton) + loading state.
+- `src/components/Select.tsx` — combobox custom (Floating UI); foco `focus:!border-accent`; dropdown com barra verde à esquerda na seleção.
+- `src/index.css` — `@import "tailwindcss"` + `@theme` (Tailwind v4); `.panel-focus`/`.stake-display`/`.quality-good` com borda cinza; `.input-dark` foco verde.
+- `src/components/tabs/BetBuilderTab.tsx` — seletor esporte + pernas dinâmicas + `React.memo`.
+- `src/App.tsx` — `handleInputChange` (força ponto), `loadExample`, `resetTab`, `EXAMPLE_MAP`, `RAW_LIST_FIELDS`. `DEFAULT_INPUTS` contém só selects/flags (sem odds).
+- `src/hooks/useConfig.ts` — `DEFAULTS` (cap=0.05, floor=0.0025, edgemin=0.005); `migratePercent` converte localStorage legado (valores >1 → ÷100).
+- `src/components/ConfigModal.tsx` — `fmtPct`/`parsePct` convertem cap/floor/edgemin entre decimal (armazenado) e pontos percentuais (exibido).
 - `src/components/Sidebar.tsx` — desktop: `hidden md:flex` aside; mobile: bottom nav `md:hidden`.
 - `src/components/ResultsDrawer.tsx` — mobile: `fixed inset-0 z-50`; desktop: `md:relative md:w-[400px]`.
 - `src/components/VizSection.tsx` — só Monte Carlo em texto (gráficos removidos).
+- `src/components/ResultView.tsx` — resultado; seção "Fluxo do ajuste" (resumo λ/erro, #2).
