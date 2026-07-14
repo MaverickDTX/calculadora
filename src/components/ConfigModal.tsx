@@ -38,8 +38,8 @@ export function ConfigModal({ config, onChange, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center md:pl-60 bg-black/50 backdrop-blur-md animate-fade-in" style={{ overscrollBehavior: 'contain' }} onClick={onClose}>
       <div {...dialogProps}
-        className="border border-border rounded-2xl shadow-float w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col animate-slide-up"
-        style={{ background: 'rgba(17, 24, 39, 0.85)', backdropFilter: 'blur(32px) saturate(150%)', WebkitBackdropFilter: 'blur(32px) saturate(150%)' }}
+        className="border border-border rounded-lg shadow-float w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col animate-slide-up"
+        style={{ background: 'var(--color-surface-elevated)' }}
         onClick={e => e.stopPropagation()}
       >
         <div className="px-6 py-4 border-b border-border flex items-center justify-between">
@@ -61,32 +61,35 @@ export function ConfigModal({ config, onChange, onClose }: Props) {
           {/* Bankroll */}
           <Section icon={Wallet} title="Banca e unidade">
             <div className="grid grid-cols-2 gap-3">
-              <Field label="Banca total (R$)" value={String(local.bank).replace('.', ',')} onChange={v => update({ bank: parseFloat(v.replace(',', '.')) || 0 })} />
-              <Field label="Unidade (R$)" value={String(local.unit).replace('.', ',')} onChange={v => update({ unit: parseFloat(v.replace(',', '.')) || 0 })} />
+              <Field label="BANCA TOTAL (R$)" value={String(local.bank).replace('.', ',')} onChange={v => update({ bank: parseFloat(v.replace(',', '.')) || 0 })} />
+              <Field label="UNIDADE (R$)" value={String(local.unit).replace('.', ',')} onChange={v => update({ unit: parseFloat(v.replace(',', '.')) || 0 })} />
             </div>
           </Section>
 
           {/* Kelly */}
           <Section icon={TrendingUp} title="Critério de Kelly">
             <div className="grid grid-cols-3 gap-3">
-              <Field label="Fração Kelly" value={String(local.frac).replace('.', ',')} onChange={v => update({ frac: parseFloat(v.replace(',', '.')) || 0.20 })} />
-              <Field label="Teto (% banca)" value={fmtPct(local.cap)} onChange={v => update({ cap: parsePct(v) })} suffix="%" />
-              <Field label="Piso (% banca)" value={fmtPct(local.floor)} onChange={v => update({ floor: parsePct(v) })} suffix="%" />
+              <Field label="FRAÇÃO KELLY" value={String(local.frac).replace('.', ',')} onChange={v => update({ frac: parseFloat(v.replace(',', '.')) || 0.20 })} />
+              <Field label="TETO (% BANCA)" value={fmtPct(local.cap)} onChange={v => update({ cap: parsePct(v) })} suffix="%" />
+              <Field label="PISO (% BANCA)" value={fmtPct(local.floor)} onChange={v => update({ floor: parsePct(v) })} suffix="%" />
             </div>
           </Section>
 
           {/* Edge */}
           <Section icon={Shield} title="Filtros de valor">
             <div className="grid grid-cols-2 gap-3">
-              <Field label="Edge mínimo" value={fmtPct(local.edgemin)} onChange={v => update({ edgemin: parsePct(v) })} suffix="%" />
+              <Field label="EDGE MÍNIMO" value={fmtPct(local.edgemin)} onChange={v => update({ edgemin: parsePct(v) })} suffix="%" />
               <div className="flex items-end">
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className="relative inline-flex items-center gap-3 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={local.confAdj === 'on'}
                     onChange={e => update({ confAdj: e.target.checked ? 'on' : 'off' })}
-                    className="w-4 h-4 rounded border-border bg-surface text-accent focus:ring-accent/30"
+                    className="sr-only peer"
                   />
+                  <div className={`relative w-10 h-6 rounded-full transition-colors duration-200 peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-accent/40 ${local.confAdj === 'on' ? 'bg-accent' : 'bg-[#4B5563]'}`}>
+                    <div className={`absolute top-[3px] left-[3px] w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${local.confAdj === 'on' ? 'translate-x-[16px]' : 'translate-x-0'}`} />
+                  </div>
                   <span className="text-sm text-text-secondary">Ajustar por confiança</span>
                 </label>
               </div>
@@ -126,7 +129,7 @@ export function ConfigModal({ config, onChange, onClose }: Props) {
           <Section icon={TrendingUp} title="Boost de odd">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-text-muted mb-1.5 block">Tipo</label>
+                <label className="text-xs text-text-muted mb-1.5 block">TIPO</label>
                 <Select
                   value={local.boostType}
                   onChange={v => update({ boostType: v as BoostType })}
@@ -139,7 +142,7 @@ export function ConfigModal({ config, onChange, onClose }: Props) {
               </div>
               {local.boostType !== 'none' && (
                 <Field
-                  label={local.boostType === 'profit' ? 'Profit %' : 'Multiplicador'}
+                  label={local.boostType === 'profit' ? 'PROFIT %' : 'MULTIPLICADOR'}
                   value={String(local.boostVal).replace('.', ',')}
                   onChange={v => update({ boostVal: parseFloat(v.replace(',', '.')) || 0 })}
                 />

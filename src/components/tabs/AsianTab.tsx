@@ -1,4 +1,4 @@
-import { RotateCcw, Lightbulb } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { HelpTip } from '../HelpTip';
 import { Select } from '../Select';
 import { NumberInput } from '../NumberInput';
@@ -9,31 +9,27 @@ interface Props {
   onLoadExample: (key: string) => void;
   onReset: () => void;
   onCalculate: () => void;
+  isLoading?: boolean;
 }
 
-export function AsianTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
+export function AsianTab({ values, onChange, onLoadExample, onReset, onCalculate, isLoading }: Props) {
   const mode = values['asia-mode'] || 'total';
 
   return (
-    <div className="space-y-5 animate-fade-in">
+    <div className="space-y-3 animate-fade-in">
       <div className="panel border-warn/30">
         <p className="text-xs text-text-secondary leading-relaxed">
           Use para linhas com <b>push, meia vitória ou meia derrota</b>: Over 2.25, Under 2.75, DNB e handicaps asiáticos. O cálculo usa retornos por estado — EV e Kelly são resolvidos por crescimento logarítmico.
         </p>
       </div>
 
-      <div className="panel">
-        <div className="flex items-center gap-2 mb-3">
-          <Lightbulb size={14} className="text-warn" aria-hidden="true" />
-          <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Exemplos rápidos</span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={() => onLoadExample('asia-total')} className="btn-ghost text-xs">Total asiático</button>
-          <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} aria-hidden="true" /> Reset</button>
-        </div>
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">Exemplos:</span>
+        <button type="button" onClick={() => onLoadExample('asia-total')} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">Total asiático</button>
+        <button type="button" onClick={onReset} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors ml-auto flex items-center gap-1">Limpar</button>
       </div>
 
-      <div className="panel panel-focus space-y-5">
+      <div className="panel panel-focus space-y-3">
         <div className="section-title">Modo de cálculo</div>
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -80,7 +76,7 @@ export function AsianTab({ values, onChange, onLoadExample, onReset, onCalculate
                 ]} />
               </div>
               <div>
-                <label className="text-xs text-text-muted mb-1.5 block">Linha asiática alvo</label>
+                <label className="text-xs text-text-muted mb-1.5 block flex items-center gap-1">Linha asiática alvo<HelpTip text="Linha da aposta que você quer avaliar (pode ser quarter-line)" /></label>
                 <NumberInput value={values['asia-line'] || ''} onChange={v => onChange('asia-line', v)} placeholder="2.25" min={0} />
               </div>
             </div>
@@ -134,8 +130,8 @@ export function AsianTab({ values, onChange, onLoadExample, onReset, onCalculate
           </div>
         )}
 
-        <button type="button" onClick={onCalculate} className="btn-primary w-full mt-4 py-3 text-base">
-          Calcular
+        <button type="button" onClick={onCalculate} disabled={isLoading} className="btn-primary w-full mt-4 py-3 text-base">
+          {isLoading ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Calculando...</> : 'Calcular'}
         </button>
       </div>
     </div>

@@ -7,7 +7,7 @@ import {
   type KeyboardEvent,
 } from 'react';
 import * as FloatingUI from '@floating-ui/react';
-import { ChevronDown, Check } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 interface Option {
   value: string;
@@ -220,14 +220,14 @@ export function Select({
         aria-invalid={error}
         aria-required={!!label}
         className={[
-          'relative w-full h-11 px-4 text-left',
+          'relative w-full h-auto py-[7px] px-2.5 text-left',
           'flex items-center',
           'rounded-xl border',
           'bg-[#0B0F17]/60 backdrop-blur-xl',
           'text-text-primary placeholder:text-text-muted',
-          'font-mono text-sm',
+          'font-sans text-[13px]',
           'transition-colors',
-          'focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent',
+          'focus:outline-none focus:ring-2 focus:ring-accent/40 focus:!border-accent',
           disabled && 'opacity-50 cursor-not-allowed',
           error && 'border-danger',
           !error && !disabled && 'border-border hover:border-border-strong',
@@ -292,18 +292,16 @@ export function Select({
                   onClick={() => !opt.disabled && handleOptionClick(opt.value)}
                   onKeyDown={(e) => handleOptionKeyDown(e, index)}
                   className={[
-                    'w-full px-4 py-2.5 text-left text-sm',
+                    'w-full px-4 py-2.5 text-left text-sm border-l-2',
                     'transition-colors',
-                    opt.disabled ? 'opacity-40 cursor-not-allowed' : '',
+                    opt.disabled ? 'opacity-40 cursor-not-allowed border-transparent' : '',
+                    opt.value === value ? 'border-accent' : 'border-transparent',
                     index === highlightedIndex
                       ? 'bg-accent/15 text-accent outline-none'
                       : 'hover:bg-accent/10 text-text-primary',
                   ].filter(Boolean).join(' ')}
                 >
-                  <span className="flex items-center gap-2">
-                    {opt.value === value && <Check size={14} className="text-accent flex-shrink-0" aria-hidden="true" />}
-                    <span className="truncate">{opt.label}</span>
-                  </span>
+                  <span className="truncate">{opt.label}</span>
                 </button>
               ))}
             </div>

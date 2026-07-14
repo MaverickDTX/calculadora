@@ -84,14 +84,14 @@ const EXAMPLE_MAP: Record<string, Partial<Record<string, string>>> = {
   },
 };
 
-const TAB_LABELS: Record<TabId, string> = {
-  nres: 'N Resultados',
-  props: 'Props',
-  proxy: 'Proxy',
-  aub: 'A ou B',
-  combo: 'Combinada',
-  poi: 'Bet Builder',
-  asia: 'Asiáticos',
+const TAB_LABELS: Record<TabId, { title: string; sub: string }> = {
+  nres:  { title: 'N Resultados', sub: 'Mercados de 2+ resultados (1X2, Over/Under, etc.)' },
+  props: { title: 'Props', sub: 'Mercados Sim/Não e props de jogadores' },
+  proxy: { title: 'Proxy', sub: 'Estimativa via mercado proxy eficiente' },
+  aub:   { title: 'A ou B', sub: 'Qual dos dois lados tem valor?' },
+  combo: { title: 'Combinada', sub: 'Avalie apostas combinadas (parlays)' },
+  poi:   { title: 'Bet Builder', sub: 'Combine seleções com correlação implícita' },
+  asia:  { title: 'Asiáticos', sub: 'Handicap asiático e quarter-lines' },
 };
 
 // Campos serializados (listas com ',' como delimitador estrutural) — NÃO forçar ponto neles;
@@ -117,7 +117,7 @@ function App() {
   }, []);
 
   const isLazyTab = LAZY_TABS.has(activeTab);
-  const { result } = useCalculator(inputs, config, activeTab, isLazyTab ? calcTrigger : undefined);
+  const { result, isLoading } = useCalculator(inputs, config, activeTab, isLazyTab ? calcTrigger : undefined);
 
   const loadExample = useCallback((key: string) => {
     const example = EXAMPLE_MAP[key];
@@ -158,7 +158,7 @@ function App() {
   }, []);
 
   const tabContent = useMemo(() => {
-    const common = { values: inputs, onChange: handleInputChange, onLoadExample: loadExample, onReset: resetTab, onCalculate: handleCalculate };
+    const common = { values: inputs, onChange: handleInputChange, onLoadExample: loadExample, onReset: resetTab, onCalculate: handleCalculate, isLoading };
     switch (activeTab) {
       case 'nres': return <NResultsTab {...common} />;
       case 'props': return <PropsTab {...common} />;
@@ -168,18 +168,29 @@ function App() {
       case 'poi': return <BetBuilderTab {...common} />;
       case 'asia': return <AsianTab {...common} />;
     }
-  }, [activeTab, inputs, handleInputChange, loadExample, resetTab, handleCalculate]);
+  }, [activeTab, inputs, handleInputChange, loadExample, resetTab, handleCalculate, isLoading]);
 
   return (
     <div className="min-h-screen flex">
       <Sidebar activeTab={activeTab} onChange={setActiveTab} onConfig={() => setShowConfig(true)} />
 
       <main id="main" className="flex-1 min-w-0 flex flex-col">
-        <header className="border-b border-border px-6 py-4 flex items-center justify-between">
+        <header className="border-b border-border px-6 py-4 flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-lg font-semibold text-text-primary">{TAB_LABELS[activeTab]}</h1>
-            <p className="hidden sm:block text-xs text-text-muted mt-0.5">Kelly Stake Pro — quanto apostar, não em que apostar</p>
+            <h1 className="text-lg font-semibold text-text-primary">{TAB_LABELS[activeTab].title}</h1>
+            <p className="hidden sm:block text-xs text-text-muted mt-0.5">{TAB_LABELS[activeTab].sub}</p>
           </div>
+
+          <button
+            type="button"
+            onClick={() => setShowConfig(true)}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-border bg-surface text-[11px] font-mono font-semibold text-text-muted hover:border-border-strong transition-colors shrink-0"
+          >
+            <span className="text-accent">Kelly</span>
+            <span>{config.frac}×</span>
+            <span className="text-text-muted">·</span>
+            <span>R${config.bank.toLocaleString('pt-BR')}</span>
+          </button>
         </header>
 
         <div className="flex-1 flex overflow-hidden">
@@ -201,6 +212,7 @@ function App() {
         <ResultsModal
           result={result}
           config={config}
+          isLoading={isLoading}
           onClose={() => setShowResultsModal(false)}
         />
       )}

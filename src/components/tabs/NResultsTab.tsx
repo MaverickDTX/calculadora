@@ -1,4 +1,5 @@
-import { Plus, Minus, RotateCcw, Lightbulb } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
+import { HelpTip } from '../HelpTip';
 import { Select } from '../Select';
 import { NumberInput } from '../NumberInput';
 
@@ -8,6 +9,7 @@ interface Props {
   onLoadExample: (key: string) => void;
   onReset: () => void;
   onCalculate: () => void;
+  isLoading?: boolean;
 }
 
 export function NResultsTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
@@ -36,18 +38,13 @@ export function NResultsTab({ values, onChange, onLoadExample, onReset, onCalcul
   ];
 
   return (
-    <div className="space-y-5 animate-fade-in">
-      <div className="panel">
-        <div className="flex items-center gap-2 mb-3">
-          <Lightbulb size={14} className="text-warn" aria-hidden="true" />
-          <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Exemplos rápidos</span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {presets.map(p => (
-            <button key={p.key} type="button" onClick={() => onLoadExample(p.key)} className="btn-ghost text-xs">{p.label}</button>
-          ))}
-          <button type="button" onClick={onReset} className="btn-ghost text-xs flex items-center gap-1"><RotateCcw size={12} aria-hidden="true" /> Reset</button>
-        </div>
+    <div className="space-y-3 animate-fade-in">
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">Exemplos:</span>
+        {presets.map(p => (
+          <button key={p.key} type="button" onClick={() => onLoadExample(p.key)} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">{p.label}</button>
+        ))}
+        <button type="button" onClick={onReset} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors ml-auto flex items-center gap-1">Limpar</button>
       </div>
 
       <div className="panel panel-focus">
@@ -71,7 +68,7 @@ export function NResultsTab({ values, onChange, onLoadExample, onReset, onCalcul
         <div className="section-title">Odds de referência</div>
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div>
-            <label className="text-xs text-text-muted mb-1.5 block">Resultado avaliado</label>
+            <label className="text-xs text-text-muted mb-1.5 block flex items-center gap-1">Resultado avaliado<HelpTip text="Odds de referência para a seleção que você quer apostar" /></label>
             <NumberInput value={values['nres-eval'] || ''} onChange={v => onChange('nres-eval', v)} placeholder="2.50" min={1.01} />
           </div>
           <div>
@@ -80,7 +77,7 @@ export function NResultsTab({ values, onChange, onLoadExample, onReset, onCalcul
           </div>
         </div>
 
-        <div className="section-title">Demais resultados</div>
+        <div className="section-title flex items-center gap-1">Demais resultados<HelpTip text="Odds dos outros resultados, separados por vírgula (usadas para de-vig)" /></div>
         <div className="space-y-2">
           {others.map((v, i) => (
             <div key={i} className="flex items-center gap-2">
