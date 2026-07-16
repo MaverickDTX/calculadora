@@ -20,6 +20,8 @@ export const TENNIS_LEGS: LegKindDef[] = [
   { kind: 'totalSetsUnder', label: 'Under sets totais', needsLine: true, sport: 'tennis' },
   { kind: 'setScore', label: 'Placar de sets exato', sport: 'tennis' },
   { kind: 'firstSetWinner', label: 'Vencedor do 1º set', needsSide: true, sport: 'tennis' },
+  { kind: 'firstSetGamesOver', label: 'Over games 1º set', needsLine: true, sport: 'tennis' },
+  { kind: 'firstSetGamesUnder', label: 'Under games 1º set', needsLine: true, sport: 'tennis' },
   { kind: 'tiebreakInMatch', label: 'Tiebreak na partida', sport: 'tennis' },
 ];
 
@@ -510,6 +512,10 @@ export function legAtTennis(outcome: Outcome, leg: Leg): number {
       return (outcome.setScoreA === leg.setScoreA && outcome.setScoreB === leg.setScoreB) ? 1 : 0;
     case 'firstSetWinner':
       return (outcome.firstSetWinner === leg.side) ? 1 : 0;
+    case 'firstSetGamesOver':
+      return (outcome.setScores?.[0] ?? 0) > (leg.line ?? 0) ? 1 : 0;
+    case 'firstSetGamesUnder':
+      return (outcome.setScores?.[0] ?? 0) < (leg.line ?? 0) ? 1 : 0;
     case 'tiebreakInMatch':
       return outcome.hadTiebreak ? 1 : 0;
     default:

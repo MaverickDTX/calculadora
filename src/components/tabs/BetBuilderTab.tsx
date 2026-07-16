@@ -12,7 +12,7 @@ type LegKind =
   | 'player' | 'playerprop' | 'cornerTotal' | 'cornerTeam' | 'cornerSide'
   // Tennis
   | 'matchWinner' | 'totalGamesOver' | 'totalGamesUnder' | 'totalSetsOver' | 'totalSetsUnder'
-  | 'setScore' | 'firstSetWinner' | 'tiebreakInMatch'
+  | 'setScore' | 'firstSetWinner' | 'firstSetGamesOver' | 'firstSetGamesUnder' | 'tiebreakInMatch'
   // Basketball
   | 'moneyline' | 'spreadCover' | 'totalOver' | 'totalUnder' | 'teamTotalOver' | 'teamTotalUnder' | 'marginRange';
 
@@ -85,6 +85,8 @@ const TENNIS_LEG_OPTIONS: { value: LegKind; label: string }[] = [
   { value: 'totalSetsUnder', label: 'Under sets totais' },
   { value: 'setScore', label: 'Placar de sets exato' },
   { value: 'firstSetWinner', label: 'Vencedor do 1º set' },
+  { value: 'firstSetGamesOver', label: 'Over games 1º set' },
+  { value: 'firstSetGamesUnder', label: 'Under games 1º set' },
   { value: 'tiebreakInMatch', label: 'Tiebreak na partida' },
 ];
 
@@ -162,6 +164,7 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
       if (sport === 'tennis') {
         if (kind === 'totalGamesOver' || kind === 'totalGamesUnder') defaults.line = '22.5';
         if (kind === 'totalSetsOver' || kind === 'totalSetsUnder') defaults.line = '2.5';
+        if (kind === 'firstSetGamesOver' || kind === 'firstSetGamesUnder') defaults.line = '8.5';
         // Gravar o default que o select exibe — sem isso o estado fica com
         // side=undefined enquanto a UI mostra "Jogador A" selecionado.
         if (kind === 'matchWinner' || kind === 'firstSetWinner') defaults.side = 'A';
@@ -391,7 +394,7 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
             const isCorner = isCT || isCTeam || isCSide;
 
             // Tennis leg flags
-            const isTennisOU = ['totalGamesOver', 'totalGamesUnder', 'totalSetsOver', 'totalSetsUnder'].includes(leg.kind);
+            const isTennisOU = ['totalGamesOver', 'totalGamesUnder', 'totalSetsOver', 'totalSetsUnder', 'firstSetGamesOver', 'firstSetGamesUnder'].includes(leg.kind);
             const isTennisSide = ['matchWinner', 'firstSetWinner'].includes(leg.kind);
             const isTennisSetScore = leg.kind === 'setScore';
             const isBasketballLine = ['spreadCover', 'totalOver', 'totalUnder', 'teamTotalOver', 'teamTotalUnder'].includes(leg.kind);
@@ -415,6 +418,7 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
                       if (sport === 'tennis') {
                         if (k === 'totalGamesOver' || k === 'totalGamesUnder') defaults.line = '22.5';
                         if (k === 'totalSetsOver' || k === 'totalSetsUnder') defaults.line = '2.5';
+                        if (k === 'firstSetGamesOver' || k === 'firstSetGamesUnder') defaults.line = '8.5';
                         // Gravar o default exibido pelo select (ver addLeg).
                         if (k === 'matchWinner' || k === 'firstSetWinner') defaults.side = 'A';
                         if (k === 'setScore') {
