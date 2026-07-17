@@ -1,12 +1,12 @@
 # Handoff — Régua de Kelly (Kelly Stake Pro)
 
-> Última atualização: 2026-07-14 · Versão em produção: **v0.13**
-> ✅ **typecheck e build limpos** — `tsc --noEmit -p tsconfig.app.json` sem erros; `vite build` gera artefatos (JS ~354 kB / 106 kB gzip). `typecheck-errors-v0.5.txt` está **obsoleto** (apagar).
+> Última atualização: 2026-07-17 · Versão em produção: **v0.14**
+> ✅ **typecheck e build limpos** — `tsc --noEmit -p tsconfig.app.json` sem erros; `vite build` gera artefatos (JS ~359 kB / 107 kB gzip). `typecheck-errors-v0.5.txt` está **obsoleto** (apagar).
 > Memória detalhada do projeto: `memory/project_kelly.md` (índice em `memory/MEMORY.md`)
 > Handoff do coletor de dados: `HANDOFF-coletor-shots-time.md` (fora do git, em `C:\Projetos\calculadora\`)
 
 ## TL;DR
-Sessão fechada com **v0.13 em produção** (deploy Vercel ativo). O branch `feature/ui-redesign` foi mergeado em `main` (`--no-ff`, commit `ab4744b`) e o push em `main` disparou o auto-deploy. Entregues neste ciclo (v0.8→v0.13): redesign completo de UI (design system verde Kelly), refatoração da lógica de cálculo para `src/lib/calc.ts`, e ajustes de foco/bordas de card. **O backlog de código está esgotado** para ação (ver Pendências).
+Sessão fechada com **v0.14 em produção** (deploy Vercel ativo). O commit `967fe8f` empacotou o redesign de design system (Seção C + Geist Mono) **junto** com refatorações de UI/Viz e extensão do modelo de cálculo que já estavam no working tree. O commit `APP_VERSION` foi bumpado para `0.14` em follow-up (`docs(handoff)`). Entregues neste ciclo: design system híbrido, VizSection rewrite (UncertaintyBand + FairProbabilities), ResultView stake grid, NResultsTab labels contextuais, e `BetResult` ganha `referenceOdds`/`fairProbabilities`/`selectedOutcomeIndex`.
 
 ## Ambiente
 - **Repo:** `MaverickDTX/calculadora`
@@ -47,6 +47,47 @@ Sessão fechada com **v0.13 em produção** (deploy Vercel ativo). O branch `fea
 
 ### Correções
 - Recuperação de index git corrompido (`.git/index.corrupt` → `git reset` restaurou o index a partir de `HEAD`).
+
+### Mudanças empacotadas no commit 967fe8f (v0.13 → v0.14)
+
+> O commit `967fe8f` ("feat(ui): aplica design system hibrido (Secao C + Geist Mono)") juntou
+> **duas frentes**: o redesign de design system (esta sessão) e refatorações de UI/Viz/cálculo
+> que já estavam no working tree sem commit. Documentadas abaixo com detalhe.
+
+#### 1. Design system híbrido (Linear/Notion/Coinbase + Geist Mono)
+- `src/index.css`: `@theme` reescrito — surface ladder Linear de 4 passos (`#010102`→`#222225`), hairlines, accent único Verde-Kelly `#10b981`, text scale Linear, semantic text-only (Coinbase: `#05b169`/`#cf202f`), badges Notion (cores de produto), radius/spacing Linear, `shadow: none` (zero glows).
+- Tipografia: Inter (sans) + **Geist Mono** (mono em todos os números) via Google Fonts; Lyon Text serif para quotes (fallback Georgia).
+- Componentes: `.panel`, `.input-dark`, `.btn-primary/ghost`, `.nav-item`, `.metric-card`, `.stake-display`, `.panel-collapsible`, `.tag`, `.tooltip`.
+- `index.html`: fonte `JetBrains Mono` → `Geist Mono`; `theme-color` `#0b0d13` → `#010102`.
+- Aliases preservados (`bg-surface`, `text-text-primary`, `border-border`, `bg-accent`, `shadow-float/glow`, `text-warn/bg-warn`, `text-kelly`) para não quebrar o código existente.
+
+#### 2. VizSection rewrite (`src/components/VizSection.tsx`)
+- `UncertaintyBand`: barra de consenso entre métodos (alto/médio/baixo) com `result.divInfo.cls`, `result.evBand`, `result.confClass`. Posição 17/50/83%.
+- `FairProbabilities`: barras de probabilidade justa por resultado (`result.fairProbabilities` × `result.referenceOdds`), com destaque no `selectedOutcomeIndex` e label contextual (`Lado apostado`/`Lado contrário` para Props, `Casa`/`Empate`/`Fora` para 1X2).
+- `MonteCarlo`: simplificado — removeu prop `config`, dependência `useMemo` só de `result`. Só renderiza quando `ev > 0 && kadj > 0`.
+- `App.tsx`: `<VizSection result={result} config={config} />` → `<VizSection result={result} />`.
+
+#### 3. ResultView (`src/components/ResultView.tsx`)
+- Stake display em grid 2-col: `.stake-display` (stake recomendado) + `.panel` (Kelly cheio · ajustado + odd efetiva + método).
+- Metric cards reorganizados: grid-3 (Prob. justa · **Margem removida** · EV) + grid-2 (Odd justa · Odd efetiva). Substituiu "Kelly cheio/ajustado" por "Margem removida" no primeiro grid.
+- `methodLabel()`: mapa de `Config['method']` → label PT-BR (Equitativo/Proporcional/Probit/Log/Shin/Automático).
+- Classe `.stake-value` substitui `text-[clamp(32px,4vw,48px)]` inline.
+
+#### 4. NResultsTab (`src/components/tabs/NResultsTab.tsx`)
+- `outcomeLabels` por tipo de mercado: `1X2/Moneyline` → [Casa, Empate, Fora]; `Over/Under` → [Over, Under]; `Dupla chance` → [Casa/Empate, Casa/Fora, Empate/Fora]; `Ambas marcam` → [Sim, Não]; `Handicap asiático (3 vias)` → [Casa, Empate, Fora].
+- Layout em cards: "Odds da casa (mercado completo)" agrupa avaliado + demais num container com borda; cada linha em card próprio.
+- "Odd da sua aposta" separada abaixo, com label verde e help text.
+
+#### 5. Modelo de cálculo (`src/lib/calc.ts` + `src/types.ts`)
+- `BetResult` ganha 3 campos opcionais: `referenceOdds?: number[] | null`, `fairProbabilities?: number[] | null`, `selectedOutcomeIndex?: number | null`.
+- `makeBetBase`: propaga os 3 campos no objeto retornado.
+- `calcNres`: passa `referenceOdds: refs`, `fairProbabilities: dv.probs`, `selectedOutcomeIndex: 0`.
+- `calcProps`: `referenceOdds`/`fairProbabilities` setados no branch `otherOdd > 1` (de-vig real); `selectedOutcomeIndex: 0` em ambos os branches.
+
+#### 6. NumberInput (`src/components/NumberInput.tsx`)
+- Placeholder sem elipsis: `placeholder={placeholder ? \`${placeholder}…\` : undefined}` → `placeholder={placeholder}`.
+
+---
 
 ## Pendências (numeradas de `project_kelly.md`)
 
@@ -120,7 +161,7 @@ número sem valor decisório, a custo de 5× simulações por recálculo no brow
    em vez de fingir precisão que não existe.
 
 ## Arquivos-chave (atualizado)
-- `src/version.ts` — `APP_VERSION` (**0.13**).
+- `src/version.ts` — `APP_VERSION` (**0.14**).
 - `src/lib/calc.ts` — funções puras de cálculo por aba (`calcNres`/`calcProps`/`calcProxy`/`calcAub`/`calcCombo`/`calcPoi`/`calcAsia`); o dispatcher vive em `useCalculator.ts`.
 - `src/hooks/useCalculator.ts` — hook fino: dispatch por `activeTab` (reactive para abas leves, lazy+setTimeout(0) para abas pesadas com skeleton) + loading state.
 - `src/components/Select.tsx` — combobox custom (Floating UI); foco `focus:!border-accent`; dropdown com barra verde à esquerda na seleção.
@@ -131,5 +172,5 @@ número sem valor decisório, a custo de 5× simulações por recálculo no brow
 - `src/components/ConfigModal.tsx` — `fmtPct`/`parsePct` convertem cap/floor/edgemin entre decimal (armazenado) e pontos percentuais (exibido).
 - `src/components/Sidebar.tsx` — desktop: `hidden md:flex` aside; mobile: bottom nav `md:hidden`.
 - `src/components/ResultsDrawer.tsx` — mobile: `fixed inset-0 z-50`; desktop: `md:relative md:w-[400px]`.
-- `src/components/VizSection.tsx` — só Monte Carlo em texto (gráficos removidos).
-- `src/components/ResultView.tsx` — resultado; seção "Fluxo do ajuste" (resumo λ/erro, #2).
+- `src/components/VizSection.tsx` — `UncertaintyBand` (consenso métodos) + `FairProbabilities` (barras prob. justa) + `MonteCarlo` (só quando `ev>0 && kadj>0`); sem prop `config`.
+- `src/components/ResultView.tsx` — resultado; stake grid 2-col (stake + Kelly/margem), metric cards reorganizados, `methodLabel()`; seção "Fluxo do ajuste" (resumo λ/erro, #2).
