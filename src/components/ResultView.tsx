@@ -76,15 +76,22 @@ export function ResultContent({ B, config }: { B: BetResult; config: Config }) {
       </div>
 
       {B.ev > 0 && B.kadj > 0 && gs.units > 0 ? (
-        <div className="stake-display">
-          <div className="flex items-center justify-between">
+        <div className="grid gap-2.5 sm:grid-cols-2">
+          <div className="stake-display">
+            <div className="flex items-center justify-between">
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-wider text-indigo-200/70">Stake recomendado</div>
-              <div className="font-mono text-[clamp(32px,4vw,48px)] font-bold text-white mt-1">{fbrl(gs.reais)}</div>
+              <div className="stake-value font-mono font-bold text-white mt-1">{fbrl(gs.reais)}</div>
               <div className="font-mono text-sm text-indigo-200/60 mt-1">
                 {fnum(gs.units, 2)}u · {fpct(gs.pct)} · ideal {fnum(gs.rawUnits, 2)}u
               </div>
             </div>
+            </div>
+          </div>
+          <div className="panel flex flex-col justify-center">
+            <div className="metric-label">Kelly cheio · ajustado</div>
+            <div className="mt-1 font-mono text-xl font-semibold text-kelly">{fpct(B.kfull)} <span className="text-text-muted">·</span> {fpct(B.kadj)}</div>
+            <div className="mt-2 text-[11px] text-text-muted">Odds {fnum(B.yourEff, 3)} · {methodLabel(B.cfg.method)}</div>
           </div>
         </div>
       ) : (
@@ -107,12 +114,14 @@ export function ResultContent({ B, config }: { B: BetResult; config: Config }) {
         </div>
       </CollapsibleSection>
 
-      <div className="grid grid-cols-2 gap-2.5">
+      <div className="grid grid-cols-3 gap-2.5">
         <MetricCard label="Prob. justa" value={B.p ? fpct(B.p) : 'multi'} />
-        <MetricCard label="Odd justa" value={B.fair ? fnum(B.fair, 3) : 'multi'} />
+        <MetricCard label="Margem removida" value={B.M !== null ? fpct(B.M) : '—'} />
         <MetricCard label="EV" value={`${B.ev >= 0 ? '+' : ''}${fpct(B.ev)}`} highlight={B.ev >= 0 ? 'good' : 'bad'} />
-        <MetricCard label="Kelly cheio" value={B.kfull > 0 ? fpct(B.kfull) : '—'} />
-        <MetricCard label="Kelly ajustado" value={B.kadj > 0 ? fpct(B.kadj) : '—'} highlight={B.kadj > 0 ? 'kelly' : undefined} />
+      </div>
+
+      <div className="grid grid-cols-2 gap-2.5">
+        <MetricCard label="Odd justa" value={B.fair ? fnum(B.fair, 3) : 'multi'} />
         <MetricCard label="Odd efetiva" value={fnum(B.yourEff, 3)} />
       </div>
 
@@ -172,6 +181,11 @@ export function ResultContent({ B, config }: { B: BetResult; config: Config }) {
       )}
     </div>
   );
+}
+
+function methodLabel(method: Config['method']): string {
+  const labels: Record<Config['method'], string> = { equal: 'Equitativo', prop: 'Proporcional', probit: 'Probit', log: 'Log', shin: 'Shin', auto: 'Automático' };
+  return labels[method];
 }
 
 export function MetricCard({ label, value, highlight }: { label: string; value: string; highlight?: 'good' | 'bad' | 'kelly' }) {

@@ -84,6 +84,9 @@ function makeBetBase(args: {
   warnings?: string[];
   evBand?: [number, number] | null;
   evPoints?: EvPoint[] | null;
+  referenceOdds?: number[] | null;
+  fairProbabilities?: number[] | null;
+  selectedOutcomeIndex?: number | null;
   cfg: Config;
 }): BetResult {
   const cfg = args.cfg;
@@ -154,6 +157,9 @@ function makeBetBase(args: {
     warnings: args.warnings || [],
     evBand: args.evBand || null,
     evPoints: args.evPoints || null,
+    referenceOdds: args.referenceOdds || null,
+    fairProbabilities: args.fairProbabilities || null,
+    selectedOutcomeIndex: args.selectedOutcomeIndex ?? null,
   };
 }
 
@@ -180,6 +186,9 @@ export function calcNres(get: (id: string) => string, cfg: Config): BetResult | 
     confClass: 'high',
     confTxt: `Alta confiança — de-vig real de mercado completo com ${refs.length} vias.`,
     sens: { type: 'nres', refEval: ev, refs, method: cfg.method },
+    referenceOdds: refs,
+    fairProbabilities: dv.probs,
+    selectedOutcomeIndex: 0,
     saveable: true,
     cfg,
   });
@@ -198,6 +207,7 @@ export function calcProps(get: (id: string) => string, cfg: Config): BetResult |
   if (!(otherOdd > 1) && !marginOn) return { err: 'Preencha a referência do lado contrário ou marque "Usar margem presumida".' };
 
   let p: number, confClass: 'high' | 'mid' | 'low', txt: string, sens: Sensitivity | undefined;
+  let referenceOdds: number[] | undefined, fairProbabilities: number[] | undefined;
   let dec: string;
 
   if (otherOdd > 1) {
@@ -207,6 +217,8 @@ export function calcProps(get: (id: string) => string, cfg: Config): BetResult |
     confClass = 'high';
     txt = 'Alta confiança — Sim/Não ou Over/Under com de-vig real.';
     sens = { type: 'propPair', refEval: evalOdd, no: otherOdd, method: cfg.method };
+    referenceOdds = pair;
+    fairProbabilities = dv.probs;
     dec = `par sharp ${evalOdd.toFixed(3).replace('.', ',')} / ${otherOdd.toFixed(3).replace('.', ',')}`;
   } else {
     const mg = readPctInput(get('prop-margin') || '5,0');
@@ -229,6 +241,9 @@ export function calcProps(get: (id: string) => string, cfg: Config): BetResult |
     confClass,
     confTxt: txt,
     sens,
+    referenceOdds,
+    fairProbabilities,
+    selectedOutcomeIndex: 0,
     saveable: true,
     cfg,
   });

@@ -199,7 +199,7 @@ function App() {
               {tabContent}
             </div>
             <div className="max-w-2xl mx-auto mt-6">
-              <VizSection result={result} config={config} />
+              <VizSection result={result} />
             </div>
             <div className="h-8" />
           </div>

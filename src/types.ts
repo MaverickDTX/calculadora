@@ -59,6 +59,9 @@ export interface BetResult {
   warnings: string[];
   evBand: [number, number] | null;
   evPoints: EvPoint[] | null;
+  referenceOdds?: number[] | null;
+  fairProbabilities?: number[] | null;
+  selectedOutcomeIndex?: number | null;
 }
 
 export interface ReturnState {

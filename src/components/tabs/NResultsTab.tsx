@@ -15,6 +15,14 @@ interface Props {
 export function NResultsTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
   const raw = values['nres-others'] || '';
   const others = raw ? raw.split(',').map(s => s.trim()) : [''];
+  const outcomeLabels = {
+    '1X2 / Moneyline': ['Casa', 'Empate', 'Fora'],
+    'Over/Under': ['Over', 'Under'],
+    'Dupla chance': ['Casa/Empate', 'Casa/Fora', 'Empate/Fora'],
+    'Ambas marcam': ['Sim', 'Não'],
+    'Handicap asiático (3 vias)': ['Casa', 'Empate', 'Fora'],
+  }[values['nres-type'] || '1X2 / Moneyline'];
+  const outcomeLabel = (index: number) => outcomeLabels?.[index] || `Resultado ${index + 1}`;
 
   const updateOthers = (newOthers: string[]) => {
     newOthers = newOthers.map(s => s.replace(/,/g, '.'));
@@ -65,29 +73,28 @@ export function NResultsTab({ values, onChange, onLoadExample, onReset, onCalcul
           />
         </div>
 
-        <div className="section-title">Odds de referência</div>
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div>
-            <label className="text-xs text-text-muted mb-1.5 block flex items-center gap-1">Resultado avaliado<HelpTip text="Odds de referência para a seleção que você quer apostar" /></label>
+        <div className="section-title flex items-center gap-1">Odds da casa (mercado completo)<HelpTip text="Todas as vias são usadas juntas para remover a margem do mercado." /></div>
+        <div className="space-y-2 rounded-xl border border-border bg-surface/40 p-2.5">
+          <div className="grid grid-cols-[minmax(0,1fr)_10rem] items-center gap-3 rounded-lg border border-border p-2.5">
+            <label className="text-xs text-text-muted flex items-center gap-1">{outcomeLabel(0)}<HelpTip text="Odd de referência para a seleção que você quer apostar" /></label>
             <NumberInput value={values['nres-eval'] || ''} onChange={v => onChange('nres-eval', v)} placeholder="2.50" min={1.01} />
           </div>
-          <div>
-            <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
-            <NumberInput value={values['nres-your'] || ''} onChange={v => onChange('nres-your', v)} className="input-highlight" placeholder="2.65" min={1.01} />
-          </div>
-        </div>
-
-        <div className="section-title flex items-center gap-1">Demais resultados<HelpTip text="Odds dos outros resultados, separados por vírgula (usadas para de-vig)" /></div>
-        <div className="space-y-2">
           {others.map((v, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <NumberInput value={v} onChange={v => changeOther(i, v)} placeholder={`Odd do resultado ${i + 2}`} min={1.01} />
+            <div key={i} className="grid grid-cols-[minmax(0,1fr)_10rem_auto] items-center gap-3 rounded-lg border border-border p-2.5">
+              <span className="text-xs text-text-muted">{outcomeLabel(i + 1)}</span>
+              <NumberInput value={v} onChange={v => changeOther(i, v)} placeholder="Odd" min={1.01} />
               {others.length > 1 && (
                 <button type="button" aria-label="Remover resultado" onClick={() => removeOther(i)} className="icon-btn text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors"><Minus size={16} aria-hidden="true" /></button>
               )}
             </div>
           ))}
-          <button type="button" onClick={addOther} className="btn-ghost text-xs flex items-center gap-1.5 mt-1"><Plus size={14} aria-hidden="true" /> Adicionar resultado</button>
+          <button type="button" onClick={addOther} className="btn-ghost text-xs flex items-center gap-1.5"><Plus size={14} aria-hidden="true" /> Adicionar resultado</button>
+        </div>
+
+        <div className="mt-4">
+          <label className="text-xs text-accent mb-1.5 block">Odd da sua aposta</label>
+          <NumberInput value={values['nres-your'] || ''} onChange={v => onChange('nres-your', v)} className="input-highlight" placeholder="2.65" min={1.01} />
+          <p className="mt-1.5 text-[11px] text-text-muted">Casa onde você vai apostar</p>
         </div>
       </div>
 
