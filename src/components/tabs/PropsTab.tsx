@@ -9,9 +9,10 @@ interface Props {
   onReset: () => void;
   onCalculate: () => void;
   isLoading?: boolean;
+  hideCalcButton?: boolean;
 }
 
-export function PropsTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
+export function PropsTab({ values, onChange, onLoadExample, onReset, onCalculate, hideCalcButton = false }: Props) {
   const propFamily = values['prop-family'] || 'prop_gols';
   const marginOn = values['prop-margin-on'] !== 'false';
   const evalNo = values['prop-side-no'] === 'true';
@@ -86,9 +87,9 @@ export function PropsTab({ values, onChange, onLoadExample, onReset, onCalculate
           <button
             type="button"
             onClick={() => onChange('prop-margin-on', String(!marginOn))}
-            className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${marginOn ? 'bg-accent/15 text-accent border border-accent/40' : 'bg-surface-hover text-text-muted border border-border'}`}
+            className={`inline-flex items-center gap-2 rounded px-3 py-1.5 text-xs font-semibold transition-colors ${marginOn ? 'bg-accent/15 text-accent border border-accent/40' : 'bg-surface-hover text-text-muted border border-border'}`}
           >
-            <span className={`w-2 h-2 rounded-full ${marginOn ? 'bg-accent' : 'bg-[#4B5563]'}`} />
+            <span className={`w-2 h-2 rounded ${marginOn ? 'bg-accent' : 'bg-[#4B5563]'}`} />
             Margem: {marginOn ? 'Ativada' : 'Desativada'}
           </button>
 
@@ -101,9 +102,11 @@ export function PropsTab({ values, onChange, onLoadExample, onReset, onCalculate
         </div>
       </div>
 
-      <button type="button" onClick={onCalculate} className="btn-primary w-full mt-4 py-3 text-base">
-        Calcular
-      </button>
+      {!hideCalcButton && (
+        <button type="button" onClick={onCalculate} className="btn-calc w-full mt-4">
+          Calcular
+        </button>
+      )}
     </div>
   );
 }

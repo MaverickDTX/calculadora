@@ -10,9 +10,10 @@ interface Props {
   onReset: () => void;
   onCalculate: () => void;
   isLoading?: boolean;
+  hideCalcButton?: boolean;
 }
 
-export function NResultsTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
+export function NResultsTab({ values, onChange, onLoadExample, onReset, onCalculate, hideCalcButton = false }: Props) {
   const raw = values['nres-others'] || '';
   const others = raw ? raw.split(',').map(s => s.trim()) : [''];
   const outcomeLabels = {
@@ -47,15 +48,15 @@ export function NResultsTab({ values, onChange, onLoadExample, onReset, onCalcul
 
   return (
     <div className="space-y-3 animate-fade-in">
-      <div className="flex items-center gap-2">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">Exemplos:</span>
-        {presets.map(p => (
-          <button key={p.key} type="button" onClick={() => onLoadExample(p.key)} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">{p.label}</button>
-        ))}
-        <button type="button" onClick={onReset} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors ml-auto flex items-center gap-1">Limpar</button>
-      </div>
-
       <div className="panel panel-focus">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="t-caption text-text-muted">Exemplos:</span>
+          {presets.map(p => (
+            <button key={p.key} type="button" onClick={() => onLoadExample(p.key)} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors">{p.label}</button>
+          ))}
+          <button type="button" onClick={onReset} className="border border-border rounded px-2 py-0.5 text-[11px] font-semibold text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors ml-auto flex items-center gap-1">Limpar</button>
+        </div>
+
         <div className="section-title">Mercado</div>
         <div className="mb-4">
           <label className="text-xs text-text-muted mb-1.5 block">Tipo do mercado</label>
@@ -74,17 +75,17 @@ export function NResultsTab({ values, onChange, onLoadExample, onReset, onCalcul
         </div>
 
         <div className="section-title flex items-center gap-1">Odds da casa (mercado completo)<HelpTip text="Todas as vias são usadas juntas para remover a margem do mercado." /></div>
-        <div className="space-y-2 rounded-xl border border-border bg-surface/40 p-2.5">
-          <div className="grid grid-cols-[minmax(0,1fr)_10rem] items-center gap-3 rounded-lg border border-border p-2.5">
+        <div className="space-y-2 rounded-lg border border-border bg-surface/40 p-2.5">
+          <div className="grid grid-cols-[minmax(0,1fr)_10rem_32px] items-center gap-3 rounded-lg border border-border p-2.5">
             <label className="text-xs text-text-muted flex items-center gap-1">{outcomeLabel(0)}<HelpTip text="Odd de referência para a seleção que você quer apostar" /></label>
             <NumberInput value={values['nres-eval'] || ''} onChange={v => onChange('nres-eval', v)} placeholder="2.50" min={1.01} />
           </div>
           {others.map((v, i) => (
-            <div key={i} className="grid grid-cols-[minmax(0,1fr)_10rem_auto] items-center gap-3 rounded-lg border border-border p-2.5">
+          <div key={i} className="grid grid-cols-[minmax(0,1fr)_10rem_32px] items-center gap-3 rounded-lg border border-border p-2.5">
               <span className="text-xs text-text-muted">{outcomeLabel(i + 1)}</span>
               <NumberInput value={v} onChange={v => changeOther(i, v)} placeholder="Odd" min={1.01} />
               {others.length > 1 && (
-                <button type="button" aria-label="Remover resultado" onClick={() => removeOther(i)} className="icon-btn text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors"><Minus size={16} aria-hidden="true" /></button>
+                <button type="button" aria-label="Remover resultado" onClick={() => removeOther(i)} className="text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors flex items-center justify-center"><Minus size={16} aria-hidden="true" /></button>
               )}
             </div>
           ))}
@@ -98,9 +99,11 @@ export function NResultsTab({ values, onChange, onLoadExample, onReset, onCalcul
         </div>
       </div>
 
-      <button type="button" onClick={onCalculate} className="btn-primary w-full mt-4 py-3 text-base">
-        Calcular
-      </button>
+      {!hideCalcButton && (
+        <button type="button" onClick={onCalculate} className="btn-calc w-full mt-4">
+          Calcular
+        </button>
+      )}
     </div>
   );
 }

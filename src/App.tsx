@@ -1,12 +1,15 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import type { TabId } from './types';
 import { useConfig } from './hooks/useConfig';
 import { useCalculator } from './hooks/useCalculator';
-import { Sidebar } from './components/Sidebar';
-import { ResultsModal } from './components/ResultsModal';
+import { useMediaQuery } from './hooks/useDialog';
+import { Topbar } from './components/Topbar';
+import { CommandPalette } from './components/CommandPalette';
 import { ConfigModal } from './components/ConfigModal';
 import { VizSection } from './components/VizSection';
 import { Toast } from './components/Toast';
+import { ResultView } from './components/ResultView';
+import { ResultsDrawer } from './components/ResultsDrawer';
 import { NResultsTab } from './components/tabs/NResultsTab';
 import { PropsTab } from './components/tabs/PropsTab';
 import { ProxyTab } from './components/tabs/ProxyTab';
@@ -101,15 +104,68 @@ const RAW_LIST_FIELDS = new Set(['poi-legs', 'combo-legs', 'aub-odds', 'nres-oth
 // Abas que usam cálculo lazy (sob demanda via botão "Calcular") — abas pesadas.
 const LAZY_TABS: Set<TabId> = new Set(['combo', 'poi', 'asia']);
 
+const TAB_PREFIXES: Record<TabId, string[]> = {
+  nres: ['nres-'], props: ['prop-'], proxy: ['proxy-'], aub: ['aub-'],
+  combo: ['combo-'], poi: ['poi-'], asia: ['asia-', 'asiah-'],
+};
+
+// Verdadeiro quando a aba ativa tem algum campo preenchido pelo usuário.
+// Exclui chaves de DEFAULT_INPUTS (selects/flags de roteamento, nunca conteúdo numérico) para evitar erro falso no load.
+function tabHasContent(inputs: Record<string, string>, tab: TabId): boolean {
+  const pfx = TAB_PREFIXES[tab];
+  return Object.keys(inputs).some(k => pfx.some(p => k.startsWith(p)) && !(k in DEFAULT_INPUTS) && inputs[k] !== '');
+}
+
+type Theme = 'ink' | 'ivory';
+
+function useTheme(): [Theme, () => void] {
+  const [theme, setTheme] = useState<Theme>(() => {
+    try {
+      const saved = localStorage.getItem('ks-theme');
+      return saved === 'ivory' ? 'ivory' : 'ink';
+    } catch {
+      return 'ink';
+    }
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'ivory') root.setAttribute('data-theme', 'ivory');
+    else root.removeAttribute('data-theme');
+    try {
+      localStorage.setItem('ks-theme', theme);
+    } catch { /* ignore */ }
+  }, [theme]);
+
+  const toggle = useCallback(() => setTheme(t => (t === 'ink' ? 'ivory' : 'ink')), []);
+  return [theme, toggle];
+}
+
 function App() {
   const { config, setConfig } = useConfig();
+  const [theme, toggleTheme] = useTheme();
   const [activeTab, setActiveTab] = useState<TabId>('nres');
   const [inputs, setInputs] = useState<Record<string, string>>(DEFAULT_INPUTS);
   const [showConfig, setShowConfig] = useState(false);
-  const [showResultsModal, setShowResultsModal] = useState(false);
+  const [showPalette, setShowPalette] = useState(false);
   const [calcTrigger, setCalcTrigger] = useState(0);
+  const [mobileResultOpen, setMobileResultOpen] = useState(false);
   // Snapshot dos inputs anterior ao último Reset, para o "Desfazer" do toast.
   const [undoSnapshot, setUndoSnapshot] = useState<Record<string, string> | null>(null);
+
+  const isMobile = useMediaQuery('(max-width: 1023px)');
+
+  // Atalho global ⌘K / Ctrl+K abre e fecha a paleta de comandos.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setShowPalette(p => !p);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   const handleInputChange = useCallback((id: string, value: string) => {
     const v = RAW_LIST_FIELDS.has(id) ? value : value.replace(/,/g, '.');
@@ -139,7 +195,7 @@ function App() {
     };
     const pfx = prefixes[activeTab];
     setInputs(prev => {
-      const hadContent = Object.keys(prev).some(k => pfx.some(p => k.startsWith(p)) && prev[k] !== '');
+      const hadContent = Object.keys(prev).some(k => pfx.some(p => k.startsWith(p)) && !(k in DEFAULT_INPUTS) && prev[k] !== '');
       if (hadContent) setUndoSnapshot(prev);
       const next = { ...prev };
       for (const k of Object.keys(next)) if (pfx.some(p => k.startsWith(p))) next[k] = '';
@@ -154,11 +210,12 @@ function App() {
 
   const handleCalculate = useCallback(() => {
     setCalcTrigger(t => t + 1);
-    setShowResultsModal(true);
-  }, []);
+    if (isMobile) setMobileResultOpen(true);
+  }, [isMobile]);
 
   const tabContent = useMemo(() => {
-    const common = { values: inputs, onChange: handleInputChange, onLoadExample: loadExample, onReset: resetTab, onCalculate: handleCalculate, isLoading };
+    const hideCalc = !isMobile && !isLazyTab;
+    const common = { values: inputs, onChange: handleInputChange, onLoadExample: loadExample, onReset: resetTab, onCalculate: handleCalculate, isLoading, hideCalcButton: hideCalc };
     switch (activeTab) {
       case 'nres': return <NResultsTab {...common} />;
       case 'props': return <PropsTab {...common} />;
@@ -168,54 +225,96 @@ function App() {
       case 'poi': return <BetBuilderTab {...common} />;
       case 'asia': return <AsianTab {...common} />;
     }
-  }, [activeTab, inputs, handleInputChange, loadExample, resetTab, handleCalculate, isLoading]);
+  }, [activeTab, inputs, handleInputChange, loadExample, resetTab, handleCalculate, isLoading, isMobile, isLazyTab]);
 
   return (
-    <div className="min-h-screen flex">
-      <Sidebar activeTab={activeTab} onChange={setActiveTab} onConfig={() => setShowConfig(true)} />
+    <div className="min-h-screen flex flex-col">
+      <Topbar
+        activeTab={activeTab}
+        onChange={setActiveTab}
+        onConfig={() => setShowConfig(true)}
+        onOpenPalette={() => setShowPalette(true)}
+        config={config}
+      />
 
-      <main id="main" className="flex-1 min-w-0 flex flex-col">
-        <header className="border-b border-border px-6 py-4 flex items-center justify-between gap-4">
-          <div>
-            <h1 className="text-lg font-semibold text-text-primary">{TAB_LABELS[activeTab].title}</h1>
-            <p className="hidden sm:block text-xs text-text-muted mt-0.5">{TAB_LABELS[activeTab].sub}</p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setShowConfig(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-border bg-surface text-[11px] font-mono font-semibold text-text-muted hover:border-border-strong transition-colors shrink-0"
-          >
-            <span className="text-accent">Kelly</span>
-            <span>{config.frac}×</span>
-            <span className="text-text-muted">·</span>
-            <span>R${config.bank.toLocaleString('pt-BR')}</span>
-          </button>
-        </header>
-
-        <div className="flex-1 flex overflow-hidden">
-          <div className="flex-1 overflow-y-auto scrollbar-thin p-6 pb-20 md:pb-6">
-            <div className="max-w-2xl mx-auto animate-fade-in">
-              {tabContent}
-            </div>
-            <div className="max-w-2xl mx-auto mt-6">
-              <VizSection result={result} />
-            </div>
-            <div className="h-8" />
-          </div>
+      <div className="flex-1 w-full max-w-screen-xl mx-auto px-4 sm:px-6 py-6">
+        {/* Sub-header contextual */}
+        <div className="mb-5">
+          <h1 className="t-headline text-text-primary">{TAB_LABELS[activeTab].title}</h1>
+          <p className="t-body-sm text-text-muted mt-1">{TAB_LABELS[activeTab].sub}</p>
         </div>
-      </main>
 
-      {showConfig && <ConfigModal config={config} onChange={setConfig} onClose={() => setShowConfig(false)} />}
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(340px,1fr)]">
+          {/* Coluna esquerda: formulário da aba + viz abaixo (§13.9) */}
+          <div className="min-w-0 animate-fade-in space-y-4">
+            {tabContent}
+            {result && !('err' in result) && <VizSection result={result} />}
+          </div>
 
-      {showResultsModal && (
-        <ResultsModal
+          {/* Coluna direita (desktop): resultado inline + viz, sticky */}
+          <aside className="hidden lg:block">
+            <div className="sticky top-[calc(3.5rem+24px)] pr-1 space-y-4">
+              {(() => {
+                const showEmpty = !result || ('err' in result && !tabHasContent(inputs, activeTab));
+                if (showEmpty && !isLoading) {
+                  return (
+                    <>
+                      <div className="panel">
+                        <div className="t-title mb-3">Resumo da banca</div>
+                        <dl className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+                          <BankRow label="Banca" value={`R$ ${config.bank.toLocaleString('pt-BR')}`} />
+                          <BankRow label="Unidade" value={`R$ ${config.unit.toLocaleString('pt-BR')}`} />
+                          <BankRow label="Fração Kelly" value={`${config.frac}×`} />
+                          <BankRow label="Teto" value={`${(config.cap * 100).toFixed(1)}%`} />
+                          <BankRow label="Piso" value={`${(config.floor * 100).toFixed(2)}%`} />
+                          <BankRow label="Edge mín." value={`${(config.edgemin * 100).toFixed(1)}%`} />
+                        </dl>
+                      </div>
+                      <div className="rounded-lg border border-dashed border-hairline-strong p-8 text-center">
+                        <p className="t-body-sm text-text-muted">Preencha e calcule</p>
+                        <p className="text-xs text-text-tertiary mt-1">O resultado aparece aqui</p>
+                      </div>
+                    </>
+                  );
+                }
+                return (
+                  <>
+                    <ResultView result={result} config={config} isLoading={isLoading} />
+                  </>
+                );
+              })()}
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      {/* Mobile: resultado em bottom-sheet */}
+      {isMobile && mobileResultOpen && (
+        <ResultsDrawer
           result={result}
           config={config}
           isLoading={isLoading}
-          onClose={() => setShowResultsModal(false)}
+          onClose={() => setMobileResultOpen(false)}
         />
       )}
+
+      {showConfig && (
+        <ConfigModal
+          config={config}
+          onChange={setConfig}
+          onClose={() => setShowConfig(false)}
+          theme={theme}
+          onToggleTheme={toggleTheme}
+        />
+      )}
+
+      <CommandPalette
+        open={showPalette}
+        onClose={() => setShowPalette(false)}
+        onSelect={(t) => setActiveTab(t)}
+        onSettings={() => setShowConfig(true)}
+        onToggleTheme={toggleTheme}
+      />
 
       {undoSnapshot && (
         <Toast
@@ -230,3 +329,12 @@ function App() {
 }
 
 export default App;
+
+function BankRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col">
+      <dt className="t-caption text-text-muted">{label}</dt>
+      <dd className="font-mono text-[15px] text-text-primary mt-0.5">{value}</dd>
+    </div>
+  );
+}

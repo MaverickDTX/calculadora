@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Wallet, SlidersHorizontal, Percent, Shield, TrendingUp } from 'lucide-react';
+import { X, Wallet, SlidersHorizontal, Percent, Shield, TrendingUp, Sun } from 'lucide-react';
 import type { Config, DevigMethod, BoostType } from '../types';
 import { useDialog } from '../hooks/useDialog';
 import { Select } from './Select';
@@ -8,6 +8,8 @@ interface Props {
   config: Config;
   onChange: (c: Config) => void;
   onClose: () => void;
+  theme: 'ink' | 'ivory';
+  onToggleTheme: () => void;
 }
 
 const TITLE_ID = 'config-modal-title';
@@ -21,7 +23,7 @@ const METHODS: { id: DevigMethod; label: string; desc: string }[] = [
   { id: 'auto', label: 'Automático', desc: 'Recomenda o melhor método pelo perfil de odds' },
 ];
 
-export function ConfigModal({ config, onChange, onClose }: Props) {
+export function ConfigModal({ config, onChange, onClose, theme, onToggleTheme }: Props) {
   const [local, setLocal] = useState<Config>(config);
   const { dialogProps } = useDialog<HTMLDivElement>({
     open: true,
@@ -36,9 +38,9 @@ export function ConfigModal({ config, onChange, onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center md:pl-60 bg-black/50 backdrop-blur-md animate-fade-in" style={{ overscrollBehavior: 'contain' }} onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 animate-fade-in p-4" style={{ overscrollBehavior: 'contain' }} onClick={onClose}>
       <div {...dialogProps}
-        className="border border-border rounded-lg shadow-float w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col animate-slide-up"
+        className="border border-border rounded-lg shadow-float w-full max-w-3xl max-h-[90vh] overflow-y-auto scrollbar-thin flex flex-col animate-slide-up"
         style={{ background: 'var(--color-surface-elevated)' }}
         onClick={e => e.stopPropagation()}
       >
@@ -57,7 +59,32 @@ export function ConfigModal({ config, onChange, onClose }: Props) {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto scrollbar-thin p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto scrollbar-thin p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+            {/* Tema */}
+            <Section icon={Sun} title="Tema">
+            <div className="inline-flex rounded-lg border border-border overflow-hidden">
+              <button
+                type="button"
+                onClick={() => { if (theme !== 'ink') onToggleTheme(); }}
+                className={`px-4 py-2 text-sm font-medium transition-colors ${
+                  theme === 'ink' ? 'bg-accent-soft text-accent' : 'text-text-muted hover:text-text-primary'
+                }`}
+              >
+                Escuro
+              </button>
+              <button
+                type="button"
+                onClick={() => { if (theme !== 'ivory') onToggleTheme(); }}
+                className={`px-4 py-2 text-sm font-medium border-l border-border transition-colors ${
+                  theme === 'ivory' ? 'bg-accent-soft text-accent' : 'text-text-muted hover:text-text-primary'
+                }`}
+              >
+                Claro
+              </button>
+            </div>
+          </Section>
+
           {/* Bankroll */}
           <Section icon={Wallet} title="Banca e unidade">
             <div className="grid grid-cols-2 gap-3">
@@ -87,8 +114,8 @@ export function ConfigModal({ config, onChange, onClose }: Props) {
                     onChange={e => update({ confAdj: e.target.checked ? 'on' : 'off' })}
                     className="sr-only peer"
                   />
-                  <div className={`relative w-10 h-6 rounded-full transition-colors duration-200 peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-accent/40 ${local.confAdj === 'on' ? 'bg-accent' : 'bg-[#4B5563]'}`}>
-                    <div className={`absolute top-[3px] left-[3px] w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${local.confAdj === 'on' ? 'translate-x-[16px]' : 'translate-x-0'}`} />
+                  <div className={`relative w-10 h-6 rounded transition-colors duration-200 peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-accent/40 ${local.confAdj === 'on' ? 'bg-accent' : 'bg-[#4B5563]'}`}>
+                    <div className={`absolute top-[3px] left-[3px] w-4 h-4 rounded bg-white shadow-sm transition-transform duration-200 ${local.confAdj === 'on' ? 'translate-x-[16px]' : 'translate-x-0'}`} />
                   </div>
                   <span className="text-sm text-text-secondary">Ajustar por confiança</span>
                 </label>
@@ -97,12 +124,12 @@ export function ConfigModal({ config, onChange, onClose }: Props) {
           </Section>
 
           {/* De-vig */}
-          <Section icon={Percent} title="Método de de-vig">
-            <div className="space-y-2">
+          <Section icon={Percent} title="Método de de-vig" className="md:col-span-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {METHODS.map(m => (
                 <label
                   key={m.id}
-                  className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                  className={`flex items-start gap-3 p-3 rounded-md border cursor-pointer transition-all ${
                     local.method === m.id
                       ? 'border-accent bg-accent-soft'
                       : 'border-border bg-surface hover:border-border-strong'
@@ -126,7 +153,7 @@ export function ConfigModal({ config, onChange, onClose }: Props) {
           </Section>
 
           {/* Boost */}
-          <Section icon={TrendingUp} title="Boost de odd">
+          <Section icon={TrendingUp} title="Boost de odd" className="md:col-span-2">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs text-text-muted mb-1.5 block">TIPO</label>
@@ -149,18 +176,19 @@ export function ConfigModal({ config, onChange, onClose }: Props) {
               )}
             </div>
           </Section>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function Section({ icon: Icon, title, children }: { icon: React.ElementType; title: string; children: React.ReactNode }) {
+function Section({ icon: Icon, title, children, className }: { icon: React.ElementType; title: string; children: React.ReactNode; className?: string }) {
   return (
-    <div>
+    <div className={className}>
       <div className="flex items-center gap-2 mb-3">
         <Icon size={14} className="text-text-muted" aria-hidden="true" />
-        <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">{title}</span>
+        <span className="t-title">{title}</span>
       </div>
       {children}
     </div>

@@ -32,7 +32,7 @@ export function Sidebar({ activeTab, onChange, onConfig }: Props) {
       <aside className="hidden md:flex w-60 border-r border-border flex-col shrink-0" style={solidBg}>
         <div className="px-4 py-5 border-b border-border" style={{ background: 'var(--color-surface-hover)' }}>
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center shadow-glow">
+              <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
               <Calculator size={18} className="text-white" aria-hidden="true" />
             </div>
             <div>

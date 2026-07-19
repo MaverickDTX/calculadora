@@ -18,6 +18,7 @@ interface Props {
   onReset: () => void;
   onCalculate: () => void;
   isLoading?: boolean;
+  hideCalcButton?: boolean;
 }
 
 function parseLegs(saved: string): ComboLeg[] {
@@ -33,7 +34,7 @@ function serializeLegs(legs: ComboLeg[]): string {
   return legs.map(l => `${l.nWays}|${l.sideIdx}|${l.odds.join(',')}`).join(';');
 }
 
-export function ComboTab({ values, onChange, onLoadExample, onReset, onCalculate, isLoading }: Props) {
+export function ComboTab({ values, onChange, onLoadExample, onReset, onCalculate, isLoading, hideCalcButton = false }: Props) {
   const [legs, setLegs] = useState<ComboLeg[]>([]);
 
   useEffect(() => {
@@ -76,7 +77,7 @@ export function ComboTab({ values, onChange, onLoadExample, onReset, onCalculate
 
       {/* Pernas card */}
       <div className="panel panel-focus space-y-3">
-        <div className="section-title">PERNAS ({legs.length})</div>
+        <div className="section-title">Pernas ({legs.length})</div>
 
         <div className="space-y-3">
           {legs.map((leg, idx) => (
@@ -100,7 +101,7 @@ export function ComboTab({ values, onChange, onLoadExample, onReset, onCalculate
                     ...(leg.nWays >= 3 ? [{ value: '2', label: 'Via 3' }] : []),
                   ]}
                 />
-                <button type="button" aria-label="Remover perna" onClick={() => removeLeg(leg.id)} className="icon-btn ml-auto text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors">
+                <button type="button" aria-label="Remover perna" onClick={() => removeLeg(leg.id)} className="ml-auto text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors flex items-center justify-center">
                   <Trash2 size={14} aria-hidden="true" />
                 </button>
               </div>
@@ -129,16 +130,10 @@ export function ComboTab({ values, onChange, onLoadExample, onReset, onCalculate
 
       {/* Aposta combinada */}
       <div className="panel panel-focus space-y-3">
-        <div className="section-title">APOSTA COMBINADA</div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-text-muted mb-1.5 block">SUA ODD COMBINADA</label>
-            <NumberInput value={values['combo-your'] || ''} onChange={v => onChange('combo-your', v)} className="input-highlight" placeholder="7.03" min={1.01} />
-          </div>
-          <div>
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-text-muted mb-1.5 block">ODD JUSTA ESTIMADA</label>
-            <input type="text" inputMode="text" autoComplete="off" className="input-dark" placeholder="—" readOnly tabIndex={-1} />
-          </div>
+        <div className="section-title">Aposta combinada</div>
+        <div>
+          <label className="text-[11px] font-semibold uppercase tracking-wider text-text-muted mb-1.5 block">Sua odd combinada</label>
+          <NumberInput value={values['combo-your'] || ''} onChange={v => onChange('combo-your', v)} className="input-highlight" placeholder="7.03" min={1.01} />
         </div>
 
         <label className="flex items-center gap-3 cursor-pointer">
@@ -152,9 +147,11 @@ export function ComboTab({ values, onChange, onLoadExample, onReset, onCalculate
           </div>
         )}
 
-        <button type="button" onClick={onCalculate} disabled={isLoading} className="btn-primary w-full">
-          {isLoading ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Calculando...</> : 'Calcular'}
-        </button>
+        {!hideCalcButton && (
+          <button type="button" onClick={onCalculate} disabled={isLoading} className="btn-calc w-full">
+            {isLoading ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Calculando...</> : 'Calcular'}
+          </button>
+        )}
       </div>
 
       {/* Info footer */}

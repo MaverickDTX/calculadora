@@ -32,7 +32,7 @@ function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-text-muted">
       <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
-        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
+        style={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-hairline)' }}
       >
         <TrendingUp size={28} className="opacity-40" aria-hidden="true" />
       </div>
@@ -58,54 +58,50 @@ export function ResultContent({ B, config }: { B: BetResult; config: Config }) {
   const flow = stakeFlow(B);
   const gs = gridStake(B.kadj, config.bank, config.unit);
   const qual = setQuality(B);
-  const QualIcon = qual.icon;
+
+  const hasStake = B.ev > 0 && B.kadj > 0 && gs.units > 0;
 
   return (
     <div className="space-y-4 animate-fade-in">
-      <div className={`panel ${qual.cls}`}>
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <QualIcon size={18} aria-hidden="true" className={qual.cls === 'quality-good' ? 'text-value' : qual.cls === 'quality-mid' ? 'text-warn' : 'text-danger'} />
-            <span className="text-sm font-semibold text-text-primary">{qual.label}</span>
+      {/* Hero da stake — um único card, uma voz por linha (§13.1) */}
+      {hasStake ? (
+        <div className="stake-display">
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <span className={`tag ${qual.cls === 'quality-good' ? 'tag-value' : qual.cls === 'quality-mid' ? 'tag-warn' : qual.cls === 'quality-bad' ? 'tag-danger' : 'tag-info'}`}>
+              {qual.pill}
+            </span>
+            <span className="text-xs text-text-muted text-right">{qual.desc}</span>
           </div>
-          <span className={`tag ${qual.cls === 'quality-good' ? 'tag-value' : qual.cls === 'quality-mid' ? 'tag-warn' : qual.cls === 'quality-bad' ? 'tag-danger' : 'tag-info'}`}>
-            {qual.pill}
-          </span>
-        </div>
-        <p className="text-xs text-text-muted mt-2 leading-relaxed">{qual.desc}</p>
-      </div>
-
-      {B.ev > 0 && B.kadj > 0 && gs.units > 0 ? (
-        <div className="grid gap-2.5 sm:grid-cols-2">
-          <div className="stake-display">
-            <div className="flex items-center justify-between">
-            <div>
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-indigo-200/70">Stake recomendado</div>
-              <div className="stake-value font-mono font-bold text-white mt-1">{fbrl(gs.reais)}</div>
-              <div className="font-mono text-sm text-indigo-200/60 mt-1">
-                {fnum(gs.units, 2)}u · {fpct(gs.pct)} · ideal {fnum(gs.rawUnits, 2)}u
-              </div>
-            </div>
-            </div>
-          </div>
-          <div className="panel flex flex-col justify-center">
-            <div className="metric-label">Kelly cheio · ajustado</div>
-            <div className="mt-1 font-mono text-xl font-semibold text-kelly">{fpct(B.kfull)} <span className="text-text-muted">·</span> {fpct(B.kadj)}</div>
-            <div className="mt-2 text-[11px] text-text-muted">Odds {fnum(B.yourEff, 3)} · {methodLabel(B.cfg.method)}</div>
+          <div className="stake-value text-text-primary">{fbrl(gs.reais)}</div>
+          <div className="font-mono text-xs text-text-muted mt-2 space-y-0.5">
+            <div>{fnum(gs.units, 2)}u · {fpct(gs.pct)} · ideal {fnum(gs.rawUnits, 2)}u</div>
+            <div>Kelly {fpct(B.kfull)}→{fpct(B.kadj)} · odds {fnum(B.yourEff, 3)} · {methodLabel(B.cfg.method)}</div>
           </div>
         </div>
       ) : (
-        <div className="panel text-center py-6">
-          <div className="text-sm font-semibold text-text-secondary mb-1">
-            {B.ev <= 0 ? 'Sem valor / travado' : B.ev < config.edgemin ? 'Abaixo do edge mínimo' : 'Filtros travaram stake'}
+        <div className="stake-display">
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <span className="tag tag-info">{qual.pill}</span>
+            <span className="text-xs text-text-muted text-right">{qual.desc}</span>
           </div>
-          <p className="text-xs text-text-muted">
+          <div className="t-title text-text-secondary">{B.ev <= 0 ? 'Sem valor / travado' : B.ev < config.edgemin ? 'Abaixo do edge mínimo' : 'Filtros travaram stake'}</div>
+          <p className="text-xs text-text-muted mt-2">
             {B.ev <= 0 ? `EV de ${fpct(B.ev)}. Kelly cheio é zero.` : `Edge ${fpct(B.ev)} < mínimo ${fpct(config.edgemin)}`}
           </p>
         </div>
       )}
 
-      <CollapsibleSection title="Decomposição">
+      {/* Metric cards — labels abreviadas, valores nowrap (§13.3), grid responsivo 2+1 (§13.7.1) */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+        <MetricCard label="Prob. justa" value={B.p ? fpct(B.p) : 'multi'} />
+        <MetricCard label="Margem" value={B.M !== null ? fpct(B.M) : '—'} />
+        <MetricCard label="EV" value={`${B.ev >= 0 ? '+' : ''}${fpct(B.ev)}`} highlight={B.ev >= 0 ? 'good' : 'bad'} />
+        <MetricCard label="Odd justa" value={B.fair ? fnum(B.fair, 3) : 'multi'} />
+        <MetricCard label="Odd efetiva" value={fnum(B.yourEff, 3)} />
+      </div>
+
+      {/* Secundário colapsado por default (§13.4) */}
+      <CollapsibleSection title="Decomposição" defaultOpen={false}>
         <div className="font-mono text-sm text-text-secondary rounded-lg p-3 border border-border"
           style={{ background: 'var(--color-surface)' }}
         >
@@ -114,18 +110,7 @@ export function ResultContent({ B, config }: { B: BetResult; config: Config }) {
         </div>
       </CollapsibleSection>
 
-      <div className="grid grid-cols-3 gap-2.5">
-        <MetricCard label="Prob. justa" value={B.p ? fpct(B.p) : 'multi'} />
-        <MetricCard label="Margem removida" value={B.M !== null ? fpct(B.M) : '—'} />
-        <MetricCard label="EV" value={`${B.ev >= 0 ? '+' : ''}${fpct(B.ev)}`} highlight={B.ev >= 0 ? 'good' : 'bad'} />
-      </div>
-
-      <div className="grid grid-cols-2 gap-2.5">
-        <MetricCard label="Odd justa" value={B.fair ? fnum(B.fair, 3) : 'multi'} />
-        <MetricCard label="Odd efetiva" value={fnum(B.yourEff, 3)} />
-      </div>
-
-      <CollapsibleSection title="Fluxo do ajuste">
+      <CollapsibleSection title="Fluxo do ajuste" defaultOpen={false}>
         <div className="flex flex-wrap gap-1.5">
           <FlowTag label={`fração ${fnum(config.frac, 2)}`} />
           <FlowTag label={`confiança ${fnum(flow.cf, 2)}`} type={flow.cf < 1 ? 'warn' : 'info'} />
@@ -138,15 +123,14 @@ export function ResultContent({ B, config }: { B: BetResult; config: Config }) {
         </div>
       </CollapsibleSection>
 
-      <div className="panel">
-        <div className="section-title">Confiança do modelo</div>
+      <CollapsibleSection title="Confiança do modelo" defaultOpen={false}>
         <div className="flex items-center gap-2">
           <span className={`tag ${B.confClass === 'high' ? 'tag-value' : B.confClass === 'mid' ? 'tag-warn' : 'tag-danger'}`}>
             {B.confClass === 'high' ? 'Alta' : B.confClass === 'mid' ? 'Média' : 'Baixa'}
           </span>
           <span className="text-xs text-text-muted">{B.confTxt}{B.fb ? ' (fallback proporcional)' : ''}</span>
         </div>
-      </div>
+      </CollapsibleSection>
 
       {B.ev > 0 && B.kadj > 0 && gs.units > 0 && B.returns.length > 0 && (
         <CollapsibleSection title="Retornos por estado" defaultOpen={false}>
@@ -193,7 +177,7 @@ export function MetricCard({ label, value, highlight }: { label: string; value: 
   return (
     <div className="metric-card">
       <div className="metric-label">{label}</div>
-      <div className={`metric-value ${colorClass}`}>{value}</div>
+      <div className={`metric-value whitespace-nowrap ${colorClass}`}>{value}</div>
     </div>
   );
 }

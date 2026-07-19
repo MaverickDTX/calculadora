@@ -4,7 +4,7 @@ export function SkeletonResult() {
       {/* Painel de qualidade */}
       <div className="panel">
         <div className="flex items-center gap-2">
-          <div className="h-5 w-5 rounded-full animate-shimmer" style={{ background: 'var(--color-surface-hover)' }} />
+          <div className="h-5 w-5 rounded animate-shimmer" style={{ background: 'var(--color-surface-hover)' }} />
           <div className="h-4 w-28 rounded-md animate-shimmer" style={{ background: 'var(--color-surface-hover)' }} />
         </div>
         <div className="h-3 w-64 rounded-md animate-shimmer mt-2" style={{ background: 'var(--color-surface-hover)' }} />
@@ -12,9 +12,9 @@ export function SkeletonResult() {
 
       {/* Stake display */}
       <div className="stake-display">
-        <div className="h-3 w-24 rounded-md animate-shimmer mb-2" style={{ background: 'rgba(255,255,255,0.08)' }} />
-        <div className="h-10 w-36 rounded-md animate-shimmer" style={{ background: 'rgba(255,255,255,0.08)' }} />
-        <div className="h-3 w-48 rounded-md animate-shimmer mt-1.5" style={{ background: 'rgba(255,255,255,0.08)' }} />
+        <div className="h-3 w-24 rounded-md animate-shimmer mb-2" style={{ background: 'var(--color-surface-hover)' }} />
+        <div className="h-10 w-36 rounded-md animate-shimmer" style={{ background: 'var(--color-surface-hover)' }} />
+        <div className="h-3 w-48 rounded-md animate-shimmer mt-1.5" style={{ background: 'var(--color-surface-hover)' }} />
       </div>
 
       {/* Métricas (grid 2 col) */}

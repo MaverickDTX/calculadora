@@ -50,6 +50,7 @@ interface Props {
   onReset: () => void;
   onCalculate: () => void;
   isLoading?: boolean;
+  hideCalcButton?: boolean;
 }
 
 // ─── Football leg options ───
@@ -138,7 +139,7 @@ function serializeLegs(legs: Leg[]): string {
   ].join('|')).join(';');
 }
 
-export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onLoadExample, onReset, onCalculate, isLoading }: Props) {
+export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onLoadExample, onReset, onCalculate, isLoading, hideCalcButton = false }: Props) {
   const [legs, setLegs] = useState<Leg[]>([]);
   const [cornerOpen, setCornerOpen] = useState(false);
   const [tennisExtra, setTennisExtra] = useState(false);
@@ -613,9 +614,11 @@ export const BetBuilderTab = memo(function BetBuilderTab({ values, onChange, onL
         </div>
       </div>
 
-      <button type="button" onClick={onCalculate} disabled={isLoading} className="btn-primary w-full py-3 text-base">
-        {isLoading ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Calculando...</> : 'Calcular'}
-      </button>
+      {!hideCalcButton && (
+        <button type="button" onClick={onCalculate} disabled={isLoading} className="btn-calc w-full">
+          {isLoading ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Calculando...</> : 'Calcular'}
+        </button>
+      )}
 
       <div className="px-4 py-3 rounded-lg border border-border/50 bg-surface text-[11px] text-text-muted leading-relaxed">
         {sport === 'tennis' ? (

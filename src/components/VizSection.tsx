@@ -34,11 +34,11 @@ function UncertaintyBand({ result }: { result: BetResult }) {
     <div className="panel">
       <div className="section-title">Consenso entre métodos</div>
       <div className="flex items-center gap-3">
-        <div className="relative h-3 flex-1 rounded-full overflow-hidden" style={{ background: 'linear-gradient(90deg, var(--green) 0%, var(--green) 33%, var(--amber) 50%, var(--red) 100%)' }} aria-hidden="true">
-          <span className="absolute top-[-3px] h-5 w-0.5 rounded bg-white shadow-[0_0_0_1px_rgba(0,0,0,.35)]" style={{ left: `${position}%` }} />
+        <div className="relative h-3 flex-1 rounded overflow-hidden" style={{ background: 'linear-gradient(90deg, var(--green) 0%, var(--green) 33%, var(--amber) 50%, var(--red) 100%)' }} aria-hidden="true">
+          <span className="absolute top-[-3px] h-5 w-0.5 rounded bg-[var(--color-text-primary)] shadow-[0_0_0_1px_rgba(0,0,0,.35)]" style={{ left: `${position}%` }} />
         </div>
         <div className="flex items-center gap-1.5 text-xs text-text-secondary shrink-0">
-          <span className={`w-2 h-2 rounded-full ${dotClass}`} />
+          <span className={`w-2 h-2 rounded ${dotClass}`} />
           <span>{label}</span>
         </div>
       </div>
@@ -66,7 +66,7 @@ function FairProbabilities({ result }: { result: BetResult }) {
             <div key={index} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
               <div className="min-w-0">
                 <div className="mb-1 flex justify-between gap-2 text-[11px] text-text-muted"><span className={selected ? 'text-accent font-semibold' : ''}>{label}</span><span className="font-mono">{fpct(probability)}</span></div>
-                <div className="h-2 rounded-full bg-surface-hover overflow-hidden"><div className={`h-full rounded-full ${selected ? 'bg-accent' : 'bg-text-muted/50'}`} style={{ width: `${Math.max(2, probability * 100)}%` }} /></div>
+                <div className="h-2 rounded bg-surface-hover overflow-hidden"><div className={`h-full rounded ${selected ? 'bg-accent' : 'bg-text-muted/50'}`} style={{ width: `${Math.max(2, probability * 100)}%` }} /></div>
               </div>
               <span className="font-mono text-xs text-text-secondary">{fnum(1 / probability, 3)}</span>
             </div>
@@ -110,12 +110,11 @@ function MonteCarlo({ result }: { result: BetResult }) {
 
   return (
     <div className="panel">
-      <div className="flex items-center justify-between mb-1">
+      <div className="flex items-center justify-between mb-2">
         <div className="section-title mb-0">Projeção de banca (Monte Carlo)</div>
         <span className="tag tag-info">{sims.length} trajetórias · 250 apostas</span>
       </div>
-      <p className="text-[11px] text-text-muted mb-3">Risco de ruína e mediana após 250 apostas</p>
-      <div className="flex items-center justify-between text-xs text-text-muted">
+      <div className="flex items-center justify-between text-[12px] text-text-muted">
         <span>Ruína aprox: <span className="font-mono text-text-secondary">{fpct(ruin)}</span></span>
         <span>Mediana final: <span className="font-mono text-text-secondary">{median.toFixed(2)}x</span></span>
       </div>

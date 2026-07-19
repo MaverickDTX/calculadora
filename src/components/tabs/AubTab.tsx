@@ -10,6 +10,7 @@ interface Props {
   onReset: () => void;
   onCalculate: () => void;
   isLoading?: boolean;
+  hideCalcButton?: boolean;
 }
 
 function parseRows(oddsStr: string): { id: number; value: string }[] {
@@ -21,7 +22,7 @@ function parseRows(oddsStr: string): { id: number; value: string }[] {
   return rows;
 }
 
-export function AubTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
+export function AubTab({ values, onChange, onLoadExample, onReset, onCalculate, hideCalcButton = false }: Props) {
   const [rows, setRows] = useState<{ id: number; value: string }[]>([]);
 
   useEffect(() => {
@@ -75,10 +76,10 @@ export function AubTab({ values, onChange, onLoadExample, onReset, onCalculate }
         {rows.length > 2 && (
           <div className="space-y-2">
             {rows.slice(2).map((row, idx) => (
-              <div key={row.id} className="flex items-center gap-2">
-                <span className="text-xs text-text-muted w-6 shrink-0">{String.fromCharCode(67 + idx)}</span>
+              <div key={row.id} className="grid grid-cols-[auto_1fr_32px] items-center gap-2 rounded-lg border border-border p-2.5">
+                <span className="text-xs text-text-muted w-6">{String.fromCharCode(67 + idx)}</span>
                 <NumberInput value={row.value} onChange={v => updateRow(row.id, v)} placeholder={`odd seleção ${String.fromCharCode(67 + idx)}`} min={1.01} />
-                <button type="button" aria-label="Remover seleção" onClick={() => removeRow(row.id)} className="icon-btn text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors"><Trash2 size={14} aria-hidden="true" /></button>
+                <button type="button" aria-label="Remover seleção" onClick={() => removeRow(row.id)} className="text-text-muted hover:text-danger p-1.5 rounded-lg hover:bg-danger-soft transition-colors flex items-center justify-center"><Trash2 size={14} aria-hidden="true" /></button>
               </div>
             ))}
           </div>
@@ -100,7 +101,9 @@ export function AubTab({ values, onChange, onLoadExample, onReset, onCalculate }
           <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
           <NumberInput value={values['aub-your'] || ''} onChange={v => onChange('aub-your', v)} className="input-highlight" placeholder="1.85" min={1.01} />
         </div>
-        <button type="button" onClick={onCalculate} className="btn-primary w-full">Calcular</button>
+        {!hideCalcButton && (
+          <button type="button" onClick={onCalculate} className="btn-calc w-full">Calcular</button>
+        )}
       </div>
     </div>
   );

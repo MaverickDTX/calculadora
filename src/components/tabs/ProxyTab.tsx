@@ -14,6 +14,7 @@ interface Props {
   onReset: () => void;
   onCalculate: () => void;
   isLoading?: boolean;
+  hideCalcButton?: boolean;
 }
 
 function parseConsRows(oddsStr: string, exclStr: string): ConsRow[] {
@@ -26,7 +27,7 @@ function parseConsRows(oddsStr: string, exclStr: string): ConsRow[] {
   return rows;
 }
 
-export function ProxyTab({ values, onChange, onLoadExample, onReset, onCalculate }: Props) {
+export function ProxyTab({ values, onChange, onLoadExample, onReset, onCalculate, hideCalcButton = false }: Props) {
   const mode = values['proxy-mode'] || 'single';
   const family = values['proxy-family'] || 'ou_gols_ft';
   const [consRows, setConsRows] = useState<ConsRow[]>([]);
@@ -130,7 +131,9 @@ export function ProxyTab({ values, onChange, onLoadExample, onReset, onCalculate
               <label className="text-xs text-text-muted mb-1.5 block">Sua odd</label>
               <NumberInput value={values['proxy-your'] || ''} onChange={v => onChange('proxy-your', v)} className="input-highlight" placeholder="2.20" min={1.01} />
             </div>
-            <button type="button" onClick={onCalculate} className="btn-primary w-full mt-4">Calcular</button>
+            {!hideCalcButton && (
+              <button type="button" onClick={onCalculate} className="btn-calc w-full mt-4">Calcular</button>
+            )}
           </>
         ) : (
           <>
@@ -158,7 +161,9 @@ export function ProxyTab({ values, onChange, onLoadExample, onReset, onCalculate
                 <NumberInput value={values['proxy-cons-your'] || ''} onChange={v => onChange('proxy-cons-your', v)} className="input-highlight" placeholder="2.20" min={1.01} />
               </div>
             </div>
-            <button type="button" onClick={onCalculate} className="btn-primary w-full mt-4">Calcular</button>
+            {!hideCalcButton && (
+              <button type="button" onClick={onCalculate} className="btn-calc w-full mt-4">Calcular</button>
+            )}
           </>
         )}
       </div>

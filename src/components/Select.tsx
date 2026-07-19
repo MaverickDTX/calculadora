@@ -222,8 +222,8 @@ export function Select({
         className={[
           'relative w-full h-auto py-[7px] px-2.5 text-left',
           'flex items-center',
-          'rounded-xl border',
-          'bg-[#0B0F17]/60 backdrop-blur-xl',
+          'rounded-md border',
+          'bg-surface-2',
           'text-text-primary placeholder:text-text-muted',
           'font-sans text-[13px]',
           'transition-colors',
@@ -267,8 +267,8 @@ export function Select({
               role="listbox"
               aria-label={label || 'Opções'}
               className={[
-                'absolute z-50 max-h-64 overflow-auto rounded-xl border border-border',
-                'bg-surface/95 backdrop-blur-xl shadow-float',
+                'absolute z-50 max-h-64 overflow-auto rounded-md border border-border',
+                'bg-surface-2 shadow-float',
                 'py-1.5',
                 'top-full mt-2',
               ].filter(Boolean).join(' ')}

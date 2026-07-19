@@ -2,15 +2,24 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#010102" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#0E0E0F" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#F7F4EE" media="(prefers-color-scheme: light)" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kelly Stake Pro</title>
     <meta name="description" content="Calculadora de apostas esportivas: quanto apostar, não em que apostar." />
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('ks-theme');
+          if (t === 'ivory') document.documentElement.setAttribute('data-theme', 'ivory');
+        } catch (e) {}
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   </head>
   <body>
     <a href="#main" class="skip-link">Ir para o conteúdo</a>

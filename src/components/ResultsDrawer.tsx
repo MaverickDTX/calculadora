@@ -2,6 +2,7 @@ import { X } from 'lucide-react';
 import type { BetResult, Config } from '../types';
 import { useDialog, useMediaQuery } from '../hooks/useDialog';
 import { ResultView } from './ResultView';
+import { VizSection } from './VizSection';
 
 interface Props {
   result: BetResult | { err: string } | null;
@@ -27,7 +28,7 @@ export function ResultsDrawer({ result, config, isLoading, onClose }: Props) {
     <>
       {isMobile && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm animate-fade-in"
+          className="fixed inset-0 z-40 bg-black/50 animate-fade-in"
           onClick={onClose}
           aria-hidden="true"
         />
@@ -39,13 +40,13 @@ export function ResultsDrawer({ result, config, isLoading, onClose }: Props) {
         }}
       >
         <div aria-hidden="true" className="md:hidden pt-2 pb-1 flex justify-center">
-          <div className="w-10 h-1 rounded-full bg-[#4B5563]" />
+          <div className="w-10 h-1 rounded bg-[#4B5563]" />
         </div>
         <div className="px-5 py-4 border-b border-border flex items-center justify-between shrink-0"
           style={{ background: 'var(--color-surface-hover)' }}
         >
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-accent animate-pulse-soft" />
+            <div className="w-2 h-2 rounded bg-accent animate-pulse-soft" />
             <span id={TITLE_ID} className="text-sm font-semibold text-text-primary">Resultado</span>
           </div>
           <button type="button" onClick={onClose} aria-label="Fechar resultado" className="icon-btn text-text-muted hover:text-text-primary transition-colors">
@@ -54,6 +55,9 @@ export function ResultsDrawer({ result, config, isLoading, onClose }: Props) {
         </div>
 
         <ResultView result={result} config={config} isLoading={isLoading} />
+        <div className="px-5 pb-6">
+          <VizSection result={result} />
+        </div>
       </div>
     </>
   );

@@ -10,9 +10,10 @@ interface Props {
   onReset: () => void;
   onCalculate: () => void;
   isLoading?: boolean;
+  hideCalcButton?: boolean;
 }
 
-export function AsianTab({ values, onChange, onLoadExample, onReset, onCalculate, isLoading }: Props) {
+export function AsianTab({ values, onChange, onLoadExample, onReset, onCalculate, isLoading, hideCalcButton = false }: Props) {
   const mode = values['asia-mode'] || 'total';
 
   return (
@@ -130,9 +131,11 @@ export function AsianTab({ values, onChange, onLoadExample, onReset, onCalculate
           </div>
         )}
 
-        <button type="button" onClick={onCalculate} disabled={isLoading} className="btn-primary w-full mt-4 py-3 text-base">
-          {isLoading ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Calculando...</> : 'Calcular'}
-        </button>
+        {!hideCalcButton && (
+          <button type="button" onClick={onCalculate} disabled={isLoading} className="btn-calc w-full mt-4">
+            {isLoading ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Calculando...</> : 'Calcular'}
+          </button>
+        )}
       </div>
     </div>
   );
