@@ -1,6 +1,7 @@
+import { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import type { BetResult, Config } from '../types';
-import { useDialog, useMediaQuery } from '../hooks/useDialog';
+import { useDialog } from '../hooks/useDialog';
 import { ResultView } from './ResultView';
 import { VizSection } from './VizSection';
 
@@ -12,34 +13,116 @@ interface Props {
 }
 
 const TITLE_ID = 'results-drawer-title';
+const DISMISS_THRESHOLD = 0.35;
 
 export function ResultsDrawer({ result, config, isLoading, onClose }: Props) {
-  const isMobile = useMediaQuery('(max-width: 767px)');
-  const { ref, dialogProps } = useDialog<HTMLDivElement>({
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const [dragY, setDragY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const dragStartY = useRef<number | null>(null);
+  const dragStartTime = useRef<number | null>(null);
+  const prefersReducedMotion = useRef(false);
+  const sheetHeight = useRef(0);
+
+  const { dialogProps } = useDialog<HTMLDivElement>({
     open: true,
     onClose,
-    enabled: isMobile,
+    enabled: true,
     labelId: TITLE_ID,
   });
 
-  const a11yProps = isMobile ? dialogProps : { ref };
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    prefersReducedMotion.current = mq.matches;
+    const handler = () => { prefersReducedMotion.current = mq.matches; };
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  useEffect(() => {
+    if (sheetRef.current) {
+      sheetHeight.current = sheetRef.current.getBoundingClientRect().height;
+    }
+  });
+
+  const dismissSheet = () => {
+    if (prefersReducedMotion.current) { onClose(); return; }
+    setDragY(sheetHeight.current || 300);
+    setIsDragging(false);
+    setTimeout(onClose, 250);
+  };
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (prefersReducedMotion.current) return;
+    const target = e.target as HTMLElement;
+    if (target.closest('button') || target.closest('a') || target.closest('details')) return;
+    dragStartY.current = e.clientY;
+    dragStartTime.current = performance.now();
+    setIsDragging(true);
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (dragStartY.current === null) return;
+    const dy = e.clientY - dragStartY.current;
+    const damped = dy > 0 ? dy + (dy * dy) / (sheetHeight.current * 3 || 100) : dy / 4;
+    setDragY(Math.max(0, damped));
+  };
+
+  const onPointerUp = (_e: React.PointerEvent) => {
+    if (dragStartY.current === null) { setIsDragging(false); return; }
+    const elapsed = performance.now() - (dragStartTime.current || performance.now());
+    const velocity = dragY / (elapsed || 1);
+    const dist = dragY / (sheetHeight.current || 300);
+
+    if (dist > DISMISS_THRESHOLD || velocity > 0.4) {
+      dismissSheet();
+    } else if (dragY > 0) {
+      setDragY(0);
+    }
+    setIsDragging(false);
+    dragStartY.current = null;
+    dragStartTime.current = null;
+  };
 
   return (
     <>
-      {isMobile && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50 animate-fade-in"
-          onClick={onClose}
-          aria-hidden="true"
-        />
-      )}
-      <div {...a11yProps}
-        className="fixed bottom-0 left-0 right-0 z-50 h-[60vh] flex flex-col rounded-t-lg border border-border animate-slide-up md:relative md:inset-auto md:z-auto md:h-auto md:w-[400px] md:shrink-0 md:border-0 md:border-l md:border-border md:rounded-none"
+      <div
+        ref={backdropRef}
+        className="fixed inset-0 z-40 bg-black/50 animate-fade-in pointer-events-auto"
+        onClick={onClose}
+        aria-hidden="true"
         style={{
+          opacity: isDragging ? Math.max(0, 1 - dragY / (sheetHeight.current || 300)) : undefined,
+          transition: isDragging ? 'none' : 'opacity 220ms cubic-bezier(0.32, 0.72, 0, 1)',
+        }}
+      />
+      <div
+        {...dialogProps}
+        ref={sheetRef}
+        className="fixed bottom-0 left-0 right-0 z-50 flex flex-col rounded-t-lg border border-border pointer-events-auto"
+        style={{
+          height: 'min(70dvh, 85dvh)',
           background: 'var(--color-surface-elevated)',
+          transform: mounted ? `translateY(${dragY}px)` : 'translateY(100%)',
+          transition: isDragging ? 'none' : mounted ? 'transform 220ms cubic-bezier(0.32, 0.72, 0, 1)' : 'none',
         }}
       >
-        <div aria-hidden="true" className="md:hidden pt-2 pb-1 flex justify-center">
+        <div
+          className="pt-2 pb-1 flex justify-center touch-none"
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+          style={{ touchAction: 'none' as const }}
+        >
           <div className="w-10 h-1 rounded bg-[#4B5563]" />
         </div>
         <div className="px-5 py-4 border-b border-border flex items-center justify-between shrink-0"
@@ -54,10 +137,9 @@ export function ResultsDrawer({ result, config, isLoading, onClose }: Props) {
           </button>
         </div>
 
-        <ResultView result={result} config={config} isLoading={isLoading} />
-        <div className="px-5 pb-6">
+        <ResultView result={result} config={config} isLoading={isLoading}>
           <VizSection result={result} />
-        </div>
+        </ResultView>
       </div>
     </>
   );

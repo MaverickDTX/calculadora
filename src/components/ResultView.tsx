@@ -9,9 +9,10 @@ interface ResultViewProps {
   result: BetResult | { err: string } | null;
   config: Config;
   isLoading?: boolean;
+  children?: React.ReactNode;
 }
 
-export function ResultView({ result, config, isLoading }: ResultViewProps) {
+export function ResultView({ result, config, isLoading, children }: ResultViewProps) {
   const [animateKey, setAnimateKey] = useState(0);
 
   useEffect(() => {
@@ -19,11 +20,12 @@ export function ResultView({ result, config, isLoading }: ResultViewProps) {
   }, [result]);
 
   return (
-    <div className="flex-1 overflow-y-auto scrollbar-thin p-5 space-y-5" style={{ overscrollBehavior: 'contain' }}>
+    <div className="flex-1 overflow-y-auto scrollbar-thin p-5 space-y-5 md:pb-5 pb-20" style={{ overscrollBehavior: 'contain' }}>
       {isLoading && <SkeletonResult />}
       {!isLoading && !result && <EmptyState />}
       {!isLoading && result && 'err' in result && <ErrorState msg={result.err} />}
       {!isLoading && result && !('err' in result) && <ResultContent key={animateKey} B={result} config={config} />}
+      {!isLoading && children}
     </div>
   );
 }

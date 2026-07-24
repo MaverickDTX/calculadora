@@ -5,6 +5,7 @@ import { useCalculator } from './hooks/useCalculator';
 import { useMediaQuery } from './hooks/useDialog';
 import { Topbar } from './components/Topbar';
 import { SideRail } from './components/SideRail';
+import { BottomNav } from './components/BottomNav';
 import { AlertTriangle } from 'lucide-react';
 import { ConfigModal } from './components/ConfigModal';
 import { VizSection } from './components/VizSection';
@@ -223,7 +224,7 @@ function App() {
 
       <div className="flex flex-1 overflow-hidden">
         <SideRail activeTab={activeTab} onChange={setActiveTab} />
-        <main className="flex-1 overflow-y-auto p-6 xl:p-8 max-w-[2200px] mx-auto w-full">
+        <main className="flex-1 overflow-y-auto p-6 xl:p-8 pb-20 md:pb-6 max-w-[2200px] mx-auto w-full">
           <div className="mb-5">
             <h1 className="t-headline text-text-primary">{TAB_LABELS[activeTab].title}</h1>
             <p className="t-body-sm text-text-muted mt-1">{TAB_LABELS[activeTab].sub}</p>
@@ -307,6 +308,8 @@ function App() {
           onDismiss={() => setUndoSnapshot(null)}
         />
       )}
+
+      <BottomNav activeTab={activeTab} onChange={setActiveTab} />
     </div>
   );
 }
