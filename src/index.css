@@ -185,6 +185,12 @@
   100% { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes slideInLeft {
+  0% { opacity: 0; transform: translateX(-8px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-in-left { animation: slideInLeft 0.25s ease-out; }
+
 @keyframes pulseSoft {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.6; }

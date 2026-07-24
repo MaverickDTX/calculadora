@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import type { BetResult } from '../types';
 import { fpct, fnum } from '../lib/math';
 
@@ -15,7 +14,7 @@ export function VizSection({ result }: Props) {
     <div className="space-y-4 animate-fade-in">
       <UncertaintyBand result={result as BetResult} />
       <FairProbabilities result={result as BetResult} />
-      {(result as BetResult).ev > 0 && (result as BetResult).kadj > 0 && <MonteCarlo result={result as BetResult} />}
+
     </div>
   );
 }
@@ -77,47 +76,3 @@ function FairProbabilities({ result }: { result: BetResult }) {
   );
 }
 
-function MonteCarlo({ result }: { result: BetResult }) {
-  const sims = useMemo(() => {
-    const n = 300;
-    const bets = 250;
-    const paths: number[][] = [];
-    for (let s = 0; s < n; s++) {
-      let bank = 1;
-      const path = [bank];
-      for (let b = 0; b < bets; b++) {
-        const ret = result.returns.length > 0
-          ? result.returns
-          : [{ p: result.p || 0.5, net: result.yourEff - 1 }, { p: 1 - (result.p || 0.5), net: -1 }];
-        const r = Math.random();
-        let cum = 0;
-        let net = -1;
-        for (const state of ret) {
-          cum += state.p;
-          if (r <= cum) { net = state.net; break; }
-        }
-        bank *= (1 + result.kadj * net);
-        path.push(bank);
-      }
-      paths.push(path);
-    }
-    return paths;
-  }, [result]);
-
-  const ruin = sims.filter(p => p[p.length - 1] < 0.5).length / sims.length;
-  const finals = sims.map(p => p[p.length - 1]).sort((a, b) => a - b);
-  const median = finals[Math.floor(finals.length / 2)];
-
-  return (
-    <div className="panel">
-      <div className="flex items-center justify-between mb-2">
-        <div className="section-title mb-0">Projeção de banca (Monte Carlo)</div>
-        <span className="tag tag-info">{sims.length} trajetórias · 250 apostas</span>
-      </div>
-      <div className="flex items-center justify-between text-[12px] text-text-muted">
-        <span>Ruína aprox: <span className="font-mono text-text-secondary">{fpct(ruin)}</span></span>
-        <span>Mediana final: <span className="font-mono text-text-secondary">{median.toFixed(2)}x</span></span>
-      </div>
-    </div>
-  );
-}

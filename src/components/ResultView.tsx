@@ -64,20 +64,37 @@ export function ResultContent({ B, config }: { B: BetResult; config: Config }) {
   return (
     <div className="space-y-4 animate-fade-in">
       {/* Hero da stake — um único card, uma voz por linha (§13.1) */}
-      {hasStake ? (
-        <div className="stake-display">
-          <div className="flex items-center justify-between gap-3 mb-3">
-            <span className={`tag ${qual.cls === 'quality-good' ? 'tag-value' : qual.cls === 'quality-mid' ? 'tag-warn' : qual.cls === 'quality-bad' ? 'tag-danger' : 'tag-info'}`}>
-              {qual.pill}
-            </span>
-            <span className="text-xs text-text-muted text-right">{qual.desc}</span>
+{hasStake ? (
+          <div className="stake-display">
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <span className={`tag ${qual.cls === 'quality-good' ? 'tag-value' : qual.cls === 'quality-mid' ? 'tag-warn' : qual.cls === 'quality-bad' ? 'tag-danger' : 'tag-info'}`}>
+                {qual.pill}
+              </span>
+              <span className="text-xs text-text-muted text-right">{qual.desc}</span>
+            </div>
+            <div className="stake-value text-text-primary">{fbrl(gs.reais)}</div>
+            <div className="font-mono text-xs text-text-muted mt-2 space-y-0.5">
+              <div>{fnum(gs.units, 2)}u · {fpct(gs.pct)} · ideal {fnum(gs.rawUnits, 2)}u</div>
+              <div>Kelly {fpct(B.kfull)}→{fpct(B.kadj)} · odds {fnum(B.yourEff, 3)} · {methodLabel(B.cfg.method)}</div>
+            </div>
+            {/* Progress bar */}
+            <div className="space-y-1.5 pt-2 border-t border-hairline mt-3">
+              <div className="flex justify-between text-[11px] font-mono text-text-muted">
+                <span>Porcentagem do Teto Kelly ({(config.cap * 100).toFixed(1)}%)</span>
+                <span>{Math.round((gs.pct / config.cap) * 100)}%</span>
+              </div>
+              <div className="w-full h-2.5 bg-canvas rounded-full overflow-hidden border border-hairline p-0.5">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    (gs.pct / config.cap) * 100 >= 90 ? 'bg-danger' :
+                    (gs.pct / config.cap) * 100 >= 60 ? 'bg-warn' :
+                    'bg-accent'
+                  }`}
+                  style={{ width: `${Math.min(100, (gs.pct / config.cap) * 100)}%` }}
+                />
+              </div>
+            </div>
           </div>
-          <div className="stake-value text-text-primary">{fbrl(gs.reais)}</div>
-          <div className="font-mono text-xs text-text-muted mt-2 space-y-0.5">
-            <div>{fnum(gs.units, 2)}u · {fpct(gs.pct)} · ideal {fnum(gs.rawUnits, 2)}u</div>
-            <div>Kelly {fpct(B.kfull)}→{fpct(B.kadj)} · odds {fnum(B.yourEff, 3)} · {methodLabel(B.cfg.method)}</div>
-          </div>
-        </div>
       ) : (
         <div className="stake-display">
           <div className="flex items-center justify-between gap-3 mb-3">

@@ -4,7 +4,8 @@ import { useConfig } from './hooks/useConfig';
 import { useCalculator } from './hooks/useCalculator';
 import { useMediaQuery } from './hooks/useDialog';
 import { Topbar } from './components/Topbar';
-import { CommandPalette } from './components/CommandPalette';
+import { SideRail } from './components/SideRail';
+import { AlertTriangle } from 'lucide-react';
 import { ConfigModal } from './components/ConfigModal';
 import { VizSection } from './components/VizSection';
 import { Toast } from './components/Toast';
@@ -132,9 +133,7 @@ function useTheme(): [Theme, () => void] {
     const root = document.documentElement;
     if (theme === 'ivory') root.setAttribute('data-theme', 'ivory');
     else root.removeAttribute('data-theme');
-    try {
-      localStorage.setItem('ks-theme', theme);
-    } catch { /* ignore */ }
+    try { localStorage.setItem('ks-theme', theme); } catch {}
   }, [theme]);
 
   const toggle = useCallback(() => setTheme(t => (t === 'ink' ? 'ivory' : 'ink')), []);
@@ -147,25 +146,11 @@ function App() {
   const [activeTab, setActiveTab] = useState<TabId>('nres');
   const [inputs, setInputs] = useState<Record<string, string>>(DEFAULT_INPUTS);
   const [showConfig, setShowConfig] = useState(false);
-  const [showPalette, setShowPalette] = useState(false);
   const [calcTrigger, setCalcTrigger] = useState(0);
   const [mobileResultOpen, setMobileResultOpen] = useState(false);
-  // Snapshot dos inputs anterior ao último Reset, para o "Desfazer" do toast.
   const [undoSnapshot, setUndoSnapshot] = useState<Record<string, string> | null>(null);
 
   const isMobile = useMediaQuery('(max-width: 1023px)');
-
-  // Atalho global ⌘K / Ctrl+K abre e fecha a paleta de comandos.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        setShowPalette(p => !p);
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
 
   const handleInputChange = useCallback((id: string, value: string) => {
     const v = RAW_LIST_FIELDS.has(id) ? value : value.replace(/,/g, '.');
@@ -181,8 +166,8 @@ function App() {
     const tab = EXAMPLE_TAB[key];
     if (!tab) return;
     setActiveTab(tab);
-    setInputs((prev: Record<string, string>) => {
-      const next: Record<string, string> = { ...prev };
+    setInputs(prev => {
+      const next = { ...prev };
       Object.entries(example).forEach(([k, v]) => { if (v !== undefined) next[k] = RAW_LIST_FIELDS.has(k) ? v : v.replace(/,/g, '.'); });
       return next;
     });
@@ -217,7 +202,7 @@ function App() {
     const hideCalc = !isMobile && !isLazyTab;
     const common = { values: inputs, onChange: handleInputChange, onLoadExample: loadExample, onReset: resetTab, onCalculate: handleCalculate, isLoading, hideCalcButton: hideCalc };
     switch (activeTab) {
-      case 'nres': return <NResultsTab {...common} />;
+      case 'nres': return <NResultsTab {...common} config={config} />;
       case 'props': return <PropsTab {...common} />;
       case 'proxy': return <ProxyTab {...common} />;
       case 'aub': return <AubTab {...common} />;
@@ -225,7 +210,7 @@ function App() {
       case 'poi': return <BetBuilderTab {...common} />;
       case 'asia': return <AsianTab {...common} />;
     }
-  }, [activeTab, inputs, handleInputChange, loadExample, resetTab, handleCalculate, isLoading, isMobile, isLazyTab]);
+  }, [activeTab, inputs, handleInputChange, loadExample, resetTab, handleCalculate, isLoading, isMobile, isLazyTab, config]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -233,62 +218,68 @@ function App() {
         activeTab={activeTab}
         onChange={setActiveTab}
         onConfig={() => setShowConfig(true)}
-        onOpenPalette={() => setShowPalette(true)}
         config={config}
       />
 
-      <div className="flex-1 w-full max-w-screen-xl mx-auto px-4 sm:px-6 py-6">
-        {/* Sub-header contextual */}
-        <div className="mb-5">
-          <h1 className="t-headline text-text-primary">{TAB_LABELS[activeTab].title}</h1>
-          <p className="t-body-sm text-text-muted mt-1">{TAB_LABELS[activeTab].sub}</p>
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(340px,1fr)]">
-          {/* Coluna esquerda: formulário da aba + viz abaixo (§13.9) */}
-          <div className="min-w-0 animate-fade-in space-y-4">
-            {tabContent}
-            {result && !('err' in result) && <VizSection result={result} />}
+      <div className="flex flex-1 overflow-hidden">
+        <SideRail activeTab={activeTab} onChange={setActiveTab} />
+        <main className="flex-1 overflow-y-auto p-6 xl:p-8 max-w-[2200px] mx-auto w-full">
+          <div className="mb-5">
+            <h1 className="t-headline text-text-primary">{TAB_LABELS[activeTab].title}</h1>
+            <p className="t-body-sm text-text-muted mt-1">{TAB_LABELS[activeTab].sub}</p>
           </div>
 
-          {/* Coluna direita (desktop): resultado inline + viz, sticky */}
-          <aside className="hidden lg:block">
-            <div className="sticky top-[calc(3.5rem+24px)] pr-1 space-y-4">
-              {(() => {
-                const showEmpty = !result || ('err' in result && !tabHasContent(inputs, activeTab));
-                if (showEmpty && !isLoading) {
-                  return (
-                    <>
-                      <div className="panel">
-                        <div className="t-title mb-3">Resumo da banca</div>
-                        <dl className="grid grid-cols-2 gap-x-4 gap-y-2.5">
-                          <BankRow label="Banca" value={`R$ ${config.bank.toLocaleString('pt-BR')}`} />
-                          <BankRow label="Unidade" value={`R$ ${config.unit.toLocaleString('pt-BR')}`} />
-                          <BankRow label="Fração Kelly" value={`${config.frac}×`} />
-                          <BankRow label="Teto" value={`${(config.cap * 100).toFixed(1)}%`} />
-                          <BankRow label="Piso" value={`${(config.floor * 100).toFixed(2)}%`} />
-                          <BankRow label="Edge mín." value={`${(config.edgemin * 100).toFixed(1)}%`} />
-                        </dl>
-                      </div>
-                      <div className="rounded-lg border border-dashed border-hairline-strong p-8 text-center">
-                        <p className="t-body-sm text-text-muted">Preencha e calcule</p>
-                        <p className="text-xs text-text-tertiary mt-1">O resultado aparece aqui</p>
-                      </div>
-                    </>
-                  );
-                }
-                return (
-                  <>
-                    <ResultView result={result} config={config} isLoading={isLoading} />
-                  </>
-                );
-              })()}
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
+            <div className="min-w-0 animate-fade-in space-y-4">
+              {tabContent}
+              {result && !('err' in result) && <VizSection result={result} />}
             </div>
-          </aside>
-        </div>
+            <aside className="hidden lg:block">
+              <div className="sticky top-[calc(3.5rem+24px)] pr-1 space-y-4">
+                {/* 1. Resumo da banca — aparece exceto quando há resultado válido */}
+                {(!result || (result && 'err' in result)) && (
+                  <div className="panel">
+                    <div className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2.5">Resumo da banca</div>
+                    <dl className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+                      <BankRow label="Banca" value={`R$ ${config.bank.toLocaleString('pt-BR')}`} />
+                      <BankRow label="Unidade" value={`R$ ${config.unit.toLocaleString('pt-BR')}`} />
+                      <BankRow label="Fração Kelly" value={`${config.frac}×`} />
+                      <BankRow label="Teto" value={`${(config.cap * 100).toFixed(1)}%`} />
+                      <BankRow label="Piso" value={`${(config.floor * 100).toFixed(2)}%`} />
+                      <BankRow label="Edge mín." value={`${(config.edgemin * 100).toFixed(1)}%`} />
+                    </dl>
+                  </div>
+                )}
+
+                {/* 2. Resultado — só após calcular com resultado válido */}
+                {result && !('err' in result) && (
+                  <ResultView result={result} config={config} isLoading={isLoading} />
+                )}
+
+                {/* 3. Placeholder — só se sem resultado e sem conteúdo na aba */}
+                {!result && !isLoading && !tabHasContent(inputs, activeTab) && (
+                  <div className="rounded-lg border border-dashed border-hairline-strong p-8 text-center">
+                    <p className="t-body-sm text-text-muted">Preencha e calcule</p>
+                    <p className="text-xs text-text-tertiary mt-1">O resultado aparece aqui</p>
+                  </div>
+                )}
+
+                {/* 4. Erro — só se usuário preencheu algo E houve erro real */}
+                {result && 'err' in result && tabHasContent(inputs, activeTab) && (
+                  <div className="panel border-danger/30" style={{ background: 'rgba(239, 68, 68, 0.06)' }}>
+                    <div className="flex items-center gap-2 text-danger mb-2">
+                      <AlertTriangle size={16} aria-hidden="true" />
+                      <span className="text-sm font-semibold">Erro no cálculo</span>
+                    </div>
+                    <p className="text-sm text-text-secondary">{result.err}</p>
+                  </div>
+                )}
+              </div>
+            </aside>
+          </div>
+        </main>
       </div>
 
-      {/* Mobile: resultado em bottom-sheet */}
       {isMobile && mobileResultOpen && (
         <ResultsDrawer
           result={result}
@@ -308,14 +299,6 @@ function App() {
         />
       )}
 
-      <CommandPalette
-        open={showPalette}
-        onClose={() => setShowPalette(false)}
-        onSelect={(t) => setActiveTab(t)}
-        onSettings={() => setShowConfig(true)}
-        onToggleTheme={toggleTheme}
-      />
-
       {undoSnapshot && (
         <Toast
           message="Campos limpos."
@@ -333,8 +316,8 @@ export default App;
 function BankRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col">
-      <dt className="t-caption text-text-muted">{label}</dt>
-      <dd className="font-mono text-[15px] text-text-primary mt-0.5">{value}</dd>
+      <dt className="text-[10px] text-text-muted uppercase tracking-wider font-semibold">{label}</dt>
+      <dd className="font-mono text-xs font-medium text-text-primary mt-0.5">{value}</dd>
     </div>
   );
 }
