@@ -203,7 +203,7 @@ function App() {
     const hideCalc = !isMobile && !isLazyTab;
     const common = { values: inputs, onChange: handleInputChange, onLoadExample: loadExample, onReset: resetTab, onCalculate: handleCalculate, isLoading, hideCalcButton: hideCalc };
     switch (activeTab) {
-      case 'nres': return <NResultsTab {...common} config={config} />;
+      case 'nres': return <NResultsTab {...common} />;
       case 'props': return <PropsTab {...common} />;
       case 'proxy': return <ProxyTab {...common} />;
       case 'aub': return <AubTab {...common} />;
@@ -211,7 +211,7 @@ function App() {
       case 'poi': return <BetBuilderTab {...common} />;
       case 'asia': return <AsianTab {...common} />;
     }
-  }, [activeTab, inputs, handleInputChange, loadExample, resetTab, handleCalculate, isLoading, isMobile, isLazyTab, config]);
+  }, [activeTab, inputs, handleInputChange, loadExample, resetTab, handleCalculate, isLoading, isMobile, isLazyTab]);
 
   return (
     <div className="min-h-screen flex flex-col">

@@ -9,7 +9,7 @@ interface Props {
 export function BottomNav({ activeTab, onChange }: Props) {
   return (
     <nav
-      className="md:hidden fixed bottom-0 inset-x-0 z-30 h-[calc(3.5rem+env(safe-area-inset-bottom))] flex items-stretch border-t border-border bg-[var(--color-canvas)] backdrop-blur supports-[backdrop-filter]:bg-[var(--color-canvas)]/90"
+      className="md:hidden fixed bottom-0 inset-x-0 z-30 h-[calc(3.5rem+env(safe-area-inset-bottom))] flex items-stretch border-t border-border bg-[var(--color-canvas)] backdrop-blur supports-[backdrop-filter]:bg-[var(--color-canvas)]/90 pb-[env(safe-area-inset-bottom)]"
       role="tablist"
       aria-label="Mercados"
     >

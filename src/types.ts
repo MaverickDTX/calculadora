@@ -62,6 +62,7 @@ export interface BetResult {
   referenceOdds?: number[] | null;
   fairProbabilities?: number[] | null;
   selectedOutcomeIndex?: number | null;
+  outcomeLabels?: string[];
 }
 
 export interface ReturnState {

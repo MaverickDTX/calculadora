@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kelly Stake Pro — Preview de Animações</title>
+  <style>
+    :root {
+      --color-canvas: #0E0E0F;
+      --color-surface-1: #151517;
+      --color-surface-2: #1A1A1D;
+      --color-surface-3: #202024;
+      --color-hairline: #232326;
+      --color-hairline-strong: #2E2E33;
+      --color-accent: #4CBF95;
+      --color-accent-hover: #63D3AA;
+      --color-accent-soft: rgba(76,191,149,0.12);
+      --color-value: #4CBF95;
+      --color-value-soft: rgba(76,191,149,0.12);
+      --color-text-primary: #F4F3F1;
+      --color-text-secondary: #C9C8C4;
+      --color-text-muted: #85858B;
+      --color-success: #4CBF95;
+      --color-success-soft: rgba(76,191,149,0.12);
+      --color-danger: #E06055;
+      --color-danger-soft: rgba(224,96,85,0.12);
+      --color-warn: #D9A144;
+      --color-warning-soft: rgba(217,161,68,0.12);
+      --color-kelly: #4CBF95;
+      --color-semantic-up: #4CBF95;
+      --color-semantic-down: #E06055;
+      --radius-md: 4px;
+      --radius-lg: 6px;
+      --radius-xl: 8px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --shadow-float: 0 8px 32px rgba(0,0,0,0.45);
+      --font-sans: 'Schibsted Grotesk', system-ui, sans-serif;
+      --font-mono: 'Geist Mono', 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--color-canvas);
+      color: var(--color-text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      padding: 32px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    h1 { font-size: 28px; font-weight: 400; letter-spacing: -0.6px; margin-bottom: var(--space-2); }
+    h2 { font-size: 20px; font-weight: 500; letter-spacing: -0.2px; margin-bottom: var(--space-3); color: var(--color-text-secondary); }
+    .subtitle { color: var(--color-text-muted); font-size: 14px; margin-bottom: var(--space-8); }
+    .section { margin-bottom: var(--space-8); border-top: 1px solid var(--color-hairline); padding-top: var(--space-6); }
+    .section-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--color-accent); font-weight: 600; margin-bottom: var(--space-2); }
+
+    .panel {
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-hairline);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+    }
+
+    .row { display: flex; gap: var(--space-4); flex-wrap: wrap; align-items: flex-end; }
+
+    .input-dark {
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-hairline);
+      color: var(--color-text-primary);
+      border-radius: var(--radius-md);
+      padding: 7px 10px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      width: 120px;
+      outline: none;
+    }
+    .input-dark:focus { border-color: var(--color-accent); box-shadow: 0 0 0 2px var(--color-accent-soft); }
+
+    .btn {
+      background: var(--color-surface-3);
+      border: 1px solid var(--color-hairline-strong);
+      color: var(--color-text-primary);
+      border-radius: var(--radius-md);
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn:hover { background: var(--color-surface-2); border-color: var(--color-accent); }
+    .btn-calc { background: var(--color-accent); color: #0E0E0F; border: none; font-weight: 600; }
+    .btn-calc:hover { background: var(--color-accent-hover); }
+
+    .metric-card {
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-hairline);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+      flex: 1 1 0;
+      min-width: 120px;
+    }
+    .metric-label { font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.3px; }
+    .metric-value { font-family: var(--font-mono); font-size: 18px; font-weight: 500; margin-top: 4px; }
+
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; }
+    .tag-value { background: var(--color-value-soft); color: var(--color-value); }
+    .tag-warn { background: var(--color-warning-soft); color: var(--color-warn); }
+    .tag-danger { background: var(--color-danger-soft); color: var(--color-danger); }
+
+    .stake-display { background: var(--color-surface-2); border: 1px solid var(--color-hairline); border-radius: var(--radius-lg); padding: var(--space-4); }
+    .stake-value { font-family: var(--font-mono); font-size: 40px; font-weight: 500; letter-spacing: -1px; margin-top: var(--space-2); }
+
+    /* ===== ANIMATIONS ===== */
+
+    @keyframes odds-shift-up {
+      0%   { border-color: var(--color-hairline); }
+      100% { border-color: var(--color-accent); }
+    }
+    @keyframes odds-shift-down {
+      0%   { border-color: var(--color-hairline); }
+      100% { border-color: var(--color-danger); }
+    }
+    @keyframes value-fade {
+      0%   { opacity: 0.35; transform: translateY(2px); }
+      100% { opacity: 1;    transform: translateY(0); }
+    }
+    @keyframes leg-settle-in {
+      0%   { opacity: 0; transform: translateY(6px) scale(0.985); }
+      100% { opacity: 1; transform: translateY(0)    scale(1);     }
+    }
+    @keyframes leg-settle-out {
+      0%   { opacity: 1; transform: translateX(0); }
+      100% { opacity: 0; transform: translateX(-8px); }
+    }
+    @keyframes gauge-bounce {
+      0%   { transform: scaleY(1); }
+      30%  { transform: scaleY(1.12); }
+      50%  { transform: scaleY(0.95); }
+      70%  { transform: scaleY(1.03); }
+      100% { transform: scaleY(1); }
+    }
+    @keyframes bento-pop {
+      0%   { transform: scale(0.8) translateY(20px); opacity: 0; }
+      60%  { transform: scale(1.03) translateY(-4px); opacity: 0.8; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    @keyframes circle-reveal {
+      0%   { clip-path: circle(0% at 100% 100%); }
+      100% { clip-path: circle(150% at 100% 100%); }
+    }
+    @keyframes dash-flow {
+      to { stroke-dashoffset: -30; }
+    }
+    @keyframes chaos-blur {
+      0%   { filter: blur(0px); opacity: 1; transform: scale(1); }
+      100% { filter: blur(6px); opacity: 0.2; transform: scale(1.05); }
+    }
+    @keyframes clean-emerge {
+      0%   { opacity: 0; transform: translateX(60px) scale(0.92); }
+      100% { opacity: 1; transform: translateX(0) scale(1); }
+    }
+    @keyframes mc-wave {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-6px); }
+    }
+
+    .input-shifted-up   { animation: odds-shift-up   0.4s ease-out; }
+    .input-shifted-down { animation: odds-shift-down 0.4s ease-out; }
+    .value-fresh        { animation: value-fade 0.28s ease-out; }
+    .leg-in             { animation: leg-settle-in  0.28s ease-out; }
+    .leg-out            { animation: leg-settle-out 0.2s  ease-in forwards; }
+    .animate-gauge-bounce     { animation: gauge-bounce 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .input-shifted-up, .input-shifted-down,
+      .value-fresh, .leg-in, .leg-out { animation: none; }
+    }
+    .animate-bento-pop        { animation: bento-pop 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+    .animate-circle-reveal    { animation: circle-reveal 0.8s cubic-bezier(0.4,0,0.2,1) both; }
+    .animate-dash-flow        { animation: dash-flow 1s linear infinite; }
+    .animate-chaos-blur       { animation: chaos-blur 1s ease-in-out forwards; }
+    .animate-clean-emerge     { animation: clean-emerge 0.8s cubic-bezier(0.4,0,0.2,1) both; }
+    .animate-mc-wave          { animation: mc-wave 2s ease-in-out infinite; }
+
+    .leg-card {
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-hairline);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+      margin-bottom: var(--space-2);
+      transition: all 0.2s ease;
+    }
+    .leg-card:hover { border-color: var(--color-hairline-strong); }
+
+    .hint { font-size: 12px; color: var(--color-text-muted); margin-top: var(--space-2); }
+    .demo-box { background: var(--color-surface-1); border: 1px dashed var(--color-hairline-strong); border-radius: var(--radius-lg); padding: var(--space-4); margin-top: var(--space-3); }
+
+    /* Marketing visuals */
+    .marketing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-3); }
+    .bento-panel {
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-hairline);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+    }
+    .bento-panel .label { font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; }
+    .bento-panel .val { font-family: var(--font-mono); font-size: 22px; color: var(--color-text-primary); margin-top: 4px; }
+
+    .chaos-cell {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--color-text-muted);
+      background: var(--color-surface-3);
+      padding: 2px 4px;
+      border-radius: 2px;
+    }
+
+    .mini-calc {
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-hairline);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3);
+    }
+    .mini-calc .line { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Kelly Stake Pro</h1>
+  <p class="subtitle">Preview standalone das animações propostas — abra no navegador, interaja com os botões e inputs.</p>
+
+  <!-- 1. ODDS SHIFT PULSE -->
+  <div class="section">
+    <div class="section-label">1 · Live UI — Odds Shift Hint</div>
+    <h2>Borda muda de cor sutilmente (sem flash/glow)</h2>
+    <div class="panel">
+      <div class="row">
+        <div>
+          <label class="metric-label" style="display:block; margin-bottom:6px;">Odd de referência</label>
+          <input id="odds-input" class="input-dark" value="2.10" />
+        </div>
+        <button class="btn" onclick="pulseOdds(0.15)">+0.15 (Up)</button>
+        <button class="btn" onclick="pulseOdds(-0.20)">−0.20 (Down)</button>
+        <button class="btn" onclick="pulseOdds(0.05)">+0.05</button>
+      </div>
+      <p class="hint">Clique nos botões para simular mudança de odd via API. Apenas a <b>borda</b> muda para verde (alta) ou vermelho (queda) por 400ms — sem tint de fundo nem glow.</p>
+    </div>
+  </div>
+
+  <!-- 2. PARLAY BUILD MAGNETISM -->
+  <div class="section">
+    <div class="section-label">2 · Live UI — Parlay Settle-In</div>
+    <h2>Entrada suave sem overshoot (280ms)</h2>
+    <div class="panel">
+      <div class="row">
+        <button class="btn btn-calc" onclick="addLeg()">+ Adicionar perna</button>
+        <button class="btn" onclick="clearLegs()">Limpar</button>
+      </div>
+      <div id="leg-container" style="margin-top: var(--space-3);"></div>
+      <p class="hint">Cada perna entra com fade + 6px deslocamento + scale 0.985→1 (sem bounce). Remover faz saída lateral de 8px. Use até 8 pernas.</p>
+    </div>
+  </div>
+
+  <!-- 3. FLUID PROFIT SLIDER -->
+  <div class="section">
+    <div class="section-label">3 · Live UI — Fluid Profit Slider</div>
+    <h2>Counter-balance bounce no stake</h2>
+    <div class="panel">
+      <div class="row" style="align-items:center;">
+        <div style="flex:1;">
+          <input id="stake-slider" type="range" min="0" max="100" value="25" step="1" style="width:100%; accent-color: var(--color-accent);" oninput="updateSlider()" />
+        </div>
+        <div id="payout-gauge" style="font-family: var(--font-mono); font-size: 28px; color: var(--color-value); min-width: 140px; text-align:right;">
+          R$ 0,00
+        </div>
+      </div>
+      <p class="hint">Arraste o slider. O payout "bate" com overshoot (gauge bounce) a cada mudança significativa.</p>
+    </div>
+  </div>
+
+  <!-- 4. RESULT COUNTER TICKER -->
+  <div class="section">
+    <div class="section-label">4 · Live UI — Result Value Fade</div>
+    <h2>Fade + 2px slide ao calcular (280ms)</h2>
+    <div class="panel">
+      <div class="stake-display">
+        <div class="row" style="justify-content:space-between; margin-bottom: var(--space-2);">
+          <span class="tag tag-value">VALUE</span>
+          <span style="font-size:12px; color: var(--color-text-muted);">Edge +4.2% · Kelly 8.3%→5.0%</span>
+        </div>
+        <div class="stake-value" id="odometer-stake">R$ 0,00</div>
+        <div style="font-family: var(--font-mono); font-size:12px; color: var(--color-text-muted); margin-top: var(--space-2);">
+          <span id="odometer-units">0,00u</span> · 5,0% · ideal 8,30u
+        </div>
+      </div>
+      <div class="row" style="margin-top: var(--space-3);">
+        <button class="btn btn-calc" onclick="rollOdometer()">Calcular (fade)</button>
+        <button class="btn" onclick="resetOdometer()">Reset</button>
+      </div>
+      <p class="hint">O valor inteiro desliza 2px + fade de 35%→100% em 280ms (sem rolar dígito a dígito).</p>
+    </div>
+  </div>
+
+  <!-- 5. BENTO GRID METRIC EXPANSION -->
+  <div class="section">
+    <div class="section-label">5 · Explainer — Bento Grid Metric Expansion</div>
+    <h2>Painéis popando em stagger</h2>
+    <div class="panel">
+      <button class="btn" onclick="playBento()">▶ Replay Bento Pop</button>
+      <div id="bento-grid" class="marketing-grid" style="margin-top: var(--space-3);"></div>
+      <p class="hint">Simula o breakdown de resultado: Kelly, Implied Prob, Arbitrage Margin, Edge — aparecem em sequência.</p>
+    </div>
+  </div>
+
+  <!-- 6. CLUTTER TO CLARITY -->
+  <div class="section">
+    <div class="section-label">6 · Explainer — Clutter-to-Clarity Transition</div>
+    <h2>Planilha caótica → UI limpa</h2>
+    <div class="panel">
+      <button class="btn" onclick="playClarity()">▶ Play Transition</button>
+      <div style="position:relative; height:220px; margin-top: var(--space-3); overflow:hidden; border-radius: var(--radius-lg); border: 1px solid var(--color-hairline);">
+        <!-- Chaos layer -->
+        <div id="chaos-layer" style="position:absolute; inset:0; padding: var(--space-4); display:grid; grid-template-columns: repeat(6, 1fr); gap:4px; align-content:start;">
+          <div class="chaos-cell">1X2 1.80</div><div class="chaos-cell">X 3.60</div>
+          <div class="chaos-cell">2 4.50</div><div class="chaos-cell">O/U 2.5</div>
+          <div class="chaos-cell">1.95</div><div class="chaos-cell">1.95</div>
+          <div class="chaos-cell">ρ -0.05</div><div class="chaos-cell">pO 0.54</div>
+          <div class="chaos-cell">pU 0.46</div><div class="chaos-cell">M 4.2%</div>
+          <div class="chaos-cell">kf 0.083</div><div class="chaos-cell">ka 0.050</div>
+          <div class="chaos-cell">stake?</div><div class="chaos-cell">bank 1000</div>
+          <div class="chaos-cell">frac 0.6</div><div class="chaos-cell">conf 1.0</div>
+          <div class="chaos-cell">EV +4.2%</div><div class="chaos-cell">cap 10%</div>
+          <div class="chaos-cell">floor 1%</div><div class="chaos-cell">div 1.0</div>
+          <div class="chaos-cell">sens 1.0</div><div class="chaos-cell">pp 0.52</div>
+          <div class="chaos-cell">log 0.51</div><div class="chaos-cell">shin 0.53</div>
+        </div>
+        <!-- Clean layer -->
+        <div id="clean-layer" style="position:absolute; inset:0; padding: var(--space-4); opacity:0; background: var(--color-surface-1);">
+          <div style="font-size:13px; color: var(--color-text-muted); margin-bottom: var(--space-2);">Kelly Stake Pro — Resultado</div>
+          <div class="mini-calc">
+            <div class="line"><span>Stake recomendada</span><span style="color: var(--color-value); font-family: var(--font-mono);">R$ 50,00</span></div>
+            <div class="line"><span>Unidades</span><span style="font-family: var(--font-mono);">5,00u</span></div>
+            <div class="line"><span>Edge vs mercado</span><span style="color: var(--color-value); font-family: var(--font-mono);">+4,2%</span></div>
+            <div class="line"><span>Qualidade</span><span class="tag tag-value">VALUE</span></div>
+          </div>
+        </div>
+      </div>
+      <p class="hint">Transição de blur+scale (caos) para emerge (clean UI) em ~1.8s.</p>
+    </div>
+  </div>
+
+  <!-- 7. DATA STREAM PROCESSING -->
+  <div class="section">
+    <div class="section-label">7 · Explainer — Data Stream Processing (SGP Engine)</div>
+    <h2>Conveyor de esportes → processador → saída</h2>
+    <div class="panel">
+      <button class="btn" onclick="toggleStream()" id="stream-btn">▶ Start Stream</button>
+      <svg viewBox="0 0 400 160" style="width:100%; height:160px; margin-top: var(--space-3);">
+        <defs>
+          <linearGradient id="neon-flow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="var(--color-accent)" />
+            <stop offset="50%" stop-color="var(--color-kelly)" />
+            <stop offset="100%" stop-color="var(--color-accent)" />
+          </linearGradient>
+        </defs>
+        <!-- Sources -->
+        <text x="20" y="35" font-size="20">⚽</text>
+        <text x="20" y="80" font-size="20">🎾</text>
+        <text x="20" y="125" font-size="20">🏀</text>
+        <!-- Paths -->
+        <path id="path-0" d="M 50 30 Q 200 30 340 70" stroke="url(#neon-flow)" stroke-width="2" fill="none" stroke-dasharray="8 4" opacity="0.3" />
+        <path id="path-1" d="M 50 75 Q 200 75 340 80" stroke="url(#neon-flow)" stroke-width="2" fill="none" stroke-dasharray="8 4" opacity="0.3" />
+        <path id="path-2" d="M 50 120 Q 200 120 340 90" stroke="url(#neon-flow)" stroke-width="2" fill="none" stroke-dasharray="8 4" opacity="0.3" />
+        <!-- Processor -->
+        <rect x="300" y="55" width="90" height="70" rx="8" fill="var(--color-surface-2)" stroke="var(--color-border)" />
+        <text x="345" y="85" text-anchor="middle" font-size="11" fill="var(--color-text-primary)">SGP Engine</text>
+        <text x="345" y="100" text-anchor="middle" font-size="9" fill="var(--color-text-muted)">Monte Carlo</text>
+        <text id="stream-output" x="300" y="150" font-size="13" fill="var(--color-success)" opacity="0">✓ Value Bet</text>
+      </svg>
+      <p class="hint">Linhas neon animadas (dash-flow) simulam processamento de múltiplos esportes no motor.</p>
+    </div>
+  </div>
+
+  <!-- 8. SCALING CIRCLE REVEAL -->
+  <div class="section">
+    <div class="section-label">8 · Marketing — Scaling Circle Reveal</div>
+    <h2>Círculo escalando do canto inferior</h2>
+    <div class="panel">
+      <button class="btn" onclick="playCircle()">▶ Play Reveal</button>
+      <div id="circle-container" style="position:relative; height:200px; margin-top: var(--space-3); border-radius: var(--radius-lg); border:1px solid var(--color-hairline); overflow:hidden; background: var(--color-surface-1);">
+        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color: var(--color-text-muted); font-size:13px;">
+          Tela introdutória (logo + tagline)
+        </div>
+        <div id="circle-reveal" style="position:absolute; inset:0; background: linear-gradient(135deg, var(--color-accent-soft), var(--color-surface-2)); display:flex; align-items:center; justify-content:center; clip-path: circle(0% at 100% 100%);">
+          <div style="text-align:center;">
+            <div style="font-size:24px; color: var(--color-value); font-weight:500;">Kelly Stake Pro</div>
+            <div style="font-size:13px; color: var(--color-text-secondary); margin-top:4px;">Stake sizing com ciência de Kelly</div>
+          </div>
+        </div>
+      </div>
+      <p class="hint">clip-path circle expande do canto inferior direito revelando a UI do produto.</p>
+    </div>
+  </div>
+
+  <!-- 9. MONTE CARLO WAVE -->
+  <div class="section">
+    <div class="section-label">9 · Marketing — Monte Carlo Wave Simulator</div>
+    <h2>Distribuição de probabilidade → pico afiado</h2>
+    <div class="panel">
+      <button class="btn" onclick="playWave()">▶ Play Simulation</button>
+      <canvas id="mc-canvas" width="700" height="200" style="width:100%; height:200px; margin-top: var(--space-3); background: var(--color-surface-1); border-radius: var(--radius-lg); border:1px solid var(--color-hairline);"></canvas>
+      <p class="hint">Distribuição larga (incerteza) converge para pico afiado (previsão precisa) via Monte Carlo.</p>
+    </div>
+  </div>
+
+  <script>
+    // 1. ODDS SHIFT PULSE (subtle: only border color shift)
+    function pulseOdds(delta) {
+      const input = document.getElementById('odds-input');
+      const current = parseFloat(input.value.replace(',', '.'));
+      const next = Math.max(1.01, +(current + delta).toFixed(2));
+      input.value = next.toFixed(2).replace('.', ',');
+      const cls = delta > 0 ? 'input-shifted-up' : 'input-shifted-down';
+      input.classList.remove('input-shifted-up', 'input-shifted-down');
+      void input.offsetWidth;
+      input.classList.add(cls);
+      setTimeout(() => input.classList.remove(cls), 400);
+    }
+
+    // 2. PARLAY BUILD MAGNETISM
+    let legCount = 0;
+    const MAX_LEGS = 8;
+    function addLeg() {
+      if (legCount >= MAX_LEGS) return;
+      legCount++;
+      const container = document.getElementById('leg-container');
+      const card = document.createElement('div');
+      card.className = 'leg-card leg-in';
+      card.dataset.id = legCount;
+      card.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:13px;">Perna ${legCount} · <span style="color:var(--color-text-muted); font-family:var(--font-mono);">odd ${(1.5 + legCount * 0.3).toFixed(2)}</span></span>
+        <button class="btn" style="padding:4px 8px; font-size:11px;" onclick="removeLeg(${legCount})">Remover</button>
+      </div>`;
+      container.appendChild(card);
+    }
+    function removeLeg(id) {
+      const card = document.querySelector(`[data-id="${id}"]`);
+      if (!card) return;
+      card.classList.remove('leg-in');
+      card.classList.add('leg-out');
+      setTimeout(() => card.remove(), 200);
+      legCount = Math.max(0, legCount - 1);
+    }
+    function clearLegs() {
+      const container = document.getElementById('leg-container');
+      container.innerHTML = '';
+      legCount = 0;
+    }
+
+    // 3. FLUID PROFIT SLIDER
+    let lastGauge = 0;
+    function updateSlider() {
+      const slider = document.getElementById('stake-slider');
+      const gauge = document.getElementById('payout-gauge');
+      const pct = parseInt(slider.value);
+      const payout = (pct / 100) * 1000 * 0.052; // bank 1000, kelly 5.2%
+      gauge.textContent = 'R$ ' + payout.toFixed(2).replace('.', ',');
+      if (Math.abs(pct - lastGauge) >= 3) {
+        gauge.classList.remove('animate-gauge-bounce');
+        void gauge.offsetWidth;
+        gauge.classList.add('animate-gauge-bounce');
+        lastGauge = pct;
+      }
+    }
+
+    // 4. RESULT COUNTER TICKER (subtle: whole value fades + 2px slide)
+    function rollOdometer() {
+      const targets = { stake: 50.00, units: 5.00 };
+      animateValue('odometer-stake', targets.stake, 'R$ ', 2);
+      animateValue('odometer-units', targets.units, '', 2, 'u');
+    }
+    function resetOdometer() {
+      animateValue('odometer-stake', 0, 'R$ ', 2);
+      animateValue('odometer-units', 0, '', 2, 'u');
+    }
+    function animateValue(elId, value, prefix, decimals, suffix) {
+      const el = document.getElementById(elId);
+      el.textContent = prefix + value.toFixed(decimals).replace('.', ',') + (suffix || '');
+      el.classList.remove('value-fresh');
+      void el.offsetWidth;
+      el.classList.add('value-fresh');
+    }
+
+    // 5. BENTO GRID
+    function playBento() {
+      const grid = document.getElementById('bento-grid');
+      const data = [
+        { label: 'Kelly Criterion', val: '5,0%' },
+        { label: 'Implied Prob', val: '18,9%' },
+        { label: 'Arbitrage Margin', val: '4,2%' },
+        { label: 'Edge vs Market', val: '+4,2%' },
+      ];
+      grid.innerHTML = '';
+      data.forEach((d, i) => {
+        const p = document.createElement('div');
+        p.className = 'bento-panel animate-bento-pop';
+        p.style.animationDelay = (i * 80) + 'ms';
+        p.innerHTML = `<div class="label">${d.label}</div><div class="val">${d.val}</div>`;
+        grid.appendChild(p);
+      });
+    }
+
+    // 6. CLUTTER TO CLARITY
+    let clarityPlayed = false;
+    function playClarity() {
+      const chaos = document.getElementById('chaos-layer');
+      const clean = document.getElementById('clean-layer');
+      chaos.classList.remove('animate-chaos-blur');
+      clean.classList.remove('animate-clean-emerge');
+      void chaos.offsetWidth;
+      chaos.classList.add('animate-chaos-blur');
+      setTimeout(() => {
+        clean.style.opacity = '1';
+        clean.classList.add('animate-clean-emerge');
+      }, 1000);
+    }
+
+    // 7. DATA STREAM
+    let streamOn = false;
+    let streamTimer = null;
+    function toggleStream() {
+      streamOn = !streamOn;
+      const btn = document.getElementById('stream-btn');
+      const paths = [0, 1, 2].map(i => document.getElementById('path-' + i));
+      const output = document.getElementById('stream-output');
+      if (streamOn) {
+        btn.textContent = '⏸ Stop Stream';
+        paths.forEach(p => { p.classList.add('animate-dash-flow'); p.style.opacity = '1'; });
+        streamTimer = setInterval(() => {
+          output.style.opacity = output.style.opacity === '1' ? '0.3' : '1';
+        }, 500);
+      } else {
+        btn.textContent = '▶ Start Stream';
+        paths.forEach(p => { p.classList.remove('animate-dash-flow'); p.style.opacity = '0.3'; });
+        output.style.opacity = '0';
+        clearInterval(streamTimer);
+      }
+    }
+
+    // 8. SCALING CIRCLE REVEAL
+    function playCircle() {
+      const reveal = document.getElementById('circle-reveal');
+      reveal.classList.remove('animate-circle-reveal');
+      void reveal.offsetWidth;
+      reveal.style.clipPath = 'circle(0% at 100% 100%)';
+      reveal.classList.add('animate-circle-reveal');
+    }
+
+    // 9. MONTE CARLO WAVE
+    let waveRAF = null;
+    function playWave() {
+      const canvas = document.getElementById('mc-canvas');
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height;
+      let frame = 0;
+      cancelAnimationFrame(waveRAF);
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        const sharpness = Math.min(frame / 150, 1);
+        const baseY = H * 0.75;
+        const points = [];
+        for (let i = 0; i <= 100; i++) {
+          const x = (i / 100) * W;
+          const t = i / 100;
+          const wave = Math.sin(t * Math.PI * 6 + frame * 0.05) * 15 * (1 - sharpness);
+          const peak = Math.exp(-Math.pow((t - 0.5) * 7, 2) * sharpness) * H * 0.55;
+          points.push({ x, y: baseY - wave - peak });
+        }
+        // Fill
+        ctx.beginPath();
+        ctx.moveTo(0, H);
+        points.forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.lineTo(W, H);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(76,191,149,0.12)';
+        ctx.fill();
+        // Line
+        ctx.beginPath();
+        points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+        ctx.strokeStyle = '#4CBF95';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        // Label
+        ctx.fillStyle = '#85858B';
+        ctx.font = '11px monospace';
+        ctx.fillText(sharpness < 0.5 ? 'Distribuição ampla (incerteza)' : 'Pico afiado (previsão)', 12, 20);
+        frame++;
+        if (frame < 320) waveRAF = requestAnimationFrame(draw);
+      }
+      draw();
+    }
+
+    // Init
+    playBento();
+    rollOdometer();
+    updateSlider();
+  </script>
+</body>
+</html>

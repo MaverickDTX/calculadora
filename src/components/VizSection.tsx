@@ -11,7 +11,7 @@ export function VizSection({ result }: Props) {
   if (!hasResult) return null;
 
   return (
-    <div className="space-y-4 animate-fade-in">
+    <div className="space-y-4 animate-fade-in max-w-[720px]">
       <UncertaintyBand result={result as BetResult} />
       <FairProbabilities result={result as BetResult} />
 
@@ -60,7 +60,7 @@ function FairProbabilities({ result }: { result: BetResult }) {
       <div className="space-y-2.5">
         {probabilities.map((probability, index) => {
           const selected = index === result.selectedOutcomeIndex;
-          const label = result.label === 'Props Sim/Não' ? (index === 0 ? 'Lado apostado' : 'Lado contrário') : index === 0 ? 'Resultado avaliado' : `Resultado ${index + 1}`;
+          const label = result.outcomeLabels?.[index] ?? (result.label === 'Props Sim/Não' ? (index === 0 ? 'Lado apostado' : 'Lado contrário') : index === 0 ? 'Resultado avaliado' : `Resultado ${index + 1}`);
           return (
             <div key={index} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
               <div className="min-w-0">

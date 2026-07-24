@@ -20,7 +20,7 @@ export function ResultView({ result, config, isLoading, children }: ResultViewPr
   }, [result]);
 
   return (
-    <div className="flex-1 overflow-y-auto scrollbar-thin p-5 space-y-5 md:pb-5 pb-20" style={{ overscrollBehavior: 'contain' }}>
+    <div className="flex-1 overflow-y-auto scrollbar-thin p-5 space-y-5 md:pb-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]" style={{ overscrollBehavior: 'contain' }}>
       {isLoading && <SkeletonResult />}
       {!isLoading && !result && <EmptyState />}
       {!isLoading && result && 'err' in result && <ErrorState msg={result.err} />}
@@ -85,16 +85,12 @@ export function ResultContent({ B, config }: { B: BetResult; config: Config }) {
                 <span>Porcentagem do Teto Kelly ({(config.cap * 100).toFixed(1)}%)</span>
                 <span>{Math.round((gs.pct / config.cap) * 100)}%</span>
               </div>
-              <div className="w-full h-2.5 bg-canvas rounded-full overflow-hidden border border-hairline p-0.5">
-                <div
-                  className={`h-full rounded-full transition-all duration-500 ${
-                    (gs.pct / config.cap) * 100 >= 90 ? 'bg-danger' :
-                    (gs.pct / config.cap) * 100 >= 60 ? 'bg-warn' :
-                    'bg-accent'
-                  }`}
-                  style={{ width: `${Math.min(100, (gs.pct / config.cap) * 100)}%` }}
-                />
-              </div>
+<div className="w-full h-2.5 bg-canvas rounded-full overflow-hidden border border-hairline p-0.5">
+                 <div
+                   className="h-full rounded-full transition-all duration-500 bg-accent"
+                   style={{ width: `${Math.min(100, (gs.pct / config.cap) * 100)}%` }}
+                 />
+               </div>
             </div>
           </div>
       ) : (
@@ -111,16 +107,16 @@ export function ResultContent({ B, config }: { B: BetResult; config: Config }) {
       )}
 
       {/* Metric cards — labels abreviadas, valores nowrap (§13.3), grid responsivo 2+1 (§13.7.1) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-        <MetricCard label="Prob. justa" value={B.p ? fpct(B.p) : 'multi'} />
-        <MetricCard label="Margem" value={B.M !== null ? fpct(B.M) : '—'} />
-        <MetricCard label="EV" value={`${B.ev >= 0 ? '+' : ''}${fpct(B.ev)}`} highlight={B.ev >= 0 ? 'good' : 'bad'} />
-        <MetricCard label="Odd justa" value={B.fair ? fnum(B.fair, 3) : 'multi'} />
-        <MetricCard label="Odd efetiva" value={fnum(B.yourEff, 3)} />
-      </div>
+  <div className="grid grid-cols-6 gap-2.5">
+    <MetricCard className="col-span-2" label="Prob. justa" value={B.p ? fpct(B.p) : 'multi'} />
+    <MetricCard className="col-span-2" label="Margem" value={B.M !== null ? fpct(B.M) : '—'} />
+    <MetricCard className="col-span-2" label="EV" value={`${B.ev >= 0 ? '+' : ''}${fpct(B.ev)}`} highlight={B.ev >= 0 ? 'good' : 'bad'} />
+    <MetricCard className="col-span-3" label="Odd justa" value={B.fair ? fnum(B.fair, 3) : 'multi'} />
+    <MetricCard className="col-span-3" label="Odd efetiva" value={fnum(B.yourEff, 3)} />
+  </div>
 
       {/* Secundário colapsado por default (§13.4) */}
-      <CollapsibleSection title="Decomposição" defaultOpen={false}>
+      <CollapsibleSection title="Decomposição" defaultOpen={true}>
         <div className="font-mono text-sm text-text-secondary rounded-lg p-3 border border-border"
           style={{ background: 'var(--color-surface)' }}
         >
@@ -129,7 +125,7 @@ export function ResultContent({ B, config }: { B: BetResult; config: Config }) {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Fluxo do ajuste" defaultOpen={false}>
+      <CollapsibleSection title="Fluxo do ajuste" defaultOpen={true}>
         <div className="flex flex-wrap gap-1.5">
           <FlowTag label={`fração ${fnum(config.frac, 2)}`} />
           <FlowTag label={`confiança ${fnum(flow.cf, 2)}`} type={flow.cf < 1 ? 'warn' : 'info'} />
@@ -191,10 +187,10 @@ function methodLabel(method: Config['method']): string {
   return labels[method];
 }
 
-export function MetricCard({ label, value, highlight }: { label: string; value: string; highlight?: 'good' | 'bad' | 'kelly' }) {
+export function MetricCard({ label, value, highlight, className = '' }: { label: string; value: string; highlight?: 'good' | 'bad' | 'kelly'; className?: string; }) {
   const colorClass = highlight === 'good' ? 'text-value' : highlight === 'bad' ? 'text-danger' : highlight === 'kelly' ? 'text-kelly' : 'text-text-primary';
   return (
-    <div className="metric-card">
+    <div className={`metric-card ${className}`}>
       <div className="metric-label">{label}</div>
       <div className={`metric-value whitespace-nowrap ${colorClass}`}>{value}</div>
     </div>

@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import type { MutableRefObject } from 'react';
 import { X } from 'lucide-react';
 import type { BetResult, Config } from '../types';
 import { useDialog } from '../hooks/useDialog';
@@ -26,12 +27,17 @@ export function ResultsDrawer({ result, config, isLoading, onClose }: Props) {
   const prefersReducedMotion = useRef(false);
   const sheetHeight = useRef(0);
 
-  const { dialogProps } = useDialog<HTMLDivElement>({
+  const { ref: dialogRef, dialogProps } = useDialog<HTMLDivElement>({
     open: true,
     onClose,
     enabled: true,
     labelId: TITLE_ID,
   });
+
+  const setRefs = useCallback((node: HTMLDivElement | null) => {
+    (sheetRef as unknown as MutableRefObject<HTMLDivElement | null>).current = node;
+    (dialogRef as unknown as MutableRefObject<HTMLDivElement | null>).current = node;
+  }, [dialogRef]);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -46,11 +52,16 @@ export function ResultsDrawer({ result, config, isLoading, onClose }: Props) {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  useEffect(() => {
-    if (sheetRef.current) {
-      sheetHeight.current = sheetRef.current.getBoundingClientRect().height;
-    }
-  });
+  useLayoutEffect(() => {
+    const update = () => {
+      if (sheetRef.current) {
+        sheetHeight.current = sheetRef.current.getBoundingClientRect().height;
+      }
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
   const dismissSheet = () => {
     if (prefersReducedMotion.current) { onClose(); return; }
@@ -76,7 +87,7 @@ export function ResultsDrawer({ result, config, isLoading, onClose }: Props) {
     setDragY(Math.max(0, damped));
   };
 
-  const onPointerUp = (_e: React.PointerEvent) => {
+  const onPointerUp = () => {
     if (dragStartY.current === null) { setIsDragging(false); return; }
     const elapsed = performance.now() - (dragStartTime.current || performance.now());
     const velocity = dragY / (elapsed || 1);
@@ -100,34 +111,36 @@ export function ResultsDrawer({ result, config, isLoading, onClose }: Props) {
         onClick={onClose}
         aria-hidden="true"
         style={{
-          opacity: isDragging ? Math.max(0, 1 - dragY / (sheetHeight.current || 300)) : undefined,
+          opacity: isDragging ? Math.max(0, 1 - dragY / (sheetHeight.current || 300)) : 1,
           transition: isDragging ? 'none' : 'opacity 220ms cubic-bezier(0.32, 0.72, 0, 1)',
         }}
       />
       <div
         {...dialogProps}
-        ref={sheetRef}
+        ref={setRefs}
         className="fixed bottom-0 left-0 right-0 z-50 flex flex-col rounded-t-lg border border-border pointer-events-auto"
         style={{
-          height: 'min(70dvh, 85dvh)',
+          height: 'auto',
+          maxHeight: '85dvh',
           background: 'var(--color-surface-elevated)',
           transform: mounted ? `translateY(${dragY}px)` : 'translateY(100%)',
           transition: isDragging ? 'none' : mounted ? 'transform 220ms cubic-bezier(0.32, 0.72, 0, 1)' : 'none',
         }}
       >
         <div
-          className="pt-2 pb-1 flex justify-center touch-none"
+          className="flex flex-col"
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
           style={{ touchAction: 'none' as const }}
         >
-          <div className="w-10 h-1 rounded bg-[#4B5563]" />
-        </div>
-        <div className="px-5 py-4 border-b border-border flex items-center justify-between shrink-0"
-          style={{ background: 'var(--color-surface-hover)' }}
-        >
+          <div className="pt-3 pb-1 flex justify-center">
+            <div className="w-10 h-1 rounded bg-[#4B5563]" />
+          </div>
+          <div className="px-5 py-3 border-b border-border flex items-center justify-between shrink-0"
+            style={{ background: 'var(--color-surface-hover)' }}
+          >
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded bg-accent animate-pulse-soft" />
             <span id={TITLE_ID} className="text-sm font-semibold text-text-primary">Resultado</span>
@@ -135,6 +148,7 @@ export function ResultsDrawer({ result, config, isLoading, onClose }: Props) {
           <button type="button" onClick={onClose} aria-label="Fechar resultado" className="icon-btn text-text-muted hover:text-text-primary transition-colors">
             <X size={18} aria-hidden="true" />
           </button>
+          </div>
         </div>
 
         <ResultView result={result} config={config} isLoading={isLoading}>

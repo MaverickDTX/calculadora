@@ -1,4 +1,5 @@
 import type { Config, BetResult, Sensitivity, SensitivityInfo, EvPoint, ReturnState } from '../types';
+import { outcomeLabels } from './outcome-labels';
 import {
   numDec, readPctInput, confFactor, boostOdd, binaryBet, evReturns, kellyReturns,
   normalizeReturns, devigN, devigScales, defaultScaleForLegs,
@@ -87,6 +88,7 @@ function makeBetBase(args: {
   referenceOdds?: number[] | null;
   fairProbabilities?: number[] | null;
   selectedOutcomeIndex?: number | null;
+  outcomeLabels?: string[];
   cfg: Config;
 }): BetResult {
   const cfg = args.cfg;
@@ -160,6 +162,7 @@ function makeBetBase(args: {
     referenceOdds: args.referenceOdds || null,
     fairProbabilities: args.fairProbabilities || null,
     selectedOutcomeIndex: args.selectedOutcomeIndex ?? null,
+    outcomeLabels: args.outcomeLabels,
   };
 }
 
@@ -174,6 +177,8 @@ export function calcNres(get: (id: string) => string, cfg: Config): BetResult | 
 
   const refs = [ev, ...others];
   const dv = devigN(refs, cfg.method);
+  const type = get('nres-type') || '1X2 / Moneyline';
+  const labels = outcomeLabels[type] || refs.map((_, i) => `Resultado ${i + 1}`);
 
   return makeBetBase({
     label: 'N resultados',
@@ -189,6 +194,7 @@ export function calcNres(get: (id: string) => string, cfg: Config): BetResult | 
     referenceOdds: refs,
     fairProbabilities: dv.probs,
     selectedOutcomeIndex: 0,
+    outcomeLabels: labels,
     saveable: true,
     cfg,
   });
