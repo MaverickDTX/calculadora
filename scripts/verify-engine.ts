@@ -1,7 +1,7 @@
 /**
  * Engine regression snapshots — CONTRATO.
  *
- * Estes 11 fixtures definem o comportamento esperado da engine de cálculo.
+ * Estes 12 fixtures definem o comportamento esperado da engine de cálculo.
  * Se qualquer snapshot mudar no futuro:
  *   - NÃO atualize o valor automaticamente.
  *   - Abra um PR com justificativa explícita ("mudança metodológica intencional").
@@ -69,9 +69,9 @@ function get(inputs: Record<string, string>): (id: string) => string {
 
 // ─── Fixtures ───
 
-console.log('1. NRes 3-way (2.10 / 3.40 / 3.80, your=2.00)...');
+console.log('1. NRes 3-way (2.10 / 3.40 / 3.80, your=2.00, sel=0)...');
 {
-  const inputs = { 'nres-eval': '2.10', 'nres-your': '2.00', 'nres-others': '3.40,3.80' };
+  const inputs = { 'nres-odds': '2.10,3.40,3.80', 'nres-sel': '0', 'nres-your': '2.00' };
   const result = calcNres(get(inputs), BASE_CFG);
   check('NRes 3-way', result, {
     p: 0.4650203295751494, ev: -0.06995934084970123, kfull: 0, kadj: 0,
@@ -81,7 +81,7 @@ console.log('1. NRes 3-way (2.10 / 3.40 / 3.80, your=2.00)...');
 
 console.log('2. NRes 2-way (1.85 / 1.95, your=1.80)...');
 {
-  const inputs = { 'nres-eval': '1.85', 'nres-your': '1.80', 'nres-others': '1.95' };
+  const inputs = { 'nres-odds': '1.85,1.95', 'nres-sel': '0', 'nres-your': '1.80' };
   const result = calcNres(get(inputs), BASE_CFG);
   check('NRes 2-way', result, {
     p: 0.5138911737741703, ev: -0.07499588720649353, kfull: 0, kadj: 0,
@@ -179,6 +179,16 @@ console.log('11. Asia total (cal=2.5, O/U 1.85/1.95, line=2.5, over, your=2.00).
   });
 }
 
+console.log('12. NRes 3-way sel=1 / Empate (2.50/3.30/2.80, your=2.00)...');
+{
+  const inputs = { 'nres-odds': '2.50,3.30,2.80', 'nres-sel': '1', 'nres-your': '2.00' };
+  const result = calcNres(get(inputs), BASE_CFG);
+  check('NRes 3-way sel=1', result, {
+    p: 0.2832496203, ev: -0.4335007595, kfull: 0, kadj: 0,
+    fair: 3.5304548655, confClass: 'high',
+  });
+}
+
 if (!process.exitCode) {
-  console.log('\nAll 11 snapshots match.');
+  console.log('\nAll 12 snapshots match.');
 }

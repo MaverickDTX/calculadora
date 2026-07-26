@@ -12,6 +12,9 @@ import { Select } from "../Select";
 import { NumberInput } from "../NumberInput";
 import { useMemo } from "react";
 import { outcomeLabels } from "../../lib/outcome-labels";
+import type { BetResult, Config } from "../../types";
+import { BetSidePanels } from "../BetSidePanels";
+import { fpct, fnum } from "../../lib/math";
 
 interface Props {
   values: Record<string, string>;
@@ -21,6 +24,8 @@ interface Props {
   onCalculate: () => void;
   isLoading?: boolean;
   hideCalcButton?: boolean;
+  result: BetResult | { err: string } | null;
+  config: Config;
 }
 
 export function NResultsTab({
@@ -30,57 +35,62 @@ export function NResultsTab({
   onReset,
   onCalculate,
   hideCalcButton = false,
+  result,
+  config,
 }: Props) {
-  const raw = values["nres-others"] || "";
-  const others = raw ? raw.split(",").map((s) => s.trim()) : [""];
-  const currentLabels = outcomeLabels[values["nres-type"] || "1X2 / Moneyline"];
-  const outcomeLabel = (index: number) =>
-    currentLabels?.[index] || `Resultado ${index + 1}`;
+   const oddsRaw = values["nres-odds"] || "";
+   const oddsList = oddsRaw ? oddsRaw.split(",").map((s) => s.trim()) : [""];
+   const sel = parseInt(values["nres-sel"] || "0", 10);
+   const currentLabels = outcomeLabels[values["nres-type"] || "1X2 / Moneyline"];
+   const outcomeLabel = (index: number) =>
+     currentLabels?.[index] || `Resultado ${index + 1}`;
 
-  const updateOthers = (newOthers: string[]) => {
-    newOthers = newOthers.map((s) => s.replace(/,/g, "."));
-    onChange("nres-others", newOthers.join(","));
-  };
+   const oddsNums = oddsList.map(s => Number(s.replace(",", ".")).valueOf()).filter(o => o > 1);
 
-  const addOther = () => updateOthers([...others, ""]);
-  const removeOther = (i: number) => {
-    const next = others.filter((_, idx) => idx !== i);
-    updateOthers(next.length > 0 ? next : [""]);
-  };
-  const changeOther = (i: number, v: string) => {
-    const next = [...others];
-    next[i] = v;
-    updateOthers(next);
-  };
+   const updateOdds = (newOdds: string[]) => {
+     newOdds = newOdds.map((s) => s.replace(/,/g, "."));
+     onChange("nres-odds", newOdds.join(","));
+   };
 
-  const presets = [
-    {
-      key: "nres-1x2",
-      label: "Mercado 1X2 / Moneyline",
-      desc: "Casa 2.50 · Empate 3.30 · Fora 2.80",
-    },
-    {
-      key: "nres-ou",
-      label: "Over/Under de Gols",
-      desc: "Over 1.95 · Under 1.95",
-    },
-  ];
+   const addOdd = () => updateOdds([...oddsList, ""]);
+   const removeOdd = (i: number) => {
+     const next = oddsList.filter((_, idx) => idx !== i);
+     const nextSel =
+       i < sel ? sel - 1 :
+       i === sel ? 0 :
+       sel;
+     onChange("nres-sel", String(Math.min(nextSel, Math.max(0, next.length - 1))));
+     updateOdds(next.length > 0 ? next : [""]);
+   };
+   const changeOdd = (i: number, v: string) => {
+     const next = [...oddsList];
+     next[i] = v;
+     updateOdds(next);
+   };
+   const selectSel = (i: number) => {
+     onChange("nres-sel", String(i));
+   };
 
-  const numWays =
-    values["nres-type"] === "Over/Under" ||
-    values["nres-type"] === "Ambas marcam"
-      ? 2
-      : 3;
+   const presets = [
+     {
+       key: "nres-1x2",
+       label: "Mercado 1X2 / Moneyline",
+       desc: "Casa 2.50 · Empate 3.30 · Fora 2.80",
+     },
+     {
+       key: "nres-ou",
+       label: "Over/Under de Gols",
+       desc: "Over 1.95 · Under 1.95",
+     },
+   ];
 
-  const sumProb = useMemo(() => {
-    const evalOdd = Number(values["nres-eval"]?.replace(",", ".") || 0);
-    const othersOdds = others
-      .map((o) => Number(o.replace(",", ".")).valueOf())
-      .filter((o) => o > 1);
-    if (evalOdd <= 1 || othersOdds.length === 0) return null;
-    const prob = 1 / evalOdd + othersOdds.reduce((s, o) => s + 1 / o, 0);
-    return prob;
-  }, [values["nres-eval"], others]);
+    const sumProb = useMemo(() => {
+     if (oddsNums.length < 2) return null;
+     const yourOdd = Number(values["nres-your"]?.replace(",", ".") || 0);
+     if (yourOdd <= 1) return null;
+     const prob = 1 / yourOdd + oddsNums.reduce((s, o) => s + 1 / o, 0);
+     return prob;
+   }, [values["nres-your"], oddsNums]);
 
   return (
     <div className="space-y-4 animate-fade-in">
@@ -98,13 +108,13 @@ export function NResultsTab({
             <RotateCw size={11} /> Limpar
           </button>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2">
+        <div className="flex flex-wrap gap-2">
           {presets.map((p) => (
             <button
               key={p.key}
               type="button"
               onClick={() => onLoadExample(p.key)}
-              className="border border-border bg-canvas/30 hover:border-accent hover:bg-surface-hover p-2 rounded-lg text-left transition-all flex items-start gap-2 group"
+              className="flex-1 min-w-[240px] max-w-[340px] border border-border bg-canvas/30 hover:border-accent hover:bg-surface-hover p-2 rounded-lg text-left transition-all flex items-start gap-2 group"
             >
               <div className="w-7 h-7 rounded bg-accent-soft text-accent flex items-center justify-center shrink-0 group-hover:bg-accent group-hover:text-canvas transition-colors">
                 <Sparkles size={14} />
@@ -151,51 +161,84 @@ export function NResultsTab({
               { value: "Outro", label: "Outro" },
             ]}
           />
-          <div
-            className={`grid gap-3 mt-3 ${numWays === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}
-          >
-            <div>
-              <label className="text-[10px] text-text-muted uppercase tracking-wider font-semibold block mb-1">
-                {outcomeLabel(0)}
-              </label>
-              <NumberInput
-                value={values["nres-eval"] || ""}
-                onChange={(v) => onChange("nres-eval", v)}
-                placeholder="2.50"
-                min={1.01}
-              />
-            </div>
-            {others.map((v, i) => (
-              <div key={i} className="relative">
-                <label className="text-[10px] text-text-muted uppercase tracking-wider font-semibold block mb-1">
-                  {outcomeLabel(i + 1)}
-                </label>
-                <NumberInput
-                  value={v}
-                  onChange={(v) => changeOther(i, v)}
-                  placeholder="Odd"
-                  min={1.01}
-                />
-                {others.length > 1 && (
-                  <button
-                    type="button"
-                    aria-label="Remover resultado"
-                    onClick={() => removeOther(i)}
-                    className="absolute top-5 right-1 text-text-muted hover:text-danger p-1 rounded hover:bg-danger-soft transition-colors"
-                  >
-                    <Minus size={14} />
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-          <button
-            type="button"
-            onClick={addOther}
-            className="mt-3 w-full border border-dashed border-hairline-strong hover:border-accent rounded-lg p-2.5 text-xs text-text-muted hover:text-accent transition-all flex items-center justify-center gap-1.5"
-          >
-            <Plus size={14} /> Adicionar resultado
-          </button>
+           <div
+             className="grid gap-3 mt-3"
+             role="radiogroup"
+             aria-label="Resultado avaliado"
+           >
+             {oddsList.map((v, i) => {
+               const isSelected = sel === i;
+               return (
+                 <div
+                   key={i}
+                   className={`relative rounded-lg border p-3 transition-colors ${
+                     isSelected
+                       ? "border-accent bg-accent/5"
+                       : "border-border bg-canvas/30 hover:border-hairline-strong"
+                   }`}
+                 >
+                   <label className="flex items-center gap-2 mb-2 cursor-pointer">
+                     <input
+                       type="radio"
+                       name="nres-sel"
+                       checked={isSelected}
+                       onChange={() => selectSel(i)}
+                       className="accent-accent"
+                       aria-label={`Avaliar ${outcomeLabel(i)}`}
+                     />
+                     <span
+                       className={`text-[10px] uppercase tracking-wider font-semibold ${
+                         isSelected ? "text-accent" : "text-text-muted"
+                       }`}
+                     >
+                       {outcomeLabel(i)}
+                     </span>
+                   </label>
+                   <NumberInput
+                     value={v}
+                     onChange={(val) => changeOdd(i, val)}
+                     placeholder="Odd"
+                     min={1.01}
+                   />
+                   {result && !("err" in result) &&
+                     result.fairProbabilities &&
+                     result.fairProbabilities.length === oddsList.length && (
+                       <div className="mt-1.5 flex items-center gap-2">
+                         <div className="h-0.5 flex-1 rounded bg-surface-hover overflow-hidden">
+                           <div
+                             className={`h-full rounded ${
+                               isSelected ? "bg-accent" : "bg-text-muted/50"
+                             }`}
+                             style={{ width: `${Math.max(2, result.fairProbabilities[i] * 100)}%` }}
+                           />
+                         </div>
+                         <span className="font-mono text-[10px] text-text-muted whitespace-nowrap">
+                           {fpct(result.fairProbabilities[i])} · justa{" "}
+                           {fnum(1 / result.fairProbabilities[i], 3)}
+                         </span>
+                       </div>
+                     )}
+                   {oddsList.length > 1 && (
+                     <button
+                       type="button"
+                       aria-label="Remover resultado"
+                       onClick={() => removeOdd(i)}
+                       className="absolute top-2 right-2 text-text-muted hover:text-danger p-1 rounded hover:bg-danger-soft transition-colors"
+                     >
+                       <Minus size={14} />
+                     </button>
+                   )}
+                 </div>
+               );
+             })}
+           </div>
+           <button
+             type="button"
+             onClick={addOdd}
+             className="mt-3 w-full border border-dashed border-hairline-strong hover:border-accent rounded-lg p-2.5 text-xs text-text-muted hover:text-accent transition-all flex items-center justify-center gap-1.5"
+           >
+             <Plus size={14} /> Adicionar resultado
+           </button>
           {sumProb !== null && (
             <div
               className={`mt-3 flex items-start gap-2.5 p-2.5 rounded-lg border text-xs ${
@@ -239,39 +282,43 @@ export function NResultsTab({
           )}
         </div>
 
-        {/* Card 2: Sua Aposta */}
-        <div
-          className="panel self-start"
-          style={{
-            background: "var(--color-accent-soft)",
-            border: "1px solid var(--color-accent)",
-          }}
-        >
-          <label
-            className="text-xs font-semibold mb-1.5 block"
-            style={{ color: "var(--color-accent)" }}
+        {/* Coluna direita: card da aposta + painéis laterais */}
+        <div className="space-y-4">
+          <div
+            className="panel self-start"
+            style={{
+              background: "var(--color-accent-soft)",
+              border: "1px solid var(--color-accent)",
+            }}
           >
-            Odd da sua aposta
-          </label>
-          <NumberInput
-            value={values["nres-your"] || ""}
-            onChange={(v) => onChange("nres-your", v)}
-            className="input-highlight"
-            placeholder="2.65"
-            min={1.01}
-          />
-          <p className="mt-1.5 text-[11px] text-text-muted">
-            Casa onde você vai apostar
-          </p>
-          {!hideCalcButton && (
-            <button
-              type="button"
-              onClick={onCalculate}
-              className="btn-calc w-full mt-4"
+            <label
+              className="text-xs font-semibold mb-1.5 block"
+              style={{ color: "var(--color-accent)" }}
             >
-              Calcular
-            </button>
-          )}
+              Odd da sua aposta
+            </label>
+            <NumberInput
+              value={values["nres-your"] || ""}
+              onChange={(v) => onChange("nres-your", v)}
+              className="input-highlight"
+              placeholder="2.65"
+              min={1.01}
+            />
+            <p className="mt-1.5 text-[11px] text-text-muted">
+              Casa onde você vai apostar
+            </p>
+            {!hideCalcButton && (
+              <button
+                type="button"
+                onClick={onCalculate}
+                className="btn-calc w-full mt-4"
+              >
+                Calcular
+              </button>
+            )}
+          </div>
+
+          <BetSidePanels result={result} config={config} />
         </div>
       </div>
     </div>

@@ -3,18 +3,22 @@ import { fpct, fnum } from '../lib/math';
 
 interface Props {
   result: BetResult | { err: string } | null;
+  showFairProbabilities?: boolean;
 }
 
-export function VizSection({ result }: Props) {
+export function VizSection({ result, showFairProbabilities = true }: Props) {
   const hasResult = result && !('err' in result);
-
   if (!hasResult) return null;
+
+  const B = result as BetResult;
+  const showUncertainty = !!(B.divInfo.cls && B.evBand);
+  const showFair = showFairProbabilities && !!(B.fairProbabilities && B.referenceOdds && B.fairProbabilities.length >= 2 && B.referenceOdds.length === B.fairProbabilities.length);
+  if (!showUncertainty && !showFair) return null;
 
   return (
     <div className="space-y-4 animate-fade-in max-w-[720px]">
-      <UncertaintyBand result={result as BetResult} />
-      <FairProbabilities result={result as BetResult} />
-
+      {showUncertainty && <UncertaintyBand result={B} />}
+      {showFair && <FairProbabilities result={B} />}
     </div>
   );
 }

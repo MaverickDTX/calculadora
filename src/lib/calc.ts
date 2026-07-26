@@ -68,7 +68,7 @@ function calcSensitivity(B: {
   return { factor, html, status };
 }
 
-function makeBetBase(args: {
+type MakeBetArgs = {
   label: string;
   decomp: string;
   p: number | null;
@@ -90,9 +90,21 @@ function makeBetBase(args: {
   selectedOutcomeIndex?: number | null;
   outcomeLabels?: string[];
   cfg: Config;
-}): BetResult {
+};
+
+type EvalAtOdd = {
+  yourEff: number;
+  base: { returns: ReturnState[]; ev: number; kfull: number; b: number };
+  fairVal: number | null;
+  sensInfo: SensitivityInfo;
+  cf: number;
+  divInfo: { factor: number; cls: ReturnType<typeof divergenceFactor>['cls'] };
+  kadj: number;
+};
+
+function evaluateAtOdd(args: MakeBetArgs, rawOdd: number): EvalAtOdd {
   const cfg = args.cfg;
-  const yourEff = boostOdd(args.your, cfg.boostType, cfg.boostVal);
+  const yourEff = boostOdd(rawOdd, cfg.boostType, cfg.boostVal);
 
   let base: { returns: ReturnState[]; ev: number; kfull: number; b: number };
   const pVal = args.p;
@@ -133,28 +145,41 @@ function makeBetBase(args: {
   kadj = Math.min(kadj, cfg.cap, base.kfull);
   if (base.ev < cfg.edgemin) kadj = 0;
 
+  return { yourEff, base, fairVal, sensInfo, cf, divInfo: { factor: divInfo.factor, cls: divInfo.cls }, kadj };
+}
+
+function makeBetBase(args: MakeBetArgs): BetResult {
+  const main = evaluateAtOdd(args, args.your);
+
+  const step = tick(args.your);
+  const oddLadder = [0, 1, 2, 3].map(i => {
+    const odd = Number((args.your + i * step).toFixed(3));
+    const r = evaluateAtOdd(args, odd);
+    return { odd, ev: r.base.ev, kadj: r.kadj };
+  });
+
   return {
     label: args.label,
     decomp: args.decomp,
-    p: pVal,
-    fair: fairVal,
+    p: args.p,
+    fair: main.fairVal,
     your: args.your,
-    yourEff,
-    boosted: yourEff !== args.your,
+    yourEff: main.yourEff,
+    boosted: main.yourEff !== args.your,
     M: args.M ?? null,
     fb: args.fb ?? false,
     confClass: args.confClass,
     confTxt: args.confTxt,
     sens: args.sens || null,
-    sensInfo,
-    divInfo: { factor: divInfo.factor, cls: divInfo.cls },
+    sensInfo: main.sensInfo,
+    divInfo: main.divInfo,
     saveable: args.saveable ?? false,
-    returns: base.returns,
-    ev: base.ev,
-    kfull: base.kfull,
-    kadj,
-    b: base.b,
-    cfg,
+    returns: main.base.returns,
+    ev: main.base.ev,
+    kfull: main.base.kfull,
+    kadj: main.kadj,
+    b: main.base.b,
+    cfg: args.cfg,
     marginLabel: args.marginLabel || null,
     warnings: args.warnings || [],
     evBand: args.evBand || null,
@@ -163,37 +188,41 @@ function makeBetBase(args: {
     fairProbabilities: args.fairProbabilities || null,
     selectedOutcomeIndex: args.selectedOutcomeIndex ?? null,
     outcomeLabels: args.outcomeLabels,
+    oddLadder,
   };
 }
 
 export function calcNres(get: (id: string) => string, cfg: Config): BetResult | { err: string } {
-  const ev = numDec(get('nres-eval'));
+  const oddsRaw = get('nres-odds');
+  const refs = oddsRaw ? oddsRaw.split(',').map(s => numDec(s.trim())).filter(o => o > 1) : [];
   const your = numDec(get('nres-your'));
-  const othersRaw = get('nres-others');
-  const others = othersRaw ? othersRaw.split(',').map(s => numDec(s.trim())).filter(o => o > 1) : [];
+  const selRaw = parseInt(get('nres-sel') || '0', 10);
+  const sel = Number.isFinite(selRaw) && selRaw >= 0 && selRaw < refs.length ? selRaw : 0;
 
-  if (!(ev > 1 && your > 1)) return { err: 'Preencha o resultado 1 e a sua odd (>1).' };
-  if (others.length < 1) return { err: 'Adicione ao menos uma odd dos demais resultados.' };
+  if (refs.length < 2) return { err: 'Preencha ao menos duas odds do mercado.' };
+  if (!(your > 1)) return { err: 'Preencha a sua odd (>1).' };
 
-  const refs = [ev, ...others];
   const dv = devigN(refs, cfg.method);
   const type = get('nres-type') || '1X2 / Moneyline';
-  const labels = outcomeLabels[type] || refs.map((_, i) => `Resultado ${i + 1}`);
+  const mapped = outcomeLabels[type];
+  const labels = mapped?.length === refs.length ? mapped : undefined;
+
+  const refEval = refs[sel];
 
   return makeBetBase({
     label: 'N resultados',
-    decomp: `${get('nres-name') || 'Mercado'} · ${refs.length} vias · lado avaliado ${ev.toFixed(3).replace('.', ',')}`,
-    p: dv.p,
-    fair: 1 / dv.p,
+    decomp: `${get('nres-name') || 'Mercado'} · ${refs.length} vias · lado avaliado ${labels?.[sel] ?? `#${sel + 1}`} ${refEval.toFixed(3).replace('.', ',')}`,
+    p: dv.probs[sel],
+    fair: 1 / dv.probs[sel],
     your,
     M: dv.M,
     fb: dv.fb,
     confClass: 'high',
     confTxt: `Alta confiança — de-vig real de mercado completo com ${refs.length} vias.`,
-    sens: { type: 'nres', refEval: ev, refs, method: cfg.method },
+    sens: { type: 'nres', refEval, refs, method: cfg.method },
     referenceOdds: refs,
     fairProbabilities: dv.probs,
-    selectedOutcomeIndex: 0,
+    selectedOutcomeIndex: sel,
     outcomeLabels: labels,
     saveable: true,
     cfg,

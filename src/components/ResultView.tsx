@@ -99,10 +99,19 @@ export function ResultContent({ B, config }: { B: BetResult; config: Config }) {
             <span className="tag tag-info">{qual.pill}</span>
             <span className="text-xs text-text-muted text-right">{qual.desc}</span>
           </div>
-          <div className="t-title text-text-secondary">{B.ev <= 0 ? 'Sem valor / travado' : B.ev < config.edgemin ? 'Abaixo do edge mínimo' : 'Filtros travaram stake'}</div>
-          <p className="text-xs text-text-muted mt-2">
-            {B.ev <= 0 ? `EV de ${fpct(B.ev)}. Kelly cheio é zero.` : `Edge ${fpct(B.ev)} < mínimo ${fpct(config.edgemin)}`}
-          </p>
+          <div className="t-title text-text-secondary">{
+            B.ev <= 0 ? 'Sem valor'
+            : B.ev < config.edgemin ? 'Abaixo do edge mínimo'
+            : B.kadj <= 0 ? 'Travada por filtros'
+            : 'Stake abaixo do menor incremento'
+          }</div>
+          <p className="text-xs text-text-muted mt-2">{
+            B.ev <= 0 ? `EV de ${fpct(B.ev)}. Kelly cheio é zero.`
+            : B.ev < config.edgemin ? `Edge ${fpct(B.ev)} < mínimo ${fpct(config.edgemin)}`
+            : B.kadj <= 0
+              ? `Confiança ${fnum(flow.cf, 2)}, sensibilidade ${fnum(flow.sf, 2)}, divergência ${fnum(flow.df, 2)} zeraram a stake.`
+            : `R$ ${fnum(gs.rawUnits * config.unit, 2)} ficaria abaixo de 0,25u (R$ ${fnum(0.25 * config.unit, 2)}). Aumente a unidade, a fração de Kelly, ou aceite não apostar.`
+          }</p>
         </div>
       )}
 

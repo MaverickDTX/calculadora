@@ -63,6 +63,7 @@ export interface BetResult {
   fairProbabilities?: number[] | null;
   selectedOutcomeIndex?: number | null;
   outcomeLabels?: string[];
+  oddLadder?: { odd: number; ev: number; kadj: number }[];
 }
 
 export interface ReturnState {
