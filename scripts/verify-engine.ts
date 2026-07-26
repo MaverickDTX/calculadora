@@ -189,6 +189,17 @@ console.log('12. NRes 3-way sel=1 / Empate (2.50/3.30/2.80, your=2.00)...');
   });
 }
 
+console.log('13. NRes invalid market (2.50/3.30, your=3.50)...');
+{
+  const inputs = { 'nres-odds': '2.50,3.30', 'nres-sel': '0', 'nres-your': '3.50' };
+  const result = calcNres(get(inputs), BASE_CFG);
+  check('NRes invalid market', result, {
+    confClass: 'low',
+  });
+  assert('err' in result === false, 'NRes invalid market: should not be err');
+  assert(result.warnings.length === 1, `NRes invalid market: expected 1 warning, got ${result.warnings.length}`);
+}
+
 if (!process.exitCode) {
-  console.log('\nAll 12 snapshots match.');
+  console.log('\nAll 13 snapshots match.');
 }

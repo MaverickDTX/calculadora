@@ -10,7 +10,6 @@ import {
 import { HelpTip } from "../HelpTip";
 import { Select } from "../Select";
 import { NumberInput } from "../NumberInput";
-import { useMemo } from "react";
 import { outcomeLabels } from "../../lib/outcome-labels";
 import type { BetResult, Config } from "../../types";
 import { BetSidePanels } from "../BetSidePanels";
@@ -45,12 +44,10 @@ export function NResultsTab({
    const outcomeLabel = (index: number) =>
      currentLabels?.[index] || `Resultado ${index + 1}`;
 
-   const oddsNums = oddsList.map(s => Number(s.replace(",", ".")).valueOf()).filter(o => o > 1);
-
-   const updateOdds = (newOdds: string[]) => {
-     newOdds = newOdds.map((s) => s.replace(/,/g, "."));
-     onChange("nres-odds", newOdds.join(","));
-   };
+const updateOdds = (newOdds: string[]) => {
+      newOdds = newOdds.map((s) => s.replace(/,/g, "."));
+      onChange("nres-odds", newOdds.join(","));
+    };
 
    const addOdd = () => updateOdds([...oddsList, ""]);
    const removeOdd = (i: number) => {
@@ -84,13 +81,7 @@ export function NResultsTab({
      },
    ];
 
-    const sumProb = useMemo(() => {
-     if (oddsNums.length < 2) return null;
-     const yourOdd = Number(values["nres-your"]?.replace(",", ".") || 0);
-     if (yourOdd <= 1) return null;
-     const prob = 1 / yourOdd + oddsNums.reduce((s, o) => s + 1 / o, 0);
-     return prob;
-   }, [values["nres-your"], oddsNums]);
+    const marketMargin = result && !('err' in result) ? result.M : null;
 
   return (
     <div className="space-y-4 animate-fade-in">
@@ -239,47 +230,53 @@ export function NResultsTab({
            >
              <Plus size={14} /> Adicionar resultado
            </button>
-          {sumProb !== null && (
-            <div
-              className={`mt-3 flex items-start gap-2.5 p-2.5 rounded-lg border text-xs ${
-                sumProb > 1.2
-                  ? "border-danger/30 bg-danger/10 text-danger"
-                  : sumProb > 1.1
-                    ? "border-warn/30 bg-warn/10 text-warn"
-                    : sumProb < 1.0
-                      ? "border-accent/25 bg-accent/10 text-accent"
-                      : "border-hairline bg-canvas text-text-secondary"
-              }`}
-            >
-              {sumProb > 1.1 ? (
-                <AlertTriangle size={16} className="shrink-0 mt-0.5" />
-              ) : sumProb < 1.0 ? (
-                <TrendingUp size={16} className="shrink-0 mt-0.5" />
-              ) : (
-                <CheckCircle2 size={16} className="shrink-0 mt-0.5" />
-              )}
-              <div>
-                <div className="font-semibold">
-                  {sumProb > 1.2
-                    ? `Erro de Linha: Overround Extremo (${((sumProb - 1) * 100).toFixed(1)}%)`
-                    : sumProb > 1.1
-                      ? `Margem de Casa Salgada (${((sumProb - 1) * 100).toFixed(1)}%)`
-                      : sumProb < 1.0
-                        ? `Margem Negativa / Arbitragem (${((sumProb - 1) * 100).toFixed(1)}%)`
-                        : `Mercado Saudável (Overround: ${((sumProb - 1) * 100).toFixed(1)}%)`}
-                </div>
-                <div className="text-text-secondary mt-0.5">
-                  {sumProb > 1.2
-                    ? "A soma das probabilidades deste mercado é excessivamente alta. Verifique se digitou as odds corretamente."
-                    : sumProb > 1.1
-                      ? "O overround de mercado está alto. O de-vig funcionará, mas odds com altas margens reduzem o valor matemático sugerido."
-                      : sumProb < 1.0
-                        ? "As odds criam uma soma de probabilidades inferior a 100%. Odds fantásticas ou oportunidade clara de arbitragem."
-                        : "Parâmetros normais de de-vig"}
+            {marketMargin !== null && (
+              <div
+                className={`mt-3 flex items-start gap-2.5 p-2.5 rounded-lg border text-xs ${
+                  marketMargin > 0.2
+                    ? "border-danger/30 bg-danger/10 text-danger"
+                    : marketMargin > 0.1
+                      ? "border-warn/30 bg-warn/10 text-warn"
+                      : marketMargin >= 0
+                        ? "border-hairline bg-canvas text-text-secondary"
+                        : marketMargin >= -0.05
+                          ? "border-accent/25 bg-accent/10 text-accent"
+                          : "border-danger/30 bg-danger/10 text-danger"
+                }`}
+              >
+                {(marketMargin > 0.1 || marketMargin < -0.05) ? (
+                  <AlertTriangle size={16} className="shrink-0 mt-0.5" />
+                ) : marketMargin < 0 ? (
+                  <TrendingUp size={16} className="shrink-0 mt-0.5" />
+                ) : (
+                  <CheckCircle2 size={16} className="shrink-0 mt-0.5" />
+                )}
+                <div>
+                  <div className="font-semibold">
+                    {marketMargin > 0.2
+                      ? `Erro de Linha: Overround Extremo (+${(marketMargin * 100).toFixed(1)}%)`
+                      : marketMargin > 0.1
+                        ? `Margem de Casa Salgada (+${(marketMargin * 100).toFixed(1)}%)`
+                        : marketMargin >= 0
+                          ? `Mercado Saudável (Overround: +${(marketMargin * 100).toFixed(1)}%)`
+                          : marketMargin >= -0.05
+                            ? `Margem Negativa / Arbitragem (${(marketMargin * 100).toFixed(1)}%)`
+                            : `Erro de Linha: as odds não formam um mercado completo (${(marketMargin * 100).toFixed(1)}%)`}
+                  </div>
+                  <div className="text-text-secondary mt-0.5">
+                    {marketMargin > 0.2
+                      ? "A soma das probabilidades deste mercado é excessivamente alta. Verifique se digitou as odds corretamente."
+                      : marketMargin > 0.1
+                        ? "O overround de mercado está alto. O de-vig funcionará, mas odds com altas margens reduzem o valor matemático sugerido."
+                        : marketMargin >= 0
+                          ? "Parâmetros normais de de-vig"
+                          : marketMargin >= -0.05
+                            ? "As odds criam uma soma de probabilidades inferior a 100%. Pode ser arbitragem real entre duas vias."
+                            : `A soma das probabilidades é de ${fpct(1 + marketMargin)}. Faltam vias, ou as odds são de mercados diferentes. Verifique antes de apostar.`}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
 
         {/* Coluna direita: card da aposta + painéis laterais */}

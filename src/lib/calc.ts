@@ -3,7 +3,7 @@ import { outcomeLabels } from './outcome-labels';
 import {
   numDec, readPctInput, confFactor, boostOdd, binaryBet, evReturns, kellyReturns,
   normalizeReturns, devigN, devigScales, defaultScaleForLegs,
-  divergenceFactor, tick,
+  divergenceFactor, tick, fpct,
   scoreMatrix, fitLambdas, solveTheta,
   splitAsianLine, settleTotal, settleHandicap, diffDistribution,
   probTotalOver, fitLambdaTotal, cornerLambdaEff, poisTotalProb, cornerSideProb,
@@ -209,6 +209,12 @@ export function calcNres(get: (id: string) => string, cfg: Config): BetResult | 
 
   const refEval = refs[sel];
 
+  const S = refs.reduce((a, o) => a + 1 / o, 0);
+  const implausible = S < 0.95 || S > 1.20;
+  const warnings: string[] = implausible
+    ? [`As odds somam ${fpct(S)}. Verifique se são do mesmo mercado.`]
+    : [];
+
   return makeBetBase({
     label: 'N resultados',
     decomp: `${get('nres-name') || 'Mercado'} · ${refs.length} vias · lado avaliado ${labels?.[sel] ?? `#${sel + 1}`} ${refEval.toFixed(3).replace('.', ',')}`,
@@ -217,9 +223,12 @@ export function calcNres(get: (id: string) => string, cfg: Config): BetResult | 
     your,
     M: dv.M,
     fb: dv.fb,
-    confClass: 'high',
-    confTxt: `Alta confiança — de-vig real de mercado completo com ${refs.length} vias.`,
+    confClass: implausible ? 'low' : 'high',
+    confTxt: implausible
+      ? `Baixa confiança — as odds somam ${fpct(S)}. Não descrevem um mercado completo.`
+      : `Alta confiança — de-vig real de mercado completo com ${refs.length} vias.`,
     sens: { type: 'nres', refEval, refs, method: cfg.method },
+    warnings,
     referenceOdds: refs,
     fairProbabilities: dv.probs,
     selectedOutcomeIndex: sel,
